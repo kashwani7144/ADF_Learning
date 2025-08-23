@@ -20,6 +20,36 @@
 				}
 			}
 		],
+		"parameters": {
+			"p_src_schema": {
+				"type": "string",
+				"defaultValue": "VIVID"
+			},
+			"p_src_table": {
+				"type": "string",
+				"defaultValue": "BLOB_CUSTOMER_RAW"
+			},
+			"p_stg_schema": {
+				"type": "string",
+				"defaultValue": "DWH"
+			},
+			"p_stg_table": {
+				"type": "string",
+				"defaultValue": "STG_CUSTOMER_DETAILS"
+			},
+			"p_dim_schema": {
+				"type": "string",
+				"defaultValue": "DWH"
+			},
+			"p_dim_table": {
+				"type": "string",
+				"defaultValue": "DIM_CUSTOMER_DETAILS"
+			},
+			"p_file_table_id": {
+				"type": "int",
+				"defaultValue": 1001
+			}
+		},
 		"variables": {
 			"StartTime": {
 				"type": "String"
