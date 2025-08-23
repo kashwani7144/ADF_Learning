@@ -196,7 +196,7 @@
 						"type": "DataFlowReference",
 						"parameters": {
 							"df_sqlQuery": {
-								"value": "@string(variables('SqlQuery'))",
+								"value": "@'SELECT * FROM VIVID.BLOB_CUSTOMER_RAW'",
 								"type": "Expression"
 							}
 						},
