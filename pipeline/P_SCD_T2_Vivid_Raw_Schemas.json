@@ -193,7 +193,19 @@
 				"typeProperties": {
 					"dataflow": {
 						"referenceName": "DF_LoadStage_WithHash",
-						"type": "DataFlowReference"
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"VivivdRawTable": {
+								"Src_Schema_Name": {
+									"value": "@pipeline().parameters.p_src_schema",
+									"type": "Expression"
+								},
+								"Src_Table_Name": {
+									"value": "@pipeline().parameters.p_src_table",
+									"type": "Expression"
+								}
+							}
+						}
 					},
 					"compute": {
 						"coreCount": 8,
