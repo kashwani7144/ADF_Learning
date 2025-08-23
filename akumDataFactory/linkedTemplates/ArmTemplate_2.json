@@ -1752,7 +1752,7 @@
 						"     allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     query: (toString($df_sqlQuery)),",
+						"     query: ($df_sqlQuery),",
 						"     format: 'query') ~> VivivdRawTable",
 						"VivivdRawTable derive(HASH_DIFF = unhex(\r",
 						"  md5(\r",
