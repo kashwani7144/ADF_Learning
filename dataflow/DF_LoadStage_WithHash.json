@@ -12,8 +12,20 @@
 					"name": "VivivdRawTable"
 				}
 			],
-			"sinks": [],
-			"transformations": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_DWH_STG",
+						"type": "DatasetReference"
+					},
+					"name": "StgCustomerDetails"
+				}
+			],
+			"transformations": [
+				{
+					"name": "addHashDiffColumn"
+				}
+			],
 			"scriptLines": [
 				"parameters{",
 				"     df_sqlQuery as string",
@@ -37,7 +49,32 @@
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     query: (toString($df_sqlQuery)),",
-				"     format: 'query') ~> VivivdRawTable"
+				"     format: 'query') ~> VivivdRawTable",
+				"VivivdRawTable derive(HASH_DIFF = md5(\r",
+				"  concat(\r",
+				"    toString(upper(trim(FIRST_NAME))), '|',\r",
+				"    toString(upper(trim(LAST_NAME))),  '|',\r",
+				"    toString(trim(COMPANY)),           '|',\r",
+				"    toString(upper(trim(CITY))),       '|',\r",
+				"    toString(upper(trim(COUNTRY))),    '|',\r",
+				"    toString(replace(PHONE_1,' ','')), '|',\r",
+				"    toString(replace(PHONE_2,' ','')), '|',\r",
+				"    toString(lower(trim(EMAIL))),      '|',\r",
+				"    toString(trim(SUBSCRIPTION_DATE)), '|',\r",
+				"    toString(trim(WEBSITE))\r",
+				"  )\r",
+				")\r",
+				") ~> addHashDiffColumn",
+				"addHashDiffColumn sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> StgCustomerDetails"
 			]
 		}
 	}

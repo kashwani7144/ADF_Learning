@@ -1,0 +1,30 @@
+{
+	"name": "DS_DWH_STG",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_Azure_SB_Lkp",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"Stg_Schema_Name": {
+				"type": "String"
+			},
+			"Stg_Table_Name": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().Stg_Schema_Name",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().Stg_Table_Name",
+				"type": "Expression"
+			}
+		}
+	}
+}
