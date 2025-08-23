@@ -115,6 +115,15 @@
 			},
 			"PreviousWatermark": {
 				"type": "String"
+			},
+			"RowsInserted": {
+				"type": "Integer"
+			},
+			"RowsExpired": {
+				"type": "Integer"
+			},
+			"RowsDeleted": {
+				"type": "Integer"
 			}
 		},
 		"folder": {
