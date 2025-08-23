@@ -1,9 +1,17 @@
 {
-	"name": "DS_VIVID_CUSTOMER",
+	"name": "DS_VIVID_RAW_TABLES",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "LS_SB_SCD",
 			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"Src_Schema_Name": {
+				"type": "String"
+			},
+			"Src_Table_Name": {
+				"type": "String"
+			}
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
@@ -64,8 +72,14 @@
 			}
 		],
 		"typeProperties": {
-			"schema": "VIVID",
-			"table": "BLOB_CUSTOMER_RAW"
+			"schema": {
+				"value": "@dataset().Src_Schema_Name",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().Src_Table_Name",
+				"type": "Expression"
+			}
 		}
 	},
 	"type": "Microsoft.DataFactory/factories/datasets"
