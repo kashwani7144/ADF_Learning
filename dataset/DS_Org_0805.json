@@ -2,16 +2,12 @@
 	"name": "DS_Org_0805",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "LS_SB_Tgt_VIVID",
+			"referenceName": "LS__SB_ADVW",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
-		"schema": [],
-		"typeProperties": {
-			"schema": "VIVID",
-			"table": "BLOB_ORGANIZATION_RAW"
-		}
+		"schema": []
 	},
 	"type": "Microsoft.DataFactory/factories/datasets"
 }

@@ -2,16 +2,12 @@
 	"name": "DS_PhonePe_Trans_Raw",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "LS_SB_Tgt_VIVID",
+			"referenceName": "LS__SB_ADVW",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
-		"schema": [],
-		"typeProperties": {
-			"schema": "VIVID",
-			"table": "PHONEPE_TRANS_RAW"
-		}
+		"schema": []
 	},
 	"type": "Microsoft.DataFactory/factories/datasets"
 }

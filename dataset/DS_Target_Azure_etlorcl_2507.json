@@ -2,7 +2,7 @@
 	"name": "DS_Target_Azure_etlorcl_2507",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "LS_SB_Tgt_VIVID",
+			"referenceName": "LS_Azure_tgt_etl_orcl",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
