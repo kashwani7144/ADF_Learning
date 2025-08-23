@@ -1,0 +1,48 @@
+{
+	"name": "DS_DWH_DIM_SRC_KEYS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_SB_SCD",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "SRC_KEYS_SID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "DIM_TAB_SCHEMA_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DIM_TABLE_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "INDEX_NUM",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "BUSSINESS_ID_COL_NM",
+				"type": "nvarchar"
+			},
+			{
+				"name": "BUSSINESS_ID",
+				"type": "nvarchar"
+			},
+			{
+				"name": "INSERT_TSTMP_IST",
+				"type": "datetime2",
+				"scale": 7
+			}
+		],
+		"typeProperties": {
+			"schema": "DWH",
+			"table": "DIM_SRC_KEYS"
+		}
+	}
+}
