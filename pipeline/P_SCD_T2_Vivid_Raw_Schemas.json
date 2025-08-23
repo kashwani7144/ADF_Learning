@@ -108,7 +108,7 @@
 							"typeProperties": {
 								"variableName": "SqlQuery",
 								"value": {
-									"value": "@concat(\n  'SELECT * FROM ', pipeline().parameters.p_src_schema, '.', pipeline().parameters.p_src_table,\n  ' WHERE SRC_ROW_INSRT_TSTMP > CAST(''', \n  formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss'), \n  ''' AS DATETIME2)'\n)",
+									"value": "@concat(\r\n  'SELECT * FROM ',\r\n  pipeline().parameters.p_src_schema, '.', pipeline().parameters.p_src_table,\r\n  ' WHERE SRC_ROW_INSRT_TSTMP > CAST(''', \r\n  formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss'),\r\n  ''' AS DATETIME2)'\r\n)",
 									"type": "Expression"
 								}
 							}
