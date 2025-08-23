@@ -1158,6 +1158,59 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_DWH_DIM_SRC_KEYS')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_SB_SCD",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "SRC_KEYS_SID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DIM_TAB_SCHEMA_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DIM_TABLE_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "INDEX_NUM",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "BUSSINESS_ID_COL_NM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "BUSSINESS_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "INSERT_TSTMP_IST",
+						"type": "datetime2",
+						"scale": 7
+					}
+				],
+				"typeProperties": {
+					"schema": "DWH",
+					"table": "DIM_SRC_KEYS"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_SB_SCD')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_DWH_SB')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1271,42 +1324,38 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DS_Leads_0805')]",
+			"name": "[concat(parameters('factoryName'), '/DS_DWH_STG')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "LS__SB_ADVW",
+					"referenceName": "LS_Azure_SB_Lkp",
 					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Stg_Schema_Name": {
+						"type": "String"
+					},
+					"Stg_Table_Name": {
+						"type": "String"
+					}
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
 				"schema": [],
 				"typeProperties": {
-					"schema": "VIVID",
-					"table": "BLOB_LEAD_RAW"
+					"schema": {
+						"value": "@dataset().Stg_Schema_Name",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().Stg_Table_Name",
+						"type": "Expression"
+					}
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS__SB_ADVW')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_Org_0805')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS__SB_ADVW",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS__SB_ADVW')]"
+				"[concat(variables('factoryId'), '/linkedServices/LS_Azure_SB_Lkp')]"
 			]
 		}
 	]
