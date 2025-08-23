@@ -112,6 +112,9 @@
 		"variables": {
 			"StartTime": {
 				"type": "String"
+			},
+			"PreviousWatermark": {
+				"type": "String"
 			}
 		},
 		"folder": {
