@@ -2,7 +2,7 @@
 	"name": "DS_DWH_SB",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "LS_SB_Tgt_VIVID",
+			"referenceName": "LS_Azure_SB_Lkp",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
@@ -99,11 +99,7 @@
 				"type": "datetime2",
 				"scale": 7
 			}
-		],
-		"typeProperties": {
-			"schema": "DWH",
-			"table": "DIM_CUSTOMER_DETAILS"
-		}
+		]
 	},
 	"type": "Microsoft.DataFactory/factories/datasets"
 }
