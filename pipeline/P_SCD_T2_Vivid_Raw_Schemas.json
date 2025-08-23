@@ -342,6 +342,10 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
+						"preCopyScript": {
+							"value": "TRUNCATE TABLE DWH.SRC_KEYS_CUSTOMER;",
+							"type": "Expression"
+						},
 						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false
 					},
