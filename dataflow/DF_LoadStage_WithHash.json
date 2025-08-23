@@ -13,11 +13,7 @@
 				}
 			],
 			"sinks": [],
-			"transformations": [
-				{
-					"name": "filter1"
-				}
-			],
+			"transformations": [],
 			"scriptLines": [
 				"source(output(",
 				"          INDEX_NUM as integer,",
@@ -37,8 +33,7 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> VivivdRawTable",
-				"VivivdRawTable filter(ERROR_FUNCTION('')) ~> filter1"
+				"     format: 'table') ~> VivivdRawTable"
 			]
 		}
 	}
