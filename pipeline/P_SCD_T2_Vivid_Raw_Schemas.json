@@ -196,7 +196,7 @@
 						"type": "DataFlowReference",
 						"parameters": {
 							"df_sqlQuery": {
-								"value": "@variables('SqlQuery')",
+								"value": "@string(variables('SqlQuery'))",
 								"type": "Expression"
 							}
 						},
