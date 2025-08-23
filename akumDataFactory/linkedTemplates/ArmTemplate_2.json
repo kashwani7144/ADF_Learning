@@ -2796,7 +2796,7 @@
 								"type": "DataFlowReference",
 								"parameters": {
 									"df_sqlQuery": {
-										"value": "@variables('SqlQuery')",
+										"value": "'@{SELECT * FROM pipeline().parameters.p_src_schema.pipeline().parameters.p_src_table}'",
 										"type": "Expression"
 									}
 								},
@@ -2821,7 +2821,8 @@
 											"type": "Expression"
 										}
 									}
-								}
+								},
+								"linkedServiceParameters": {}
 							},
 							"staging": {},
 							"compute": {
