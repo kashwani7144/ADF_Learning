@@ -476,6 +476,30 @@
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
 				}
+			},
+			{
+				"name": "SetRowsDeletedCounts",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "SQL_MarkDeletes",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "RowsDeleted",
+					"value": {
+						"value": "@int(activity('SQL_MarkDeletes').output.resultSets[0].rows[0].RowsDeleted)",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
