@@ -5781,6 +5781,159 @@
 								"type": "Expression"
 							}
 						}
+					},
+					{
+						"name": "GetWatermarkValue",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "SetStartTime",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat(\n  'SELECT WATERMARK_VALUE,WATERMARK_ID FROM dbo.WATERMARK_TRACKER ',\n  'WHERE SOURCE_TABLE_NAME = ''', pipeline().parameters.p_src_table, ''' ',\n  'AND PIPELINE_NAME = ''', pipeline().Pipeline, ''' ',\n  'AND ROW_STS_CD = ''A'''\n)",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DS_Watermark_Tracker",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "SetPreviousWatermark",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetWatermarkValue",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "PreviousWatermark",
+							"value": {
+								"value": "@if(\n  or(empty(activity('GetWatermarkValue').output.firstRow), empty(activity('GetWatermarkValue').output.firstRow.WATERMARK_VALUE)),\n  '',\n  formatDateTime(activity('GetWatermarkValue').output.firstRow.WATERMARK_VALUE, 'yyyy-MM-dd HH:mm:ss.fffffff')\n)",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "IsFirstRun",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "SetPreviousWatermark",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@empty(variables('PreviousWatermark'))",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "SqlQuery_After_1_run",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "SqlQuery",
+										"value": {
+											"value": "@concat(\n  'SELECT * FROM ', pipeline().parameters.p_src_schema, '.', pipeline().parameters.p_src_table,\n  ' WHERE SRC_ROW_INSRT_TSTMP > CAST(''', \n  formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss'), \n  ''' AS DATETIME2)'\n)",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "SqlQuery_1_run",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "SqlQuery",
+										"value": {
+											"value": "@concat(\n  'SELECT * FROM ',\n pipeline().parameters.p_src_schema, '.', pipeline().parameters.p_src_table\n)",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "TruncStageTable",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "IsFirstRun",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "LS_Azure_SB_Lkp",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "@concat(\n  'TRUNCATE TABLE [',\n  pipeline().parameters.p_stg_schema, '].[', \n  pipeline().parameters.p_stg_table, '];'\n)",
+										"type": "Expression"
+									}
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
 					}
 				],
 				"policy": {
@@ -5819,6 +5972,24 @@
 				"variables": {
 					"StartTime": {
 						"type": "String"
+					},
+					"PreviousWatermark": {
+						"type": "String"
+					},
+					"RowsInserted": {
+						"type": "Integer",
+						"defaultValue": 0
+					},
+					"RowsExpired": {
+						"type": "Integer",
+						"defaultValue": 0
+					},
+					"RowsDeleted": {
+						"type": "Integer",
+						"defaultValue": 0
+					},
+					"SqlQuery": {
+						"type": "String"
 					}
 				},
 				"folder": {
@@ -5826,7 +5997,10 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_Watermark_Tracker')]",
+				"[concat(variables('factoryId'), '/linkedServices/LS_Azure_SB_Lkp')]"
+			]
 		}
 	]
 }
