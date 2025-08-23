@@ -571,14 +571,14 @@
 					"storedProcedureParameters": {
 						"FILE_TABLE_ID": {
 							"value": {
-								"value": "@item().SSDTM_ID",
+								"value": "@pipeline().parameters.p_file_table_id",
 								"type": "Expression"
 							},
 							"type": "Int32"
 						},
 						"SOURCE_TABLE_NAME": {
 							"value": {
-								"value": "@item().SRC_TBL_NAME",
+								"value": "@pipeline().parameters.p_src_table",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -630,7 +630,7 @@
 				"typeProperties": {
 					"variableName": "MaxWatermark",
 					"value": {
-						"value": "@if(\r\n  empty(activity('GetMaxModifiedDate').output.firstRow.MAX_MODIFIED_DATE),\r\n  formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss.fffffff'),\r\n  formatDateTime(activity('GetMaxModifiedDate').output.firstRow.MAX_MODIFIED_DATE, 'yyyy-MM-dd HH:mm:ss.fffffff')\r\n)",
+						"value": "@if(\n  empty(activity('GetMaxModifiedDate').output.firstRow.MAX_MODIFIED_DATE),\n  formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss.fffffff'),\n  formatDateTime(activity('GetMaxModifiedDate').output.firstRow.MAX_MODIFIED_DATE, 'yyyy-MM-dd HH:mm:ss.fffffff')\n)",
 						"type": "Expression"
 					}
 				}
@@ -686,6 +686,9 @@
 				"defaultValue": 0
 			},
 			"SqlQuery": {
+				"type": "String"
+			},
+			"MaxWatermark": {
 				"type": "String"
 			}
 		},
