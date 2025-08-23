@@ -2,7 +2,7 @@
 	"name": "DS_Customer_RAW",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "LS_SB_Tgt_VIVID",
+			"referenceName": "LS__SB_ADVW",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
