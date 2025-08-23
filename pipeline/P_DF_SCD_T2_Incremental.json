@@ -17,7 +17,13 @@
 				"typeProperties": {
 					"dataflow": {
 						"referenceName": "DF_SCD_T2_Vivid_Scd",
-						"type": "DataFlowReference"
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"VividCustomerRaw": {
+								"Src_Schema_Name": "VIVID",
+								"Src_Table_Name": "BLOB_CUSTOMER_RAW"
+							}
+						}
 					},
 					"compute": {
 						"coreCount": 8,

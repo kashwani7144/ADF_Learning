@@ -6,7 +6,7 @@
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "DS_VIVID_RAW_TABLES",
+						"referenceName": "DS_VIVID_CUSTOMER",
 						"type": "DatasetReference"
 					},
 					"name": "VividCustomerRaw"
