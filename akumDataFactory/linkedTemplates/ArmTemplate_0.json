@@ -715,6 +715,75 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/P_SCD_T2_Vivid_Raw_Schemas')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "SetStartTime",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "StartTime",
+							"value": {
+								"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"p_src_schema": {
+						"type": "string",
+						"defaultValue": "VIVID"
+					},
+					"p_src_table": {
+						"type": "string",
+						"defaultValue": "BLOB_CUSTOMER_RAW"
+					},
+					"p_stg_schema": {
+						"type": "string",
+						"defaultValue": "DWH"
+					},
+					"p_stg_table": {
+						"type": "string",
+						"defaultValue": "STG_CUSTOMER_DETAILS"
+					},
+					"p_dim_schema": {
+						"type": "string",
+						"defaultValue": "DWH"
+					},
+					"p_dim_table": {
+						"type": "string",
+						"defaultValue": "DIM_CUSTOMER_DETAILS"
+					},
+					"p_file_table_id": {
+						"type": "int",
+						"defaultValue": 1001
+					}
+				},
+				"variables": {
+					"StartTime": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "SCDs"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/AutoResolveIntegrationRuntime')]",
 			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
 			"apiVersion": "2018-06-01",
@@ -1286,24 +1355,6 @@
 					"schema": "VIVID",
 					"table": "BLOB_LEAD_RAW"
 				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS__SB_ADVW')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_Org_0805')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS__SB_ADVW",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {}
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/LS__SB_ADVW')]"
