@@ -1,0 +1,68 @@
+{
+	"name": "DS_SRC_DIM_LKP_1807",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_Azure_SB_Lkp",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "FILE_TABLE_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SRC_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "TGT_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SRC_SCHEMA_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "TGT_SCHEMA_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SRC_TYPE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "TGT_TYPE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ROW_ADDED_BY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ROW_STS_CD",
+				"type": "nvarchar"
+			},
+			{
+				"name": "PIPLN_NM",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ROW_VERSION",
+				"type": "timestamp"
+			},
+			{
+				"name": "INSERT_TSTMP_IST",
+				"type": "datetime2",
+				"scale": 7
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "SRC_STG_DIM_TABLE_MAPPING"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,6 @@
+{
+	"name": "SHIR-OnPremise",
+	"properties": {
+		"type": "SelfHosted"
+	}
+}

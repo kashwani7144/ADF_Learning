@@ -1,0 +1,21 @@
+{
+	"name": "LS_SB_Tgt_SalesLT_M",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"server": "etlsandbox.database.windows.net",
+			"database": "ETLSANDBOX",
+			"encrypt": "mandatory",
+			"trustServerCertificate": false,
+			"authenticationType": "SQL",
+			"userName": "akum",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQDBEOEQ4QzY5LURGM0ItNEY0Ri1BMzMxLTc4QTREQTlENTNENF8yYzA2MTM0NC0wNDIyLTRlNjAtYmVlZC0wMWZiMWJkMDM1ZWMiDQp9"
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

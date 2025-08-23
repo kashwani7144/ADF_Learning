@@ -1,0 +1,31 @@
+{
+	"name": "DS_ADVW_Src_2807",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS__SB_ADVW",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"SRC_ADVW_SCHEMA_NAME": {
+				"type": "String"
+			},
+			"SRC_ADVW_TABLE_NAME": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().SRC_ADVW_SCHEMA_NAME",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().SRC_ADVW_TABLE_NAME",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

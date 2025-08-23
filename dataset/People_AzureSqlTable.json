@@ -1,0 +1,17 @@
+{
+	"name": "People_AzureSqlTable",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_SB_Tgt_VIVID",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "VIVID",
+			"table": "BLOB_PEOPLE_RAW"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

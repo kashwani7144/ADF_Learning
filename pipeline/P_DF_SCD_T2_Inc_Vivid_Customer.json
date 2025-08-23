@@ -1,0 +1,40 @@
+{
+	"name": "P_DF_SCD_T2_Inc_Vivid_Customer",
+	"properties": {
+		"activities": [
+			{
+				"name": "SCD_T2_VIVID_CUSTOMER_SCHEMA",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "DF_SCD_T2_Vivid_Customer",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine",
+					"continuationSettings": {
+						"customizedCheckpointKey": "f9b5aa35-6478-4062-b84a-15343c423c1c"
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "DataFlows"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-08-15T04:27:53Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

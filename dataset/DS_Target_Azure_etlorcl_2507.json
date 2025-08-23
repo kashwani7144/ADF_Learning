@@ -1,0 +1,31 @@
+{
+	"name": "DS_Target_Azure_etlorcl_2507",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_SB_Tgt_VIVID",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"Tgt_Schema_Name": {
+				"type": "String"
+			},
+			"Tgt_Table_Name": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().Tgt_Schema_Name",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().Tgt_Table_Name",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

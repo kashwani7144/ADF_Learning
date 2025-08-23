@@ -1,0 +1,31 @@
+{
+	"name": "DS_Azure_ETL_Oracle",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_Azure_tgt_etl_orcl",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"Azure_Tgt_Schema_Name": {
+				"type": "String"
+			},
+			"Azure_Tgt_Table_name": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().Azure_Tgt_Schema_Name",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().Azure_Tgt_Table_name",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

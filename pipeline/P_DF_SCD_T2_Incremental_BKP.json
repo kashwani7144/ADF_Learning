@@ -1,0 +1,37 @@
+{
+	"name": "P_DF_SCD_T2_Incremental_BKP",
+	"properties": {
+		"activities": [
+			{
+				"name": "SCD_T2_VIVID_SCHEMA",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "DF_SCD_T2_Vivid_Scd",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "DataFlows"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-08-14T03:03:29Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

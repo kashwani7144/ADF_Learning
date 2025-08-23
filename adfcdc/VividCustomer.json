@@ -1,0 +1,562 @@
+{
+	"name": "VividCustomer",
+	"properties": {
+		"folder": {
+			"name": "VIVID_Schema"
+		},
+		"SourceConnectionsInfo": [
+			{
+				"SourceEntities": [
+					{
+						"name": "VIVID.BLOB_CUSTOMER_RAW",
+						"properties": {
+							"schema": [
+								{
+									"name": "INDEX_NUM",
+									"dataType": "integer"
+								},
+								{
+									"name": "CUSTOMER_ID",
+									"dataType": "string"
+								},
+								{
+									"name": "FIRST_NAME",
+									"dataType": "string"
+								},
+								{
+									"name": "LAST_NAME",
+									"dataType": "string"
+								},
+								{
+									"name": "COMPANY",
+									"dataType": "string"
+								},
+								{
+									"name": "CITY",
+									"dataType": "string"
+								},
+								{
+									"name": "COUNTRY",
+									"dataType": "string"
+								},
+								{
+									"name": "PHONE_1",
+									"dataType": "string"
+								},
+								{
+									"name": "PHONE_2",
+									"dataType": "string"
+								},
+								{
+									"name": "EMAIL",
+									"dataType": "string"
+								},
+								{
+									"name": "SUBSCRIPTION_DATE",
+									"dataType": "string"
+								},
+								{
+									"name": "WEBSITE",
+									"dataType": "string"
+								}
+							],
+							"dslConnectorProperties": [
+								{
+									"name": "schemaName",
+									"value": "VIVID"
+								},
+								{
+									"name": "tableName",
+									"value": "BLOB_CUSTOMER_RAW"
+								},
+								{
+									"name": "enableNativeCdc",
+									"value": true
+								},
+								{
+									"name": "netChanges",
+									"value": true
+								},
+								{
+									"name": "allowSchemaDrift",
+									"value": false
+								},
+								{
+									"name": "inferDriftedColumnTypes",
+									"value": false
+								}
+							]
+						}
+					}
+				],
+				"Connection": {
+					"linkedService": {
+						"referenceName": "LS_SB_Tgt_VIVID",
+						"type": "LinkedServiceReference"
+					},
+					"linkedServiceType": "AzureSqlDatabase",
+					"type": "linkedservicetype",
+					"isInlineDataset": true,
+					"commonDslConnectorProperties": [
+						{
+							"name": "allowSchemaDrift",
+							"value": true
+						},
+						{
+							"name": "inferDriftedColumnTypes",
+							"value": true
+						},
+						{
+							"name": "format",
+							"value": "table"
+						},
+						{
+							"name": "store",
+							"value": "sqlserver"
+						},
+						{
+							"name": "databaseType",
+							"value": "databaseType"
+						},
+						{
+							"name": "database",
+							"value": "database"
+						},
+						{
+							"name": "skipInitialLoad",
+							"value": true
+						}
+					]
+				}
+			}
+		],
+		"TargetConnectionsInfo": [
+			{
+				"TargetEntities": [
+					{
+						"name": "VIVID.BLOB_CUSTOMER_RAW_CDC",
+						"properties": {
+							"schema": [
+								{
+									"name": "INDEX_NUM",
+									"dataType": "integer"
+								},
+								{
+									"name": "CUSTOMER_ID",
+									"dataType": "string"
+								},
+								{
+									"name": "FIRST_NAME",
+									"dataType": "string"
+								},
+								{
+									"name": "LAST_NAME",
+									"dataType": "string"
+								},
+								{
+									"name": "COMPANY",
+									"dataType": "string"
+								},
+								{
+									"name": "CITY",
+									"dataType": "string"
+								},
+								{
+									"name": "COUNTRY",
+									"dataType": "string"
+								},
+								{
+									"name": "PHONE_1",
+									"dataType": "string"
+								},
+								{
+									"name": "PHONE_2",
+									"dataType": "string"
+								},
+								{
+									"name": "EMAIL",
+									"dataType": "string"
+								},
+								{
+									"name": "SUBSCRIPTION_DATE",
+									"dataType": "string"
+								},
+								{
+									"name": "WEBSITE",
+									"dataType": "string"
+								}
+							],
+							"dslConnectorProperties": [
+								{
+									"name": "schemaName",
+									"value": "VIVID"
+								},
+								{
+									"name": "tableName",
+									"value": "BLOB_CUSTOMER_RAW_CDC"
+								},
+								{
+									"name": "allowSchemaDrift",
+									"value": false
+								},
+								{
+									"name": "inferDriftedColumnTypes",
+									"value": false
+								},
+								{
+									"name": "keys",
+									"value": [
+										"CITY",
+										"COMPANY",
+										"COUNTRY",
+										"CUSTOMER_ID",
+										"EMAIL",
+										"FIRST_NAME",
+										"INDEX_NUM",
+										"LAST_NAME",
+										"PHONE_1",
+										"PHONE_2",
+										"SUBSCRIPTION_DATE",
+										"WEBSITE"
+									]
+								},
+								{
+									"name": "deletable",
+									"value": true
+								},
+								{
+									"name": "updateable",
+									"value": true
+								},
+								{
+									"name": "upsertable",
+									"value": true
+								},
+								{
+									"name": "defaultToUpsert",
+									"value": true
+								}
+							]
+						}
+					},
+					{
+						"name": "VIVID.BLOB_CUSTOMER_RAW",
+						"properties": {
+							"schema": [
+								{
+									"name": "INDEX_NUM",
+									"dataType": "integer"
+								},
+								{
+									"name": "CUSTOMER_ID",
+									"dataType": "string"
+								},
+								{
+									"name": "FIRST_NAME",
+									"dataType": "string"
+								},
+								{
+									"name": "LAST_NAME",
+									"dataType": "string"
+								},
+								{
+									"name": "COMPANY",
+									"dataType": "string"
+								},
+								{
+									"name": "CITY",
+									"dataType": "string"
+								},
+								{
+									"name": "COUNTRY",
+									"dataType": "string"
+								},
+								{
+									"name": "PHONE_1",
+									"dataType": "string"
+								},
+								{
+									"name": "PHONE_2",
+									"dataType": "string"
+								},
+								{
+									"name": "EMAIL",
+									"dataType": "string"
+								},
+								{
+									"name": "SUBSCRIPTION_DATE",
+									"dataType": "string"
+								},
+								{
+									"name": "WEBSITE",
+									"dataType": "string"
+								}
+							],
+							"dslConnectorProperties": [
+								{
+									"name": "schemaName",
+									"value": "VIVID"
+								},
+								{
+									"name": "tableName",
+									"value": "BLOB_CUSTOMER_RAW"
+								},
+								{
+									"name": "allowSchemaDrift",
+									"value": false
+								},
+								{
+									"name": "inferDriftedColumnTypes",
+									"value": false
+								},
+								{
+									"name": "defaultToUpsert",
+									"value": false
+								}
+							]
+						}
+					}
+				],
+				"Connection": {
+					"linkedService": {
+						"referenceName": "LS_Tgt_Vivid_0805",
+						"type": "LinkedServiceReference"
+					},
+					"linkedServiceType": "AzureSqlDatabase",
+					"type": "linkedservicetype",
+					"isInlineDataset": true,
+					"commonDslConnectorProperties": [
+						{
+							"name": "allowSchemaDrift",
+							"value": true
+						},
+						{
+							"name": "inferDriftedColumnTypes",
+							"value": true
+						},
+						{
+							"name": "format",
+							"value": "table"
+						},
+						{
+							"name": "store",
+							"value": "sqlserver"
+						},
+						{
+							"name": "databaseType",
+							"value": "databaseType"
+						},
+						{
+							"name": "database",
+							"value": "database"
+						},
+						{
+							"name": "deletable",
+							"value": false
+						},
+						{
+							"name": "insertable",
+							"value": true
+						},
+						{
+							"name": "updateable",
+							"value": false
+						},
+						{
+							"name": "upsertable",
+							"value": false
+						},
+						{
+							"name": "skipDuplicateMapInputs",
+							"value": true
+						},
+						{
+							"name": "skipDuplicateMapOutputs",
+							"value": true
+						}
+					]
+				},
+				"DataMapperMappings": [
+					{
+						"targetEntityName": "VIVID.BLOB_CUSTOMER_RAW_CDC",
+						"sourceEntityName": "VIVID.BLOB_CUSTOMER_RAW",
+						"sourceConnectionReference": {
+							"connectionName": "LS_SB_Tgt_VIVID",
+							"type": "linkedservicetype"
+						},
+						"attributeMappingInfo": {
+							"attributeMappings": [
+								{
+									"name": "CITY",
+									"type": "Direct",
+									"functionName": "",
+									"attributeReference": {
+										"name": "CITY",
+										"entity": "VIVID.BLOB_CUSTOMER_RAW",
+										"entityConnectionReference": {
+											"connectionName": "LS_SB_Tgt_VIVID",
+											"type": "linkedservicetype"
+										}
+									}
+								},
+								{
+									"name": "COMPANY",
+									"type": "Direct",
+									"functionName": "",
+									"attributeReference": {
+										"name": "COMPANY",
+										"entity": "VIVID.BLOB_CUSTOMER_RAW",
+										"entityConnectionReference": {
+											"connectionName": "LS_SB_Tgt_VIVID",
+											"type": "linkedservicetype"
+										}
+									}
+								},
+								{
+									"name": "COUNTRY",
+									"type": "Direct",
+									"functionName": "",
+									"attributeReference": {
+										"name": "COUNTRY",
+										"entity": "VIVID.BLOB_CUSTOMER_RAW",
+										"entityConnectionReference": {
+											"connectionName": "LS_SB_Tgt_VIVID",
+											"type": "linkedservicetype"
+										}
+									}
+								},
+								{
+									"name": "CUSTOMER_ID",
+									"type": "Direct",
+									"functionName": "",
+									"attributeReference": {
+										"name": "CUSTOMER_ID",
+										"entity": "VIVID.BLOB_CUSTOMER_RAW",
+										"entityConnectionReference": {
+											"connectionName": "LS_SB_Tgt_VIVID",
+											"type": "linkedservicetype"
+										}
+									}
+								},
+								{
+									"name": "EMAIL",
+									"type": "Direct",
+									"functionName": "",
+									"attributeReference": {
+										"name": "EMAIL",
+										"entity": "VIVID.BLOB_CUSTOMER_RAW",
+										"entityConnectionReference": {
+											"connectionName": "LS_SB_Tgt_VIVID",
+											"type": "linkedservicetype"
+										}
+									}
+								},
+								{
+									"name": "FIRST_NAME",
+									"type": "Direct",
+									"functionName": "",
+									"attributeReference": {
+										"name": "FIRST_NAME",
+										"entity": "VIVID.BLOB_CUSTOMER_RAW",
+										"entityConnectionReference": {
+											"connectionName": "LS_SB_Tgt_VIVID",
+											"type": "linkedservicetype"
+										}
+									}
+								},
+								{
+									"name": "INDEX_NUM",
+									"type": "Direct",
+									"functionName": "",
+									"attributeReference": {
+										"name": "INDEX_NUM",
+										"entity": "VIVID.BLOB_CUSTOMER_RAW",
+										"entityConnectionReference": {
+											"connectionName": "LS_SB_Tgt_VIVID",
+											"type": "linkedservicetype"
+										}
+									}
+								},
+								{
+									"name": "LAST_NAME",
+									"type": "Direct",
+									"functionName": "",
+									"attributeReference": {
+										"name": "LAST_NAME",
+										"entity": "VIVID.BLOB_CUSTOMER_RAW",
+										"entityConnectionReference": {
+											"connectionName": "LS_SB_Tgt_VIVID",
+											"type": "linkedservicetype"
+										}
+									}
+								},
+								{
+									"name": "PHONE_1",
+									"type": "Direct",
+									"functionName": "",
+									"attributeReference": {
+										"name": "PHONE_1",
+										"entity": "VIVID.BLOB_CUSTOMER_RAW",
+										"entityConnectionReference": {
+											"connectionName": "LS_SB_Tgt_VIVID",
+											"type": "linkedservicetype"
+										}
+									}
+								},
+								{
+									"name": "PHONE_2",
+									"type": "Direct",
+									"functionName": "",
+									"attributeReference": {
+										"name": "PHONE_2",
+										"entity": "VIVID.BLOB_CUSTOMER_RAW",
+										"entityConnectionReference": {
+											"connectionName": "LS_SB_Tgt_VIVID",
+											"type": "linkedservicetype"
+										}
+									}
+								},
+								{
+									"name": "SUBSCRIPTION_DATE",
+									"type": "Direct",
+									"functionName": "",
+									"attributeReference": {
+										"name": "SUBSCRIPTION_DATE",
+										"entity": "VIVID.BLOB_CUSTOMER_RAW",
+										"entityConnectionReference": {
+											"connectionName": "LS_SB_Tgt_VIVID",
+											"type": "linkedservicetype"
+										}
+									}
+								},
+								{
+									"name": "WEBSITE",
+									"type": "Direct",
+									"functionName": "",
+									"attributeReference": {
+										"name": "WEBSITE",
+										"entity": "VIVID.BLOB_CUSTOMER_RAW",
+										"entityConnectionReference": {
+											"connectionName": "LS_SB_Tgt_VIVID",
+											"type": "linkedservicetype"
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"Relationships": []
+			}
+		],
+		"Policy": {
+			"recurrence": {
+				"frequency": "Minute",
+				"interval": 15
+			},
+			"mode": "Microbatch"
+		},
+		"allowVNetOverride": true,
+		"id": "b07f4e3f84fe48afb35a2747534bf002"
+	}
+}

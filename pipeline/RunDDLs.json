@@ -1,0 +1,75 @@
+{
+	"name": "RunDDLs",
+	"properties": {
+		"description": "It runs DDLs",
+		"activities": [
+			{
+				"name": "DropTables",
+				"description": "Drop Tables if exists",
+				"type": "Script",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "LS_Run_DDLs_Azure_2507",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "DROP TABLE IF EXISTS HR_JOB_HISTORY;\r\nDROP TABLE IF EXISTS HR_EMPLOYEES;\r\nDROP TABLE IF EXISTS HR_DEPARTMENTS;\r\nDROP TABLE IF EXISTS HR_LOCATIONS;\r\nDROP TABLE IF EXISTS HR_COUNTRIES;\r\nDROP TABLE IF EXISTS HR_REGIONS;\r\nDROP TABLE IF EXISTS HR_JOBS;"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			},
+			{
+				"name": "CreateTables",
+				"description": "Create Tables etl-oracle database in azure",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "DropTables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "LS_Run_DDLs_Azure_2507",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "CREATE TABLE HR_JOBS (\r\n  JOB_ID NVARCHAR(100),\r\n  JOB_TITLE NVARCHAR(35) NOT NULL,\r\n  MIN_SALARY FLOAT,\r\n  MAX_SALARY FLOAT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (JOB_ID)\r\n);\r\n\r\nCREATE TABLE HR_REGIONS (\r\n  REGION_ID NVARCHAR(100) NOT NULL,\r\n  REGION_NAME NVARCHAR(25),\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (REGION_ID)\r\n);\r\n\r\nCREATE TABLE HR_COUNTRIES (\r\n  COUNTRY_ID NVARCHAR(100) NOT NULL,\r\n  COUNTRY_NAME NVARCHAR(40),\r\n  REGION_ID FLOAT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (COUNTRY_ID)\r\n);\r\n\r\nCREATE TABLE HR_LOCATIONS (\r\n  LOCATION_ID NVARCHAR(100),\r\n  STREET_ADDRESS NVARCHAR(40),\r\n  POSTAL_CODE NVARCHAR(12),\r\n  CITY NVARCHAR(30) NOT NULL,\r\n  STATE_PROVINCE NVARCHAR(25),\r\n  COUNTRY_ID CHAR(2),\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (LOCATION_ID)\r\n);\r\n\r\nCREATE TABLE HR_DEPARTMENTS (\r\n  DEPARTMENT_ID NVARCHAR(100),\r\n  DEPARTMENT_NAME NVARCHAR(30) NOT NULL,\r\n  MANAGER_ID INT,\r\n  LOCATION_ID INT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (DEPARTMENT_ID)\r\n);\r\n\r\nCREATE TABLE HR_EMPLOYEES (\r\n  EMPLOYEE_ID NVARCHAR(100),\r\n  FIRST_NAME NVARCHAR(20),\r\n  LAST_NAME NVARCHAR(25) NOT NULL,\r\n  EMAIL NVARCHAR(25) NOT NULL,\r\n  PHONE_NUMBER NVARCHAR(20),\r\n  HIRE_DATE DATETIME NOT NULL,\r\n  JOB_ID NVARCHAR(10) NOT NULL,\r\n  SALARY DECIMAL(8,2),\r\n  COMMISSION_PCT DECIMAL(2,2),\r\n  MANAGER_ID INT,\r\n  DEPARTMENT_ID INT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (EMPLOYEE_ID),\r\n  UNIQUE (EMAIL),\r\n  CHECK (salary > 0)\r\n);\r\n\r\nCREATE TABLE HR_JOB_HISTORY (\r\n  EMPLOYEE_ID NVARCHAR(100) NOT NULL,\r\n  START_DATE DATETIME NOT NULL,\r\n  END_DATE DATETIME NOT NULL,\r\n  JOB_ID NVARCHAR(10) NOT NULL,\r\n  DEPARTMENT_ID INT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (EMPLOYEE_ID, START_DATE),\r\n  CHECK (end_date > start_date)\r\n);"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			}
+		],
+		"folder": {
+			"name": "DDLs"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-08-14T03:03:28Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

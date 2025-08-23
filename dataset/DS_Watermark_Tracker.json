@@ -1,0 +1,17 @@
+{
+	"name": "DS_Watermark_Tracker",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_Azure_SB_Lkp",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "WATERMARK_TRACKER"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

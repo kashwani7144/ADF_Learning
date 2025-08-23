@@ -1,0 +1,17 @@
+{
+	"name": "DS_Leads_0805",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_SB_Tgt_VIVID",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "VIVID",
+			"table": "BLOB_LEAD_RAW"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
