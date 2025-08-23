@@ -1,0 +1,1313 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "akumDataFactory"
+		},
+		"LS_AZURE_ORACLE_2507_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_AZURE_ORACLE_2507'"
+		},
+		"LS_Azure_SB_Lkp_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_Azure_SB_Lkp'"
+		},
+		"LS_Azure_tgt_etl_orcl_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_Azure_tgt_etl_orcl'"
+		},
+		"LS_LOG_MIGRATION_EVENT_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_LOG_MIGRATION_EVENT'"
+		},
+		"LS_Run_DDLs_Azure_2507_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_Run_DDLs_Azure_2507'"
+		},
+		"LS_SB_SCD_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_SB_SCD'"
+		},
+		"LS_SB_Tgt_SalesLT_M_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_SB_Tgt_SalesLT_M'"
+		},
+		"LS__SB_ADVW_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS__SB_ADVW'"
+		},
+		"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "etl-oracle.database.windows.net"
+		},
+		"LS_AZURE_ORACLE_2507_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "etl-oracle"
+		},
+		"LS_AZURE_ORACLE_2507_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "akum"
+		},
+		"LS_Azure_SB_Lkp_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "svetlsandbox.database.windows.net"
+		},
+		"LS_Azure_SB_Lkp_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "ETLSANDBOX"
+		},
+		"LS_Azure_SB_Lkp_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "akum"
+		},
+		"LS_Azure_tgt_etl_orcl_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "svetlsandbox.database.windows.net"
+		},
+		"LS_Azure_tgt_etl_orcl_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "ETLSANDBOX"
+		},
+		"LS_Azure_tgt_etl_orcl_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "akum"
+		},
+		"LS_LOG_MIGRATION_EVENT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "svetlsandbox.database.windows.net"
+		},
+		"LS_LOG_MIGRATION_EVENT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "ETLSANDBOX"
+		},
+		"LS_LOG_MIGRATION_EVENT_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "akum"
+		},
+		"LS_Run_DDLs_Azure_2507_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "svetlsandbox.database.windows.net"
+		},
+		"LS_Run_DDLs_Azure_2507_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "etlsandbox"
+		},
+		"LS_Run_DDLs_Azure_2507_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "akum"
+		},
+		"LS_SB_SCD_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "svetlsandbox.database.windows.net"
+		},
+		"LS_SB_SCD_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "ETLSANDBOX"
+		},
+		"LS_SB_SCD_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "akum"
+		},
+		"LS_SB_Tgt_SalesLT_M_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "etlsandbox.database.windows.net"
+		},
+		"LS_SB_Tgt_SalesLT_M_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "ETLSANDBOX"
+		},
+		"LS_SB_Tgt_SalesLT_M_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "akum"
+		},
+		"LS__SB_ADVW_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "svetlsandbox.database.windows.net"
+		},
+		"LS__SB_ADVW_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "ETLSANDBOX"
+		},
+		"LS__SB_ADVW_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "akum"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/SHIR-OnPremise')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/VividCustomer')]",
+			"type": "Microsoft.DataFactory/factories/adfcdcs",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "VIVID_Schema"
+				},
+				"SourceConnectionsInfo": [
+					{
+						"SourceEntities": [
+							{
+								"name": "VIVID.BLOB_CUSTOMER_RAW",
+								"properties": {
+									"schema": [
+										{
+											"name": "INDEX_NUM",
+											"dataType": "integer"
+										},
+										{
+											"name": "CUSTOMER_ID",
+											"dataType": "string"
+										},
+										{
+											"name": "FIRST_NAME",
+											"dataType": "string"
+										},
+										{
+											"name": "LAST_NAME",
+											"dataType": "string"
+										},
+										{
+											"name": "COMPANY",
+											"dataType": "string"
+										},
+										{
+											"name": "CITY",
+											"dataType": "string"
+										},
+										{
+											"name": "COUNTRY",
+											"dataType": "string"
+										},
+										{
+											"name": "PHONE_1",
+											"dataType": "string"
+										},
+										{
+											"name": "PHONE_2",
+											"dataType": "string"
+										},
+										{
+											"name": "EMAIL",
+											"dataType": "string"
+										},
+										{
+											"name": "SUBSCRIPTION_DATE",
+											"dataType": "string"
+										},
+										{
+											"name": "WEBSITE",
+											"dataType": "string"
+										}
+									],
+									"dslConnectorProperties": [
+										{
+											"name": "schemaName",
+											"value": "VIVID"
+										},
+										{
+											"name": "tableName",
+											"value": "BLOB_CUSTOMER_RAW"
+										},
+										{
+											"name": "enableNativeCdc",
+											"value": true
+										},
+										{
+											"name": "netChanges",
+											"value": true
+										},
+										{
+											"name": "allowSchemaDrift",
+											"value": false
+										},
+										{
+											"name": "inferDriftedColumnTypes",
+											"value": false
+										}
+									]
+								}
+							}
+						],
+						"Connection": {
+							"linkedServiceType": "AzureSqlDatabase",
+							"type": "linkedservicetype",
+							"isInlineDataset": true,
+							"commonDslConnectorProperties": [
+								{
+									"name": "allowSchemaDrift",
+									"value": true
+								},
+								{
+									"name": "inferDriftedColumnTypes",
+									"value": true
+								},
+								{
+									"name": "format",
+									"value": "table"
+								},
+								{
+									"name": "store",
+									"value": "sqlserver"
+								},
+								{
+									"name": "databaseType",
+									"value": "databaseType"
+								},
+								{
+									"name": "database",
+									"value": "database"
+								},
+								{
+									"name": "skipInitialLoad",
+									"value": true
+								}
+							]
+						}
+					}
+				],
+				"TargetConnectionsInfo": [
+					{
+						"TargetEntities": [
+							{
+								"name": "VIVID.BLOB_CUSTOMER_RAW_CDC",
+								"properties": {
+									"schema": [
+										{
+											"name": "INDEX_NUM",
+											"dataType": "integer"
+										},
+										{
+											"name": "CUSTOMER_ID",
+											"dataType": "string"
+										},
+										{
+											"name": "FIRST_NAME",
+											"dataType": "string"
+										},
+										{
+											"name": "LAST_NAME",
+											"dataType": "string"
+										},
+										{
+											"name": "COMPANY",
+											"dataType": "string"
+										},
+										{
+											"name": "CITY",
+											"dataType": "string"
+										},
+										{
+											"name": "COUNTRY",
+											"dataType": "string"
+										},
+										{
+											"name": "PHONE_1",
+											"dataType": "string"
+										},
+										{
+											"name": "PHONE_2",
+											"dataType": "string"
+										},
+										{
+											"name": "EMAIL",
+											"dataType": "string"
+										},
+										{
+											"name": "SUBSCRIPTION_DATE",
+											"dataType": "string"
+										},
+										{
+											"name": "WEBSITE",
+											"dataType": "string"
+										}
+									],
+									"dslConnectorProperties": [
+										{
+											"name": "schemaName",
+											"value": "VIVID"
+										},
+										{
+											"name": "tableName",
+											"value": "BLOB_CUSTOMER_RAW_CDC"
+										},
+										{
+											"name": "allowSchemaDrift",
+											"value": false
+										},
+										{
+											"name": "inferDriftedColumnTypes",
+											"value": false
+										},
+										{
+											"name": "keys",
+											"value": [
+												"CITY",
+												"COMPANY",
+												"COUNTRY",
+												"CUSTOMER_ID",
+												"EMAIL",
+												"FIRST_NAME",
+												"INDEX_NUM",
+												"LAST_NAME",
+												"PHONE_1",
+												"PHONE_2",
+												"SUBSCRIPTION_DATE",
+												"WEBSITE"
+											]
+										},
+										{
+											"name": "deletable",
+											"value": true
+										},
+										{
+											"name": "updateable",
+											"value": true
+										},
+										{
+											"name": "upsertable",
+											"value": true
+										},
+										{
+											"name": "defaultToUpsert",
+											"value": true
+										}
+									]
+								}
+							},
+							{
+								"name": "VIVID.BLOB_CUSTOMER_RAW",
+								"properties": {
+									"schema": [
+										{
+											"name": "INDEX_NUM",
+											"dataType": "integer"
+										},
+										{
+											"name": "CUSTOMER_ID",
+											"dataType": "string"
+										},
+										{
+											"name": "FIRST_NAME",
+											"dataType": "string"
+										},
+										{
+											"name": "LAST_NAME",
+											"dataType": "string"
+										},
+										{
+											"name": "COMPANY",
+											"dataType": "string"
+										},
+										{
+											"name": "CITY",
+											"dataType": "string"
+										},
+										{
+											"name": "COUNTRY",
+											"dataType": "string"
+										},
+										{
+											"name": "PHONE_1",
+											"dataType": "string"
+										},
+										{
+											"name": "PHONE_2",
+											"dataType": "string"
+										},
+										{
+											"name": "EMAIL",
+											"dataType": "string"
+										},
+										{
+											"name": "SUBSCRIPTION_DATE",
+											"dataType": "string"
+										},
+										{
+											"name": "WEBSITE",
+											"dataType": "string"
+										}
+									],
+									"dslConnectorProperties": [
+										{
+											"name": "schemaName",
+											"value": "VIVID"
+										},
+										{
+											"name": "tableName",
+											"value": "BLOB_CUSTOMER_RAW"
+										},
+										{
+											"name": "allowSchemaDrift",
+											"value": false
+										},
+										{
+											"name": "inferDriftedColumnTypes",
+											"value": false
+										},
+										{
+											"name": "defaultToUpsert",
+											"value": false
+										}
+									]
+								}
+							}
+						],
+						"Connection": {
+							"linkedServiceType": "AzureSqlDatabase",
+							"type": "linkedservicetype",
+							"isInlineDataset": true,
+							"commonDslConnectorProperties": [
+								{
+									"name": "allowSchemaDrift",
+									"value": true
+								},
+								{
+									"name": "inferDriftedColumnTypes",
+									"value": true
+								},
+								{
+									"name": "format",
+									"value": "table"
+								},
+								{
+									"name": "store",
+									"value": "sqlserver"
+								},
+								{
+									"name": "databaseType",
+									"value": "databaseType"
+								},
+								{
+									"name": "database",
+									"value": "database"
+								},
+								{
+									"name": "deletable",
+									"value": false
+								},
+								{
+									"name": "insertable",
+									"value": true
+								},
+								{
+									"name": "updateable",
+									"value": false
+								},
+								{
+									"name": "upsertable",
+									"value": false
+								},
+								{
+									"name": "skipDuplicateMapInputs",
+									"value": true
+								},
+								{
+									"name": "skipDuplicateMapOutputs",
+									"value": true
+								}
+							]
+						},
+						"DataMapperMappings": [
+							{
+								"targetEntityName": "VIVID.BLOB_CUSTOMER_RAW_CDC",
+								"sourceEntityName": "VIVID.BLOB_CUSTOMER_RAW",
+								"sourceConnectionReference": {
+									"connectionName": "LS_SB_Tgt_VIVID",
+									"type": "linkedservicetype"
+								},
+								"attributeMappingInfo": {
+									"attributeMappings": [
+										{
+											"name": "CITY",
+											"type": "Direct",
+											"functionName": "",
+											"attributeReference": {
+												"name": "CITY",
+												"entity": "VIVID.BLOB_CUSTOMER_RAW",
+												"entityConnectionReference": {
+													"connectionName": "LS_SB_Tgt_VIVID",
+													"type": "linkedservicetype"
+												}
+											}
+										},
+										{
+											"name": "COMPANY",
+											"type": "Direct",
+											"functionName": "",
+											"attributeReference": {
+												"name": "COMPANY",
+												"entity": "VIVID.BLOB_CUSTOMER_RAW",
+												"entityConnectionReference": {
+													"connectionName": "LS_SB_Tgt_VIVID",
+													"type": "linkedservicetype"
+												}
+											}
+										},
+										{
+											"name": "COUNTRY",
+											"type": "Direct",
+											"functionName": "",
+											"attributeReference": {
+												"name": "COUNTRY",
+												"entity": "VIVID.BLOB_CUSTOMER_RAW",
+												"entityConnectionReference": {
+													"connectionName": "LS_SB_Tgt_VIVID",
+													"type": "linkedservicetype"
+												}
+											}
+										},
+										{
+											"name": "CUSTOMER_ID",
+											"type": "Direct",
+											"functionName": "",
+											"attributeReference": {
+												"name": "CUSTOMER_ID",
+												"entity": "VIVID.BLOB_CUSTOMER_RAW",
+												"entityConnectionReference": {
+													"connectionName": "LS_SB_Tgt_VIVID",
+													"type": "linkedservicetype"
+												}
+											}
+										},
+										{
+											"name": "EMAIL",
+											"type": "Direct",
+											"functionName": "",
+											"attributeReference": {
+												"name": "EMAIL",
+												"entity": "VIVID.BLOB_CUSTOMER_RAW",
+												"entityConnectionReference": {
+													"connectionName": "LS_SB_Tgt_VIVID",
+													"type": "linkedservicetype"
+												}
+											}
+										},
+										{
+											"name": "FIRST_NAME",
+											"type": "Direct",
+											"functionName": "",
+											"attributeReference": {
+												"name": "FIRST_NAME",
+												"entity": "VIVID.BLOB_CUSTOMER_RAW",
+												"entityConnectionReference": {
+													"connectionName": "LS_SB_Tgt_VIVID",
+													"type": "linkedservicetype"
+												}
+											}
+										},
+										{
+											"name": "INDEX_NUM",
+											"type": "Direct",
+											"functionName": "",
+											"attributeReference": {
+												"name": "INDEX_NUM",
+												"entity": "VIVID.BLOB_CUSTOMER_RAW",
+												"entityConnectionReference": {
+													"connectionName": "LS_SB_Tgt_VIVID",
+													"type": "linkedservicetype"
+												}
+											}
+										},
+										{
+											"name": "LAST_NAME",
+											"type": "Direct",
+											"functionName": "",
+											"attributeReference": {
+												"name": "LAST_NAME",
+												"entity": "VIVID.BLOB_CUSTOMER_RAW",
+												"entityConnectionReference": {
+													"connectionName": "LS_SB_Tgt_VIVID",
+													"type": "linkedservicetype"
+												}
+											}
+										},
+										{
+											"name": "PHONE_1",
+											"type": "Direct",
+											"functionName": "",
+											"attributeReference": {
+												"name": "PHONE_1",
+												"entity": "VIVID.BLOB_CUSTOMER_RAW",
+												"entityConnectionReference": {
+													"connectionName": "LS_SB_Tgt_VIVID",
+													"type": "linkedservicetype"
+												}
+											}
+										},
+										{
+											"name": "PHONE_2",
+											"type": "Direct",
+											"functionName": "",
+											"attributeReference": {
+												"name": "PHONE_2",
+												"entity": "VIVID.BLOB_CUSTOMER_RAW",
+												"entityConnectionReference": {
+													"connectionName": "LS_SB_Tgt_VIVID",
+													"type": "linkedservicetype"
+												}
+											}
+										},
+										{
+											"name": "SUBSCRIPTION_DATE",
+											"type": "Direct",
+											"functionName": "",
+											"attributeReference": {
+												"name": "SUBSCRIPTION_DATE",
+												"entity": "VIVID.BLOB_CUSTOMER_RAW",
+												"entityConnectionReference": {
+													"connectionName": "LS_SB_Tgt_VIVID",
+													"type": "linkedservicetype"
+												}
+											}
+										},
+										{
+											"name": "WEBSITE",
+											"type": "Direct",
+											"functionName": "",
+											"attributeReference": {
+												"name": "WEBSITE",
+												"entity": "VIVID.BLOB_CUSTOMER_RAW",
+												"entityConnectionReference": {
+													"connectionName": "LS_SB_Tgt_VIVID",
+													"type": "linkedservicetype"
+												}
+											}
+										}
+									]
+								}
+							}
+						],
+						"Relationships": []
+					}
+				],
+				"Policy": {
+					"recurrence": {
+						"frequency": "Minute",
+						"interval": 15
+					},
+					"mode": "Microbatch"
+				},
+				"allowVNetOverride": true,
+				"id": "b07f4e3f84fe48afb35a2747534bf002"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/default')]",
+			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks",
+			"apiVersion": "2018-06-01",
+			"properties": {},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AutoResolveIntegrationRuntime')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "AutoResolve",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 0
+						}
+					}
+				},
+				"managedVirtualNetwork": {
+					"type": "ManagedVirtualNetworkReference",
+					"referenceName": "default"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_AZURE_ORACLE_2507')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS_AZURE_ORACLE_2507_properties_typeProperties_server')]",
+					"database": "[parameters('LS_AZURE_ORACLE_2507_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_AZURE_ORACLE_2507_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_AZURE_ORACLE_2507_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_Azure_SB_Lkp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS_Azure_SB_Lkp_properties_typeProperties_server')]",
+					"database": "[parameters('LS_Azure_SB_Lkp_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_Azure_SB_Lkp_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_Azure_SB_Lkp_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_Azure_tgt_etl_orcl')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS_Azure_tgt_etl_orcl_properties_typeProperties_server')]",
+					"database": "[parameters('LS_Azure_tgt_etl_orcl_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_Azure_tgt_etl_orcl_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_Azure_tgt_etl_orcl_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_LOG_MIGRATION_EVENT')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS_LOG_MIGRATION_EVENT_properties_typeProperties_server')]",
+					"database": "[parameters('LS_LOG_MIGRATION_EVENT_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_LOG_MIGRATION_EVENT_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_LOG_MIGRATION_EVENT_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_Run_DDLs_Azure_2507')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS_Run_DDLs_Azure_2507_properties_typeProperties_server')]",
+					"database": "[parameters('LS_Run_DDLs_Azure_2507_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_Run_DDLs_Azure_2507_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_Run_DDLs_Azure_2507_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_SB_SCD')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS_SB_SCD_properties_typeProperties_server')]",
+					"database": "[parameters('LS_SB_SCD_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_SB_SCD_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_SB_SCD_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_SB_Tgt_SalesLT_M')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS_SB_Tgt_SalesLT_M_properties_typeProperties_server')]",
+					"database": "[parameters('LS_SB_Tgt_SalesLT_M_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_SB_Tgt_SalesLT_M_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_SB_Tgt_SalesLT_M_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS__SB_ADVW')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS__SB_ADVW_properties_typeProperties_server')]",
+					"database": "[parameters('LS__SB_ADVW_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS__SB_ADVW_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS__SB_ADVW_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RunDDLs')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "It runs DDLs",
+				"activities": [
+					{
+						"name": "DropTables",
+						"description": "Drop Tables if exists",
+						"type": "Script",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "LS_Run_DDLs_Azure_2507",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "DROP TABLE IF EXISTS HR_JOB_HISTORY;\r\nDROP TABLE IF EXISTS HR_EMPLOYEES;\r\nDROP TABLE IF EXISTS HR_DEPARTMENTS;\r\nDROP TABLE IF EXISTS HR_LOCATIONS;\r\nDROP TABLE IF EXISTS HR_COUNTRIES;\r\nDROP TABLE IF EXISTS HR_REGIONS;\r\nDROP TABLE IF EXISTS HR_JOBS;"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
+						"name": "CreateTables",
+						"description": "Create Tables etl-oracle database in azure",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "DropTables",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "LS_Run_DDLs_Azure_2507",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "CREATE TABLE HR_JOBS (\r\n  JOB_ID NVARCHAR(100),\r\n  JOB_TITLE NVARCHAR(35) NOT NULL,\r\n  MIN_SALARY FLOAT,\r\n  MAX_SALARY FLOAT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (JOB_ID)\r\n);\r\n\r\nCREATE TABLE HR_REGIONS (\r\n  REGION_ID NVARCHAR(100) NOT NULL,\r\n  REGION_NAME NVARCHAR(25),\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (REGION_ID)\r\n);\r\n\r\nCREATE TABLE HR_COUNTRIES (\r\n  COUNTRY_ID NVARCHAR(100) NOT NULL,\r\n  COUNTRY_NAME NVARCHAR(40),\r\n  REGION_ID FLOAT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (COUNTRY_ID)\r\n);\r\n\r\nCREATE TABLE HR_LOCATIONS (\r\n  LOCATION_ID NVARCHAR(100),\r\n  STREET_ADDRESS NVARCHAR(40),\r\n  POSTAL_CODE NVARCHAR(12),\r\n  CITY NVARCHAR(30) NOT NULL,\r\n  STATE_PROVINCE NVARCHAR(25),\r\n  COUNTRY_ID CHAR(2),\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (LOCATION_ID)\r\n);\r\n\r\nCREATE TABLE HR_DEPARTMENTS (\r\n  DEPARTMENT_ID NVARCHAR(100),\r\n  DEPARTMENT_NAME NVARCHAR(30) NOT NULL,\r\n  MANAGER_ID INT,\r\n  LOCATION_ID INT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (DEPARTMENT_ID)\r\n);\r\n\r\nCREATE TABLE HR_EMPLOYEES (\r\n  EMPLOYEE_ID NVARCHAR(100),\r\n  FIRST_NAME NVARCHAR(20),\r\n  LAST_NAME NVARCHAR(25) NOT NULL,\r\n  EMAIL NVARCHAR(25) NOT NULL,\r\n  PHONE_NUMBER NVARCHAR(20),\r\n  HIRE_DATE DATETIME NOT NULL,\r\n  JOB_ID NVARCHAR(10) NOT NULL,\r\n  SALARY DECIMAL(8,2),\r\n  COMMISSION_PCT DECIMAL(2,2),\r\n  MANAGER_ID INT,\r\n  DEPARTMENT_ID INT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (EMPLOYEE_ID),\r\n  UNIQUE (EMAIL),\r\n  CHECK (salary > 0)\r\n);\r\n\r\nCREATE TABLE HR_JOB_HISTORY (\r\n  EMPLOYEE_ID NVARCHAR(100) NOT NULL,\r\n  START_DATE DATETIME NOT NULL,\r\n  END_DATE DATETIME NOT NULL,\r\n  JOB_ID NVARCHAR(10) NOT NULL,\r\n  DEPARTMENT_ID INT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (EMPLOYEE_ID, START_DATE),\r\n  CHECK (end_date > start_date)\r\n);"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "DDLs"
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-08-14T03:03:28Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_Run_DDLs_Azure_2507')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_ADVW_Src_2807')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS__SB_ADVW",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"SRC_ADVW_SCHEMA_NAME": {
+						"type": "String"
+					},
+					"SRC_ADVW_TABLE_NAME": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().SRC_ADVW_SCHEMA_NAME",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().SRC_ADVW_TABLE_NAME",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS__SB_ADVW')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Azure_ETL_Oracle')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_tgt_etl_orcl",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Azure_Tgt_Schema_Name": {
+						"type": "String"
+					},
+					"Azure_Tgt_Table_name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().Azure_Tgt_Schema_Name",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().Azure_Tgt_Table_name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_Azure_tgt_etl_orcl')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Azure_Sandbox_LKP_2507')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "FILE_TABLE_MAPPING"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_Azure_SB_Lkp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Customer_RAW')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS__SB_ADVW",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "VIVID",
+					"table": "BLOB_CUSTOMER_RAW"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS__SB_ADVW')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_DWH_SB')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "CUSTOMER_SID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "INDEX_NUM",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CUSTOMER_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FIRST_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LAST_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "COMPANY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CITY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "COUNTRY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PHONE_1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PHONE_2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EMAIL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SUBSCRIPTION_DATE",
+						"type": "date"
+					},
+					{
+						"name": "WEBSITE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SRC_ROW_INSRT_TSTMP",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "WATERMARK_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ROW_EFF_DT",
+						"type": "date"
+					},
+					{
+						"name": "ROW_EXPIR_DT",
+						"type": "date"
+					},
+					{
+						"name": "ROW_STS_CD",
+						"type": "nchar"
+					},
+					{
+						"name": "INSERT_TSTMP_IST",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "LST_UPD_TSTMP_IST",
+						"type": "datetime2",
+						"scale": 7
+					}
+				],
+				"typeProperties": {
+					"schema": "DWH",
+					"table": "DIM_CUSTOMER_DETAILS"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_Azure_SB_Lkp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Leads_0805')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS__SB_ADVW",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "VIVID",
+					"table": "BLOB_LEAD_RAW"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS__SB_ADVW')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Org_0805')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS__SB_ADVW",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS__SB_ADVW')]"
+			]
+		}
+	]
+}

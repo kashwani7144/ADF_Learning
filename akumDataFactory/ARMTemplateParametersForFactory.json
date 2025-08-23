@@ -1,0 +1,105 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "akumDataFactory"
+		},
+		"LS_AZURE_ORACLE_2507_password": {
+			"value": ""
+		},
+		"LS_Azure_SB_Lkp_password": {
+			"value": ""
+		},
+		"LS_Azure_tgt_etl_orcl_password": {
+			"value": ""
+		},
+		"LS_LOG_MIGRATION_EVENT_password": {
+			"value": ""
+		},
+		"LS_Run_DDLs_Azure_2507_password": {
+			"value": ""
+		},
+		"LS_SB_SCD_password": {
+			"value": ""
+		},
+		"LS_SB_Tgt_SalesLT_M_password": {
+			"value": ""
+		},
+		"LS__SB_ADVW_password": {
+			"value": ""
+		},
+		"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
+			"value": "etl-oracle.database.windows.net"
+		},
+		"LS_AZURE_ORACLE_2507_properties_typeProperties_database": {
+			"value": "etl-oracle"
+		},
+		"LS_AZURE_ORACLE_2507_properties_typeProperties_userName": {
+			"value": "akum"
+		},
+		"LS_Azure_SB_Lkp_properties_typeProperties_server": {
+			"value": "svetlsandbox.database.windows.net"
+		},
+		"LS_Azure_SB_Lkp_properties_typeProperties_database": {
+			"value": "ETLSANDBOX"
+		},
+		"LS_Azure_SB_Lkp_properties_typeProperties_userName": {
+			"value": "akum"
+		},
+		"LS_Azure_tgt_etl_orcl_properties_typeProperties_server": {
+			"value": "svetlsandbox.database.windows.net"
+		},
+		"LS_Azure_tgt_etl_orcl_properties_typeProperties_database": {
+			"value": "ETLSANDBOX"
+		},
+		"LS_Azure_tgt_etl_orcl_properties_typeProperties_userName": {
+			"value": "akum"
+		},
+		"LS_LOG_MIGRATION_EVENT_properties_typeProperties_server": {
+			"value": "svetlsandbox.database.windows.net"
+		},
+		"LS_LOG_MIGRATION_EVENT_properties_typeProperties_database": {
+			"value": "ETLSANDBOX"
+		},
+		"LS_LOG_MIGRATION_EVENT_properties_typeProperties_userName": {
+			"value": "akum"
+		},
+		"LS_Run_DDLs_Azure_2507_properties_typeProperties_server": {
+			"value": "svetlsandbox.database.windows.net"
+		},
+		"LS_Run_DDLs_Azure_2507_properties_typeProperties_database": {
+			"value": "etlsandbox"
+		},
+		"LS_Run_DDLs_Azure_2507_properties_typeProperties_userName": {
+			"value": "akum"
+		},
+		"LS_SB_SCD_properties_typeProperties_server": {
+			"value": "svetlsandbox.database.windows.net"
+		},
+		"LS_SB_SCD_properties_typeProperties_database": {
+			"value": "ETLSANDBOX"
+		},
+		"LS_SB_SCD_properties_typeProperties_userName": {
+			"value": "akum"
+		},
+		"LS_SB_Tgt_SalesLT_M_properties_typeProperties_server": {
+			"value": "etlsandbox.database.windows.net"
+		},
+		"LS_SB_Tgt_SalesLT_M_properties_typeProperties_database": {
+			"value": "ETLSANDBOX"
+		},
+		"LS_SB_Tgt_SalesLT_M_properties_typeProperties_userName": {
+			"value": "akum"
+		},
+		"LS__SB_ADVW_properties_typeProperties_server": {
+			"value": "svetlsandbox.database.windows.net"
+		},
+		"LS__SB_ADVW_properties_typeProperties_database": {
+			"value": "ETLSANDBOX"
+		},
+		"LS__SB_ADVW_properties_typeProperties_userName": {
+			"value": "akum"
+		}
+	}
+}
