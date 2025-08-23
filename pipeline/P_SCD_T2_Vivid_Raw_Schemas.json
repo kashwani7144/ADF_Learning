@@ -500,6 +500,126 @@
 						"type": "Expression"
 					}
 				}
+			},
+			{
+				"name": "GetMaxModifiedDate",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "SetRowsDeletedCounts",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DS_Get_Watermark_2308",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "SP_UpdateWatermark",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "SetMaxWatermark",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[UpdateWatermark]",
+					"storedProcedureParameters": {
+						"FILE_TABLE_ID": {
+							"value": {
+								"value": "@item().SSDTM_ID",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"SOURCE_TABLE_NAME": {
+							"value": {
+								"value": "@item().SRC_TBL_NAME",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"UPDATED_AT_TSTMP": {
+							"value": {
+								"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"UPDATED_BY": {
+							"value": {
+								"value": "@pipeline().TriggerName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"WATERMARK_VALUE": {
+							"value": {
+								"value": "@convertFromUtc(formatDateTime(variables('MaxWatermark'), 'yyyy-MM-ddTHH:mm:ssZ'), 'India Standard Time')\n\n",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "LS_LOG_MIGRATION_EVENT",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "SetMaxWatermark",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetMaxModifiedDate",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "MaxWatermark",
+					"value": {
+						"value": "@if(\r\n  empty(activity('GetMaxModifiedDate').output.firstRow.MAX_MODIFIED_DATE),\r\n  formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss.fffffff'),\r\n  formatDateTime(activity('GetMaxModifiedDate').output.firstRow.MAX_MODIFIED_DATE, 'yyyy-MM-dd HH:mm:ss.fffffff')\r\n)",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
