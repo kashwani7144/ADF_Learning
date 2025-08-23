@@ -99,7 +99,11 @@
 				"type": "datetime2",
 				"scale": 7
 			}
-		]
+		],
+		"typeProperties": {
+			"schema": "DWH",
+			"table": "DIM_CUSTOMER_DETAILS"
+		}
 	},
 	"type": "Microsoft.DataFactory/factories/datasets"
 }
