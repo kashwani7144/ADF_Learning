@@ -13,6 +13,823 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/DF_LoadStage_WithHash')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_VIVID_RAW_TABLES",
+								"type": "DatasetReference"
+							},
+							"name": "VivivdRawTable"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DS_DWH_STG",
+								"type": "DatasetReference"
+							},
+							"name": "StgCustomerDetails"
+						}
+					],
+					"transformations": [
+						{
+							"name": "addHashDiffColumn"
+						}
+					],
+					"scriptLines": [
+						"parameters{",
+						"     df_sqlQuery as string",
+						"}",
+						"source(output(",
+						"          INDEX_NUM as integer,",
+						"          CUSTOMER_ID as string,",
+						"          FIRST_NAME as string,",
+						"          LAST_NAME as string,",
+						"          COMPANY as string,",
+						"          CITY as string,",
+						"          COUNTRY as string,",
+						"          PHONE_1 as string,",
+						"          PHONE_2 as string,",
+						"          EMAIL as string,",
+						"          SUBSCRIPTION_DATE as string,",
+						"          WEBSITE as string,",
+						"          SRC_ROW_INSRT_TSTMP as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     query: (toString($df_sqlQuery)),",
+						"     format: 'query') ~> VivivdRawTable",
+						"VivivdRawTable derive(HASH_DIFF = md5(\r",
+						"  concat(\r",
+						"    toString(upper(trim(FIRST_NAME))), '|',\r",
+						"    toString(upper(trim(LAST_NAME))),  '|',\r",
+						"    toString(trim(COMPANY)),           '|',\r",
+						"    toString(upper(trim(CITY))),       '|',\r",
+						"    toString(upper(trim(COUNTRY))),    '|',\r",
+						"    toString(replace(PHONE_1,' ','')), '|',\r",
+						"    toString(replace(PHONE_2,' ','')), '|',\r",
+						"    toString(lower(trim(EMAIL))),      '|',\r",
+						"    toString(trim(SUBSCRIPTION_DATE)), '|',\r",
+						"    toString(trim(WEBSITE))\r",
+						"  )\r",
+						")\r",
+						") ~> addHashDiffColumn",
+						"addHashDiffColumn sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> StgCustomerDetails"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_SCD_T2_Vivid_Customer')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_VIVID_CUSTOMER",
+								"type": "DatasetReference"
+							},
+							"name": "VividCustomerRaw"
+						},
+						{
+							"dataset": {
+								"referenceName": "DS_SB_TGT_SCD",
+								"type": "DatasetReference"
+							},
+							"name": "DimCustomer"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DS_DWH_SB",
+								"type": "DatasetReference"
+							},
+							"name": "DwhDimCustomerInsert"
+						},
+						{
+							"dataset": {
+								"referenceName": "DS_DWH_SB",
+								"type": "DatasetReference"
+							},
+							"name": "DwhDimCustomerUpdate"
+						}
+					],
+					"transformations": [
+						{
+							"name": "SourceJoinDimension"
+						},
+						{
+							"name": "SelectDistinctColumns"
+						},
+						{
+							"name": "DcTrackChanges"
+						},
+						{
+							"name": "CheckNewOrChangedRow"
+						},
+						{
+							"name": "NewRowsUnionChangedRows"
+						},
+						{
+							"name": "DcAddMetadataColumns"
+						},
+						{
+							"name": "DcExpireSetup"
+						},
+						{
+							"name": "alterRow1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          INDEX_NUM as integer,",
+						"          CUSTOMER_ID as string,",
+						"          FIRST_NAME as string,",
+						"          LAST_NAME as string,",
+						"          COMPANY as string,",
+						"          CITY as string,",
+						"          COUNTRY as string,",
+						"          PHONE_1 as string,",
+						"          PHONE_2 as string,",
+						"          EMAIL as string,",
+						"          SUBSCRIPTION_DATE as string,",
+						"          WEBSITE as string,",
+						"          SRC_ROW_INSRT_TSTMP as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     enableCdc: true,",
+						"     mode: 'read',",
+						"     skipInitialLoad: true,",
+						"     waterMarkColumn: 'SRC_ROW_INSRT_TSTMP',",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> VividCustomerRaw",
+						"source(output(",
+						"          CUSTOMER_SID as integer,",
+						"          INDEX_NUM as integer,",
+						"          CUSTOMER_ID as string,",
+						"          FIRST_NAME as string,",
+						"          LAST_NAME as string,",
+						"          COMPANY as string,",
+						"          CITY as string,",
+						"          COUNTRY as string,",
+						"          PHONE_1 as string,",
+						"          PHONE_2 as string,",
+						"          EMAIL as string,",
+						"          SUBSCRIPTION_DATE as string,",
+						"          WEBSITE as string,",
+						"          SRC_ROW_INSRT_TSTMP as timestamp,",
+						"          WATERMARK_ID as integer,",
+						"          BATCH_ID as integer,",
+						"          ROW_EFF_DT as date,",
+						"          ROW_EXPIR_DT as date,",
+						"          ROW_STS_CD as string,",
+						"          INSERT_TSTMP_IST as timestamp,",
+						"          LST_UPD_TSTMP_IST as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> DimCustomer",
+						"VividCustomerRaw, DimCustomer join(VividCustomerRaw@CUSTOMER_ID == DimCustomer@CUSTOMER_ID,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> SourceJoinDimension",
+						"SourceJoinDimension select(mapColumn(",
+						"          INDEX_NUM = VividCustomerRaw@INDEX_NUM,",
+						"          CUSTOMER_ID = VividCustomerRaw@CUSTOMER_ID,",
+						"          FIRST_NAME = VividCustomerRaw@FIRST_NAME,",
+						"          LAST_NAME = VividCustomerRaw@LAST_NAME,",
+						"          COMPANY = VividCustomerRaw@COMPANY,",
+						"          CITY = VividCustomerRaw@CITY,",
+						"          COUNTRY = VividCustomerRaw@COUNTRY,",
+						"          PHONE_1 = VividCustomerRaw@PHONE_1,",
+						"          PHONE_2 = VividCustomerRaw@PHONE_2,",
+						"          EMAIL = VividCustomerRaw@EMAIL,",
+						"          SUBSCRIPTION_DATE = VividCustomerRaw@SUBSCRIPTION_DATE,",
+						"          WEBSITE = VividCustomerRaw@WEBSITE,",
+						"          SRC_ROW_INSRT_TSTMP = VividCustomerRaw@SRC_ROW_INSRT_TSTMP,",
+						"          CUSTOMER_SID,",
+						"          TGT_INDEX_NUM = DimCustomer@INDEX_NUM,",
+						"          TGT_CUSTOMER_ID = DimCustomer@CUSTOMER_ID,",
+						"          TGT_FIRST_NAME = DimCustomer@FIRST_NAME,",
+						"          TGT_LAST_NAME = DimCustomer@LAST_NAME,",
+						"          TGT_COMPANY = DimCustomer@COMPANY,",
+						"          TGT_CITY = DimCustomer@CITY,",
+						"          TGT_COUNTRY = DimCustomer@COUNTRY,",
+						"          TGT_PHONE_1 = DimCustomer@PHONE_1,",
+						"          TGT_PHONE_2 = DimCustomer@PHONE_2,",
+						"          TGT_EMAIL = DimCustomer@EMAIL,",
+						"          TGT_SUBSCRIPTION_DATE = DimCustomer@SUBSCRIPTION_DATE,",
+						"          TGT_WEBSITE = DimCustomer@WEBSITE,",
+						"          TGT_SRC_ROW_INSRT_TSTMP = DimCustomer@SRC_ROW_INSRT_TSTMP",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> SelectDistinctColumns",
+						"SelectDistinctColumns derive(isChanged = iif(\r",
+						"     md5(INDEX_NUM)  != md5(TGT_INDEX_NUM)  ||\r",
+						"    md5(FIRST_NAME) != md5(TGT_FIRST_NAME) ||\r",
+						"    md5(LAST_NAME)  != md5(TGT_LAST_NAME)  ||\r",
+						"    md5(COMPANY)    != md5(TGT_COMPANY)    ||\r",
+						"    md5(CITY)       != md5(TGT_CITY)       ||\r",
+						"    md5(COUNTRY)    != md5(TGT_COUNTRY)    ||\r",
+						"    md5(PHONE_1)    != md5(TGT_PHONE_1)    ||\r",
+						"    md5(PHONE_2)    != md5(TGT_PHONE_2)    ||\r",
+						"    md5(EMAIL)      != md5(TGT_EMAIL)      ||\r",
+						"    md5(SUBSCRIPTION_DATE) != md5(TGT_SUBSCRIPTION_DATE) ||\r",
+						"    md5(WEBSITE)    != md5(TGT_WEBSITE),\r",
+						"    true(),\r",
+						"    false()\r",
+						")) ~> DcTrackChanges",
+						"DcTrackChanges split(isNull(TGT_CUSTOMER_ID),",
+						"     !isNull(TGT_CUSTOMER_ID) && (\r",
+						"  coalesce(FIRST_NAME , '') != coalesce(TGT_FIRST_NAME , '') ||\r",
+						"  coalesce(LAST_NAME  , '') != coalesce(TGT_LAST_NAME  , '') ||\r",
+						"  coalesce(COMPANY    , '') != coalesce(TGT_COMPANY    , '') ||\r",
+						"  coalesce(CITY       , '') != coalesce(TGT_CITY       , '') ||\r",
+						"  coalesce(COUNTRY    , '') != coalesce(TGT_COUNTRY    , '') ||\r",
+						"  coalesce(PHONE_1    , '') != coalesce(TGT_PHONE_1    , '') ||\r",
+						"  coalesce(PHONE_2    , '') != coalesce(TGT_PHONE_2    , '') ||\r",
+						"  coalesce(EMAIL      , '') != coalesce(TGT_EMAIL      , '') ||  \r",
+						"  coalesce(SUBSCRIPTION_DATE      , '') != coalesce(TGT_SUBSCRIPTION_DATE      , '') ||\r",
+						"  coalesce(WEBSITE    , '') != coalesce(TGT_WEBSITE    , '')\r",
+						"),",
+						"     disjoint: false) ~> CheckNewOrChangedRow@(NewRows, ChangedRows)",
+						"CheckNewOrChangedRow@NewRows, CheckNewOrChangedRow@ChangedRows union(byName: true)~> NewRowsUnionChangedRows",
+						"NewRowsUnionChangedRows derive(WATERMARK_ID = 10002,",
+						"          BATCH_ID = 50001,",
+						"          ROW_EFF_DT = currentDate(),",
+						"          ROW_EXPIR_DT = toDate('9999-12-31'),",
+						"          ROW_STS_CD = 'A') ~> DcAddMetadataColumns",
+						"CheckNewOrChangedRow@ChangedRows derive(ROW_STS_CD = 'I',",
+						"          ROW_EXPIR_DT = toDate(fromUTC(currentUTC(), 'India Standard Time')),",
+						"          LST_UPD_TSTMP_IST = fromUTC(currentUTC(), 'India Standard Time')) ~> DcExpireSetup",
+						"DcExpireSetup alterRow(updateIf(true())) ~> alterRow1",
+						"DcAddMetadataColumns sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          CUSTOMER_SID as integer,",
+						"          INDEX_NUM as integer,",
+						"          CUSTOMER_ID as string,",
+						"          FIRST_NAME as string,",
+						"          LAST_NAME as string,",
+						"          COMPANY as string,",
+						"          CITY as string,",
+						"          COUNTRY as string,",
+						"          PHONE_1 as string,",
+						"          PHONE_2 as string,",
+						"          EMAIL as string,",
+						"          SUBSCRIPTION_DATE as date,",
+						"          WEBSITE as string,",
+						"          SRC_ROW_INSRT_TSTMP as timestamp,",
+						"          WATERMARK_ID as integer,",
+						"          BATCH_ID as integer,",
+						"          ROW_EFF_DT as date,",
+						"          ROW_EXPIR_DT as date,",
+						"          ROW_STS_CD as string,",
+						"          INSERT_TSTMP_IST as timestamp,",
+						"          LST_UPD_TSTMP_IST as timestamp",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          INDEX_NUM,",
+						"          CUSTOMER_ID,",
+						"          FIRST_NAME,",
+						"          LAST_NAME,",
+						"          COMPANY,",
+						"          CITY,",
+						"          COUNTRY,",
+						"          PHONE_1,",
+						"          PHONE_2,",
+						"          EMAIL,",
+						"          SUBSCRIPTION_DATE,",
+						"          WEBSITE,",
+						"          SRC_ROW_INSRT_TSTMP,",
+						"          WATERMARK_ID,",
+						"          BATCH_ID,",
+						"          ROW_EFF_DT,",
+						"          ROW_EXPIR_DT,",
+						"          ROW_STS_CD",
+						"     )) ~> DwhDimCustomerInsert",
+						"alterRow1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          CUSTOMER_SID as integer,",
+						"          INDEX_NUM as integer,",
+						"          CUSTOMER_ID as string,",
+						"          FIRST_NAME as string,",
+						"          LAST_NAME as string,",
+						"          COMPANY as string,",
+						"          CITY as string,",
+						"          COUNTRY as string,",
+						"          PHONE_1 as string,",
+						"          PHONE_2 as string,",
+						"          EMAIL as string,",
+						"          SUBSCRIPTION_DATE as date,",
+						"          WEBSITE as string,",
+						"          SRC_ROW_INSRT_TSTMP as timestamp,",
+						"          WATERMARK_ID as integer,",
+						"          BATCH_ID as integer,",
+						"          ROW_EFF_DT as date,",
+						"          ROW_EXPIR_DT as date,",
+						"          ROW_STS_CD as string,",
+						"          INSERT_TSTMP_IST as timestamp,",
+						"          LST_UPD_TSTMP_IST as timestamp",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:false,",
+						"     updateable:true,",
+						"     upsertable:false,",
+						"     keys:['CUSTOMER_SID'],",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> DwhDimCustomerUpdate"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_SCD_T2_Vivid_Scd')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_VIVID_RAW_TABLES",
+								"type": "DatasetReference"
+							},
+							"name": "VividCustomerRaw"
+						},
+						{
+							"dataset": {
+								"referenceName": "DS_SB_TGT_SCD",
+								"type": "DatasetReference"
+							},
+							"name": "DimCustomer"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DS_DWH_SB",
+								"type": "DatasetReference"
+							},
+							"name": "DwhDimCustomerInsert"
+						},
+						{
+							"dataset": {
+								"referenceName": "DS_DWH_SB",
+								"type": "DatasetReference"
+							},
+							"name": "DwhDimCustomerUpdate"
+						}
+					],
+					"transformations": [
+						{
+							"name": "SourceJoinDimension"
+						},
+						{
+							"name": "SelectDistinctColumns"
+						},
+						{
+							"name": "DcTrackChanges"
+						},
+						{
+							"name": "CheckNewOrChangedRow"
+						},
+						{
+							"name": "NewRowsUnionChangedRows"
+						},
+						{
+							"name": "DcAddMetadataColumns"
+						},
+						{
+							"name": "DcExpireSetup"
+						},
+						{
+							"name": "alterRow1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          INDEX_NUM as integer,",
+						"          CUSTOMER_ID as string,",
+						"          FIRST_NAME as string,",
+						"          LAST_NAME as string,",
+						"          COMPANY as string,",
+						"          CITY as string,",
+						"          COUNTRY as string,",
+						"          PHONE_1 as string,",
+						"          PHONE_2 as string,",
+						"          EMAIL as string,",
+						"          SUBSCRIPTION_DATE as string,",
+						"          WEBSITE as string,",
+						"          SRC_ROW_INSRT_TSTMP as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     enableCdc: true,",
+						"     mode: 'read',",
+						"     skipInitialLoad: false,",
+						"     waterMarkColumn: 'SRC_ROW_INSRT_TSTMP',",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> VividCustomerRaw",
+						"source(output(",
+						"          CUSTOMER_SID as integer,",
+						"          INDEX_NUM as integer,",
+						"          CUSTOMER_ID as string,",
+						"          FIRST_NAME as string,",
+						"          LAST_NAME as string,",
+						"          COMPANY as string,",
+						"          CITY as string,",
+						"          COUNTRY as string,",
+						"          PHONE_1 as string,",
+						"          PHONE_2 as string,",
+						"          EMAIL as string,",
+						"          SUBSCRIPTION_DATE as string,",
+						"          WEBSITE as string,",
+						"          SRC_ROW_INSRT_TSTMP as timestamp,",
+						"          WATERMARK_ID as integer,",
+						"          BATCH_ID as integer,",
+						"          ROW_EFF_DT as date,",
+						"          ROW_EXPIR_DT as date,",
+						"          ROW_STS_CD as string,",
+						"          INSERT_TSTMP_IST as timestamp,",
+						"          LST_UPD_TSTMP_IST as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> DimCustomer",
+						"VividCustomerRaw, DimCustomer join(VividCustomerRaw@INDEX_NUM == DimCustomer@INDEX_NUM,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> SourceJoinDimension",
+						"SourceJoinDimension select(mapColumn(",
+						"          INDEX_NUM = VividCustomerRaw@INDEX_NUM,",
+						"          CUSTOMER_ID = VividCustomerRaw@CUSTOMER_ID,",
+						"          FIRST_NAME = VividCustomerRaw@FIRST_NAME,",
+						"          LAST_NAME = VividCustomerRaw@LAST_NAME,",
+						"          COMPANY = VividCustomerRaw@COMPANY,",
+						"          CITY = VividCustomerRaw@CITY,",
+						"          COUNTRY = VividCustomerRaw@COUNTRY,",
+						"          PHONE_1 = VividCustomerRaw@PHONE_1,",
+						"          PHONE_2 = VividCustomerRaw@PHONE_2,",
+						"          EMAIL = VividCustomerRaw@EMAIL,",
+						"          SUBSCRIPTION_DATE = VividCustomerRaw@SUBSCRIPTION_DATE,",
+						"          WEBSITE = VividCustomerRaw@WEBSITE,",
+						"          SRC_ROW_INSRT_TSTMP = VividCustomerRaw@SRC_ROW_INSRT_TSTMP,",
+						"          CUSTOMER_SID,",
+						"          TGT_INDEX_NUM = DimCustomer@INDEX_NUM,",
+						"          TGT_CUSTOMER_ID = DimCustomer@CUSTOMER_ID,",
+						"          TGT_FIRST_NAME = DimCustomer@FIRST_NAME,",
+						"          TGT_LAST_NAME = DimCustomer@LAST_NAME,",
+						"          TGT_COMPANY = DimCustomer@COMPANY,",
+						"          TGT_CITY = DimCustomer@CITY,",
+						"          TGT_COUNTRY = DimCustomer@COUNTRY,",
+						"          TGT_PHONE_1 = DimCustomer@PHONE_1,",
+						"          TGT_PHONE_2 = DimCustomer@PHONE_2,",
+						"          TGT_EMAIL = DimCustomer@EMAIL,",
+						"          TGT_SUBSCRIPTION_DATE = DimCustomer@SUBSCRIPTION_DATE,",
+						"          TGT_WEBSITE = DimCustomer@WEBSITE,",
+						"          TGT_SRC_ROW_INSRT_TSTMP = DimCustomer@SRC_ROW_INSRT_TSTMP",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> SelectDistinctColumns",
+						"SelectDistinctColumns derive(isChanged = iif(\r",
+						"     md5(INDEX_NUM)  != md5(TGT_INDEX_NUM)  ||\r",
+						"    md5(FIRST_NAME) != md5(TGT_FIRST_NAME) ||\r",
+						"    md5(LAST_NAME)  != md5(TGT_LAST_NAME)  ||\r",
+						"    md5(COMPANY)    != md5(TGT_COMPANY)    ||\r",
+						"    md5(CITY)       != md5(TGT_CITY)       ||\r",
+						"    md5(COUNTRY)    != md5(TGT_COUNTRY)    ||\r",
+						"    md5(PHONE_1)    != md5(TGT_PHONE_1)    ||\r",
+						"    md5(PHONE_2)    != md5(TGT_PHONE_2)    ||\r",
+						"    md5(EMAIL)      != md5(TGT_EMAIL)      ||\r",
+						"    md5(SUBSCRIPTION_DATE) != md5(TGT_SUBSCRIPTION_DATE) ||\r",
+						"    md5(WEBSITE)    != md5(TGT_WEBSITE),\r",
+						"    true(),\r",
+						"    false()\r",
+						")) ~> DcTrackChanges",
+						"DcTrackChanges split(isNull(CUSTOMER_ID),",
+						"     !isNull(TGT_CUSTOMER_ID) && (\r",
+						"  coalesce(FIRST_NAME , '') != coalesce(TGT_FIRST_NAME , '') ||\r",
+						"  coalesce(LAST_NAME  , '') != coalesce(TGT_LAST_NAME  , '') ||\r",
+						"  coalesce(COMPANY    , '') != coalesce(TGT_COMPANY    , '') ||\r",
+						"  coalesce(CITY       , '') != coalesce(TGT_CITY       , '') ||\r",
+						"  coalesce(COUNTRY    , '') != coalesce(TGT_COUNTRY    , '') ||\r",
+						"  coalesce(PHONE_1    , '') != coalesce(TGT_PHONE_1    , '') ||\r",
+						"  coalesce(PHONE_2    , '') != coalesce(TGT_PHONE_2    , '') ||\r",
+						"  coalesce(EMAIL      , '') != coalesce(TGT_EMAIL      , '') ||  \r",
+						"  coalesce(SUBSCRIPTION_DATE      , '') != coalesce(SUBSCRIPTION_DATE      , '') ||\r",
+						"  coalesce(WEBSITE    , '') != coalesce(TGT_WEBSITE    , '')\r",
+						"),",
+						"     disjoint: false) ~> CheckNewOrChangedRow@(NewRows, ChangedRows)",
+						"CheckNewOrChangedRow@NewRows, CheckNewOrChangedRow@ChangedRows union(byName: true)~> NewRowsUnionChangedRows",
+						"NewRowsUnionChangedRows derive(WATERMARK_ID = 10002,",
+						"          BATCH_ID = 50001,",
+						"          ROW_EFF_DT = currentDate(),",
+						"          ROW_EXPIR_DT = toDate('9999-12-31'),",
+						"          ROW_STS_CD = 'A') ~> DcAddMetadataColumns",
+						"CheckNewOrChangedRow@ChangedRows derive(ROW_STS_CD = 'I',",
+						"          ROW_EXPIR_DT = toDate(fromUTC(currentUTC(), 'India Standard Time'))) ~> DcExpireSetup",
+						"DcExpireSetup alterRow(updateIf(true())) ~> alterRow1",
+						"DcAddMetadataColumns sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          CUSTOMER_SID as integer,",
+						"          INDEX_NUM as integer,",
+						"          CUSTOMER_ID as string,",
+						"          FIRST_NAME as string,",
+						"          LAST_NAME as string,",
+						"          COMPANY as string,",
+						"          CITY as string,",
+						"          COUNTRY as string,",
+						"          PHONE_1 as string,",
+						"          PHONE_2 as string,",
+						"          EMAIL as string,",
+						"          SUBSCRIPTION_DATE as date,",
+						"          WEBSITE as string,",
+						"          SRC_ROW_INSRT_TSTMP as timestamp,",
+						"          WATERMARK_ID as integer,",
+						"          BATCH_ID as integer,",
+						"          ROW_EFF_DT as date,",
+						"          ROW_EXPIR_DT as date,",
+						"          ROW_STS_CD as string,",
+						"          INSERT_TSTMP_IST as timestamp,",
+						"          LST_UPD_TSTMP_IST as timestamp",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          INDEX_NUM,",
+						"          CUSTOMER_ID,",
+						"          FIRST_NAME,",
+						"          LAST_NAME,",
+						"          COMPANY,",
+						"          CITY,",
+						"          COUNTRY,",
+						"          PHONE_1,",
+						"          PHONE_2,",
+						"          EMAIL,",
+						"          SUBSCRIPTION_DATE,",
+						"          WEBSITE,",
+						"          SRC_ROW_INSRT_TSTMP,",
+						"          WATERMARK_ID,",
+						"          BATCH_ID,",
+						"          ROW_EFF_DT,",
+						"          ROW_EXPIR_DT,",
+						"          ROW_STS_CD",
+						"     )) ~> DwhDimCustomerInsert",
+						"alterRow1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          CUSTOMER_SID as integer,",
+						"          INDEX_NUM as integer,",
+						"          CUSTOMER_ID as string,",
+						"          FIRST_NAME as string,",
+						"          LAST_NAME as string,",
+						"          COMPANY as string,",
+						"          CITY as string,",
+						"          COUNTRY as string,",
+						"          PHONE_1 as string,",
+						"          PHONE_2 as string,",
+						"          EMAIL as string,",
+						"          SUBSCRIPTION_DATE as date,",
+						"          WEBSITE as string,",
+						"          SRC_ROW_INSRT_TSTMP as timestamp,",
+						"          WATERMARK_ID as integer,",
+						"          BATCH_ID as integer,",
+						"          ROW_EFF_DT as date,",
+						"          ROW_EXPIR_DT as date,",
+						"          ROW_STS_CD as string,",
+						"          INSERT_TSTMP_IST as timestamp,",
+						"          LST_UPD_TSTMP_IST as timestamp",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:false,",
+						"     updateable:true,",
+						"     upsertable:false,",
+						"     keys:['CUSTOMER_SID'],",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> DwhDimCustomerUpdate"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/P_DF_SCD_T2_Inc_Vivid_Customer')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "SCD_T2_VIVID_CUSTOMER_SCHEMA",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_SCD_T2_Vivid_Customer",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"VividCustomerRaw": {
+										"Src_Schema_Name": "VIVID",
+										"Src_Table_Name": "BLOB_CUSTOMER_RAW"
+									},
+									"DimCustomer": {},
+									"DwhDimCustomerInsert": {},
+									"DwhDimCustomerUpdate": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine",
+							"continuationSettings": {
+								"customizedCheckpointKey": "f9b5aa35-6478-4062-b84a-15343c423c1c"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "DataFlows"
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-08-15T04:27:53Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DF_SCD_T2_Vivid_Customer')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/P_DF_SCD_T2_Incremental')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "SCD_T2_VIVID_SCHEMA",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_SCD_T2_Vivid_Scd",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"VividCustomerRaw": {
+										"Src_Schema_Name": "VIVID",
+										"Src_Table_Name": "BLOB_CUSTOMER_RAW"
+									},
+									"DimCustomer": {},
+									"DwhDimCustomerInsert": {},
+									"DwhDimCustomerUpdate": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "DataFlows"
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-08-14T03:03:29Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DF_SCD_T2_Vivid_Scd')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/P_DF_SCD_T2_Incremental_BKP')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "SCD_T2_VIVID_SCHEMA",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_SCD_T2_Vivid_Scd",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"VividCustomerRaw": {
+										"Src_Schema_Name": "VIVID",
+										"Src_Table_Name": "BLOB_CUSTOMER_RAW"
+									},
+									"DimCustomer": {},
+									"DwhDimCustomerInsert": {},
+									"DwhDimCustomerUpdate": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "DataFlows"
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-08-14T03:03:29Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DF_SCD_T2_Vivid_Scd')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/P_SCD_T2_Vivid_Raw_Schemas')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -125,7 +942,7 @@
 									"typeProperties": {
 										"variableName": "SqlQuery",
 										"value": {
-											"value": "@concat(\n  'SELECT * FROM ', pipeline().parameters.p_src_schema, '.', pipeline().parameters.p_src_table,\n  ' WHERE SRC_ROW_INSRT_TSTMP > CAST(''', \n  formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss'), \n  ''' AS DATETIME2)'\n)",
+											"value": "@concat(\r\n  'SELECT * FROM ',\r\n  pipeline().parameters.p_src_schema, '.', pipeline().parameters.p_src_table,\r\n  ' WHERE SRC_ROW_INSRT_TSTMP > CAST(''', \r\n  formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss'),\r\n  ''' AS DATETIME2)'\r\n)",
 											"type": "Expression"
 										}
 									}
@@ -186,6 +1003,67 @@
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
+						"name": "DF_LoadStage_WithHash",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "TruncStageTable",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_LoadStage_WithHash",
+								"type": "DataFlowReference",
+								"parameters": {
+									"df_sqlQuery": {
+										"value": "@variables('SqlQuery')",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"VivivdRawTable": {
+										"Src_Schema_Name": {
+											"value": "@pipeline().parameters.p_src_schema",
+											"type": "Expression"
+										},
+										"Src_Table_Name": {
+											"value": "@pipeline().parameters.p_src_table",
+											"type": "Expression"
+										}
+									},
+									"StgCustomerDetails": {
+										"Stg_Schema_Name": {
+											"value": "@pipeline().parameters.p_stg_schema",
+											"type": "Expression"
+										},
+										"Stg_Table_Name": {
+											"value": "@pipeline().parameters.p_stg_table",
+											"type": "Expression"
+										}
+									}
+								},
+								"linkedServiceParameters": {}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
 						}
 					}
 				],
@@ -250,160 +1128,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/P_DF_SCD_T2_Inc_Vivid_Customer')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "SCD_T2_VIVID_CUSTOMER_SCHEMA",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "DF_SCD_T2_Vivid_Customer",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"VividCustomerRaw": {},
-									"DimCustomer": {},
-									"DwhDimCustomerInsert": {},
-									"DwhDimCustomerUpdate": {}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine",
-							"continuationSettings": {
-								"customizedCheckpointKey": "f9b5aa35-6478-4062-b84a-15343c423c1c"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataFlows"
-				},
-				"annotations": [],
-				"lastPublishTime": "2025-08-15T04:27:53Z"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/P_DF_SCD_T2_Incremental')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "SCD_T2_VIVID_SCHEMA",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "DF_SCD_T2_Vivid_Scd",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"VividCustomerRaw": {},
-									"DimCustomer": {},
-									"DwhDimCustomerInsert": {},
-									"DwhDimCustomerUpdate": {}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataFlows"
-				},
-				"annotations": [],
-				"lastPublishTime": "2025-08-14T03:03:29Z"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/P_DF_SCD_T2_Incremental_BKP')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "SCD_T2_VIVID_SCHEMA",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "DF_SCD_T2_Vivid_Scd",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"VividCustomerRaw": {},
-									"DimCustomer": {},
-									"DwhDimCustomerInsert": {},
-									"DwhDimCustomerUpdate": {}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataFlows"
-				},
-				"annotations": [],
-				"lastPublishTime": "2025-08-14T03:03:29Z"
-			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DF_LoadStage_WithHash')]"
+			]
 		}
 	]
 }
