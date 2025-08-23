@@ -2796,7 +2796,7 @@
 								"type": "DataFlowReference",
 								"parameters": {
 									"df_sqlQuery": {
-										"value": "'@{SELECT * FROM pipeline().parameters.p_src_schema.pipeline().parameters.p_src_table}'",
+										"value": "@string(variables('SqlQuery'))",
 										"type": "Expression"
 									}
 								},
