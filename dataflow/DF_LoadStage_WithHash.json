@@ -15,6 +15,9 @@
 			"sinks": [],
 			"transformations": [],
 			"scriptLines": [
+				"parameters{",
+				"     df_sqlQuery as string",
+				"}",
 				"source(output(",
 				"          INDEX_NUM as integer,",
 				"          CUSTOMER_ID as string,",
@@ -33,7 +36,8 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> VivivdRawTable"
+				"     query: (toString($df_sqlQuery)),",
+				"     format: 'query') ~> VivivdRawTable"
 			]
 		}
 	}
