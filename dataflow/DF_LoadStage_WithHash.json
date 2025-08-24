@@ -48,7 +48,7 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     query: ($df_sqlQuery),",
+				"     query: (toString($df_sqlQuery)),",
 				"     format: 'query') ~> VivivdRawTable",
 				"VivivdRawTable derive(HASH_DIFF = unhex(\r",
 				"  md5(\r",
