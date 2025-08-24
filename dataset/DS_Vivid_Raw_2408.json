@@ -1,0 +1,30 @@
+{
+	"name": "DS_Vivid_Raw_2408",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS__SB_ADVW",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"Src_Schema_Name": {
+				"type": "String"
+			},
+			"Src_Table_Name": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().Src_Schema_Name",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().Src_Table_Name",
+				"type": "Expression"
+			}
+		}
+	}
+}

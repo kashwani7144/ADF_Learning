@@ -172,70 +172,11 @@
 				}
 			},
 			{
-				"name": "DF_LoadStage_WithHash",
-				"type": "ExecuteDataFlow",
-				"dependsOn": [
-					{
-						"activity": "TruncStageTable",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"dataflow": {
-						"referenceName": "DF_LoadStage_WithHash",
-						"type": "DataFlowReference",
-						"parameters": {
-							"df_sqlQuery": {
-								"value": "@'SELECT * FROM VIVID.BLOB_CUSTOMER_RAW'",
-								"type": "Expression"
-							}
-						},
-						"datasetParameters": {
-							"VivivdRawTable": {
-								"Src_Schema_Name": {
-									"value": "@pipeline().parameters.p_src_schema",
-									"type": "Expression"
-								},
-								"Src_Table_Name": {
-									"value": "@pipeline().parameters.p_src_table",
-									"type": "Expression"
-								}
-							},
-							"StgCustomerDetails": {
-								"Stg_Schema_Name": {
-									"value": "@pipeline().parameters.p_stg_schema",
-									"type": "Expression"
-								},
-								"Stg_Table_Name": {
-									"value": "@pipeline().parameters.p_stg_table",
-									"type": "Expression"
-								}
-							}
-						}
-					},
-					"compute": {
-						"coreCount": 8,
-						"computeType": "General"
-					},
-					"traceLevel": "Fine"
-				}
-			},
-			{
 				"name": "SQL_MERGE_SCD2",
 				"type": "Script",
 				"dependsOn": [
 					{
-						"activity": "DF_LoadStage_WithHash",
+						"activity": "LoadStage_WithHash",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -634,6 +575,46 @@
 						"type": "Expression"
 					}
 				}
+			},
+			{
+				"name": "LoadStage_WithHash",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "TruncStageTable",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_Vivid_Raw_2408",
+						"type": "DatasetReference",
+						"parameters": {
+							"Src_Schema_Name": {
+								"value": "@pipeline().parameters.p_src_schema",
+								"type": "Expression"
+							}
+						}
+					}
+				]
 			}
 		],
 		"parameters": {
