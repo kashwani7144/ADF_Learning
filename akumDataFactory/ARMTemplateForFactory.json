@@ -309,6 +309,724 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/P_DF_SCD_T2_Vivid_Raw_Schemas')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "SetStartTime",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "StartTime",
+							"value": {
+								"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "GetWatermarkValue",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "SetStartTime",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat(\n  'SELECT WATERMARK_VALUE,WATERMARK_ID FROM dbo.WATERMARK_TRACKER ',\n  'WHERE SOURCE_TABLE_NAME = ''', pipeline().parameters.p_src_table, ''' ',\n  'AND PIPELINE_NAME = ''', pipeline().Pipeline, ''' ',\n  'AND ROW_STS_CD = ''A'''\n)",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DS_Watermark_Tracker",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "SetPreviousWatermark",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetWatermarkValue",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "PreviousWatermark",
+							"value": {
+								"value": "@if(\n  or(empty(activity('GetWatermarkValue').output.firstRow), empty(activity('GetWatermarkValue').output.firstRow.WATERMARK_VALUE)),\n  '',\n  formatDateTime(activity('GetWatermarkValue').output.firstRow.WATERMARK_VALUE, 'yyyy-MM-dd HH:mm:ss.fffffff')\n)",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "IsFirstRun",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "SetPreviousWatermark",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@empty(variables('PreviousWatermark'))",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "SqlQuery_After_1_run",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "SqlQuery",
+										"value": {
+											"value": "@concat(\r\n  'SELECT * FROM ',\r\n  pipeline().parameters.p_src_schema, '.', pipeline().parameters.p_src_table,\r\n  ' WHERE SRC_ROW_INSRT_TSTMP > CAST(''', \r\n  formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss'),\r\n  ''' AS DATETIME2)'\r\n)",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "SqlQuery_1_run",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "SqlQuery",
+										"value": {
+											"value": "@concat(\n  'SELECT * FROM ',\n pipeline().parameters.p_src_schema, '.', pipeline().parameters.p_src_table\n)",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "TruncStageTable",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "IsFirstRun",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "LS_Azure_SB_Lkp",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "@concat(\n  'TRUNCATE TABLE [',\n  pipeline().parameters.p_stg_schema, '].[', \n  pipeline().parameters.p_stg_table, '];'\n)",
+										"type": "Expression"
+									}
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
+						"name": "DF_LoadStage_WithHash",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "TruncStageTable",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_LoadStage_WithHash",
+								"type": "DataFlowReference",
+								"parameters": {
+									"df_sqlQuery": {
+										"value": "@'SELECT * FROM VIVID.BLOB_CUSTOMER_RAW'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"VivivdRawTable": {
+										"Src_Schema_Name": {
+											"value": "@pipeline().parameters.p_src_schema",
+											"type": "Expression"
+										},
+										"Src_Table_Name": {
+											"value": "@pipeline().parameters.p_src_table",
+											"type": "Expression"
+										}
+									},
+									"StgCustomerDetails": {
+										"Stg_Schema_Name": {
+											"value": "@pipeline().parameters.p_stg_schema",
+											"type": "Expression"
+										},
+										"Stg_Table_Name": {
+											"value": "@pipeline().parameters.p_stg_table",
+											"type": "Expression"
+										}
+									}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "SQL_MERGE_SCD2",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "DF_LoadStage_WithHash",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "LS_Azure_SB_Lkp",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "DECLARE @today_ist datetime2(3) = SYSDATETIMEOFFSET() AT TIME ZONE 'India Standard Time';\r\nDECLARE @chg TABLE(action nvarchar(10));\r\n\r\nBEGIN TRAN;\r\n\r\n-- 1) Expire rows where attributes changed\r\nMERGE DWH.DIM_CUSTOMER_DETAILS AS T\r\nUSING (\r\n  SELECT *\r\n  FROM DWH.STG_CUSTOMER_DETAILS\r\n) AS S\r\nON  T.INDEX_NUM   = S.INDEX_NUM\r\nAND T.CUSTOMER_ID = S.CUSTOMER_ID\r\nAND T.ROW_EXPIR_DT = '9999-12-31'\r\nWHEN MATCHED AND ISNULL(S.HASH_DIFF,0x) <> ISNULL(T.HASH_DIFF,0x)\r\nTHEN UPDATE SET\r\n  T.ROW_EXPIR_DT = DATEADD(day,-1,CAST(@today_ist AS date)),\r\n  T.LST_UPD_TSTMP_IST = @today_ist\r\nOUTPUT $action INTO @chg;\r\n\r\n-- 2) Insert new versions for the rows just expired\r\nINSERT INTO DWH.DIM_CUSTOMER_DETAILS\r\n(\r\n  INDEX_NUM, CUSTOMER_ID,\r\n  FIRST_NAME, LAST_NAME, COMPANY, CITY, COUNTRY,\r\n  PHONE_1, PHONE_2, EMAIL, SUBSCRIPTION_DATE, WEBSITE,\r\n  HASH_DIFF, VERSION_NUM\r\n)\r\nSELECT\r\n  S.INDEX_NUM, S.CUSTOMER_ID,\r\n  S.FIRST_NAME, S.LAST_NAME, S.COMPANY, S.CITY, S.COUNTRY,\r\n  S.PHONE_1, S.PHONE_2, S.EMAIL, S.SUBSCRIPTION_DATE, S.WEBSITE,\r\n  S.HASH_DIFF, T.VERSION_NUM + 1\r\nFROM DWH.STG_CUSTOMER_DETAILS S\r\nJOIN DWH.DIM_CUSTOMER_DETAILS T\r\n  ON T.INDEX_NUM = S.INDEX_NUM\r\n AND T.CUSTOMER_ID = S.CUSTOMER_ID\r\nWHERE T.ROW_EXPIR_DT = DATEADD(day,-1,CAST(@today_ist AS date));\r\n\r\n-- 3) Insert brand-new keys\r\nMERGE DWH.DIM_CUSTOMER_DETAILS AS T\r\nUSING (\r\n  SELECT *\r\n  FROM DWH.STG_CUSTOMER_DETAILS\r\n) AS S\r\nON  T.INDEX_NUM   = S.INDEX_NUM\r\nAND T.CUSTOMER_ID = S.CUSTOMER_ID\r\nWHEN NOT MATCHED BY TARGET\r\nTHEN INSERT\r\n(\r\n  INDEX_NUM, CUSTOMER_ID,\r\n  FIRST_NAME, LAST_NAME, COMPANY, CITY, COUNTRY,\r\n  PHONE_1, PHONE_2, EMAIL, SUBSCRIPTION_DATE, WEBSITE,\r\n  HASH_DIFF, VERSION_NUM\r\n)\r\nVALUES\r\n(\r\n  S.INDEX_NUM, S.CUSTOMER_ID,\r\n  S.FIRST_NAME, S.LAST_NAME, S.COMPANY, S.CITY, S.COUNTRY,\r\n  S.PHONE_1, S.PHONE_2, S.EMAIL, S.SUBSCRIPTION_DATE, S.WEBSITE,\r\n  S.HASH_DIFF, 1\r\n)\r\nOUTPUT $action INTO @chg;\r\n\r\nCOMMIT;\r\n\r\n-- Return counts to ADF\r\nSELECT\r\n  SUM(CASE WHEN action='INSERT' THEN 1 ELSE 0 END) AS RowsInserted,\r\n  SUM(CASE WHEN action='UPDATE' THEN 1 ELSE 0 END) AS RowsExpired\r\nFROM @chg;\r\n"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
+						"name": "SetRowsInsertedCounts",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "SQL_MERGE_SCD2",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "RowsInserted",
+							"value": {
+								"value": "@int(activity('SQL_MERGE_SCD2').output.resultSets[0].rows[0].RowsInserted)",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "SetRowsExpiredCounts",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "SetRowsInsertedCounts",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "RowsExpired",
+							"value": {
+								"value": "@int(activity('SQL_MERGE_SCD2').output.resultSets[0].rows[0].RowsExpired)",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "SourceKeys_Full",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "SetRowsExpiredCounts",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat(\n 'SELECT ',\n '''DWH'' AS DIM_TAB_SCHEMA_NAME, ',\n '''DIM_CUSTOMER_DETAILS'' AS DIM_TABLE_NAME, ',\n '''CUSTOMER_ID'' AS BUSSINESS_ID_COL_NM, ',\n 'INDEX_NUM, ',\n 'CUSTOMER_ID AS BUSSINESS_ID ',\n 'FROM ',\n pipeline().parameters.p_src_schema, '.', pipeline().parameters.p_src_table\n)",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "TRUNCATE TABLE DWH.SRC_KEYS_CUSTOMER;",
+									"type": "Expression"
+								},
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "DIM_TAB_SCHEMA_NAME",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "DIM_TAB_SCHEMA_NAME",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "DIM_TABLE_NAME",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "DIM_TABLE_NAME",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "INDEX_NUM",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "INDEX_NUM",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "BUSSINESS_ID_COL_NM",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "BUSSINESS_ID_COL_NM",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "BUSSINESS_ID",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "BUSSINESS_ID",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_VIVID_RAW_TABLES",
+								"type": "DatasetReference",
+								"parameters": {
+									"Src_Schema_Name": {
+										"value": "@pipeline().parameters.p_src_schema",
+										"type": "Expression"
+									},
+									"Src_Table_Name": {
+										"value": "@pipeline().parameters.p_src_table",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_DWH_DIM_SRC_KEYS",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "SQL_MarkDeletes",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "SourceKeys_Full",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "LS__SB_ADVW",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "DECLARE @today_ist datetime2(3) = SYSDATETIMEOFFSET() AT TIME ZONE 'India Standard Time';\r\n\r\n;WITH missing AS (\r\n  SELECT D.INDEX_NUM, D.CUSTOMER_ID\r\n  FROM DWH.DIM_CUSTOMER_DETAILS D\r\n  WHERE D.ROW_EXPIR_DT = '9999-12-31'\r\n  EXCEPT\r\n  SELECT K.INDEX_NUM, K.CUSTOMER_ID\r\n  FROM DWH.SRC_KEYS_CUSTOMER K\r\n)\r\nUPDATE D\r\n   SET D.ROW_EXPIR_DT = DATEADD(day,-1,CAST(@today_ist AS date)),\r\n       D.ROW_STS_CD   = 'D',\r\n       D.LST_UPD_TSTMP_IST = @today_ist\r\nFROM DWH.DIM_CUSTOMER_DETAILS D\r\nJOIN missing M\r\n  ON D.INDEX_NUM = M.INDEX_NUM\r\n AND D.CUSTOMER_ID = M.CUSTOMER_ID\r\nWHERE D.ROW_EXPIR_DT = '9999-12-31';\r\n\r\nSELECT @@ROWCOUNT AS RowsDeleted;"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
+						"name": "SetRowsDeletedCounts",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "SQL_MarkDeletes",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "RowsDeleted",
+							"value": {
+								"value": "@int(activity('SQL_MarkDeletes').output.resultSets[0].rows[0].RowsDeleted)",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "GetMaxModifiedDate",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "SetRowsDeletedCounts",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat(\n  'SELECT MAX(SRC_ROW_INSRT_TSTMP) AS MAX_MODIFIED_DATE FROM ',\n  pipeline().parameters.p_stg_schema, '.', pipeline().parameters.p_stg_table,\n  ' WHERE SRC_ROW_INSRT_TSTMP > ''', variables('PreviousWatermark'), ''''\n)",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DS_Get_Watermark_2308",
+								"type": "DatasetReference",
+								"parameters": {
+									"Stg_Schema_Name": {
+										"value": "@pipeline().parameters.p_stg_schema",
+										"type": "Expression"
+									},
+									"Stg_Table_Name": {
+										"value": "@pipeline().parameters.p_stg_table",
+										"type": "Expression"
+									}
+								}
+							},
+							"firstRowOnly": true
+						}
+					},
+					{
+						"name": "SP_UpdateWatermark",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "SetMaxWatermark",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[UpdateWatermark]",
+							"storedProcedureParameters": {
+								"FILE_TABLE_ID": {
+									"value": {
+										"value": "@pipeline().parameters.p_file_table_id",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"SOURCE_TABLE_NAME": {
+									"value": {
+										"value": "@pipeline().parameters.p_src_table",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"UPDATED_AT_TSTMP": {
+									"value": {
+										"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"UPDATED_BY": {
+									"value": {
+										"value": "@pipeline().TriggerName",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"WATERMARK_VALUE": {
+									"value": {
+										"value": "@convertFromUtc(formatDateTime(variables('MaxWatermark'), 'yyyy-MM-ddTHH:mm:ssZ'), 'India Standard Time')\n\n",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "LS_LOG_MIGRATION_EVENT",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "SetMaxWatermark",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetMaxModifiedDate",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "MaxWatermark",
+							"value": {
+								"value": "@if(\n  empty(activity('GetMaxModifiedDate').output.firstRow.MAX_MODIFIED_DATE),\n  formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss.fffffff'),\n  formatDateTime(activity('GetMaxModifiedDate').output.firstRow.MAX_MODIFIED_DATE, 'yyyy-MM-dd HH:mm:ss.fffffff')\n)",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"p_src_schema": {
+						"type": "string",
+						"defaultValue": "VIVID"
+					},
+					"p_src_table": {
+						"type": "string",
+						"defaultValue": "BLOB_CUSTOMER_RAW"
+					},
+					"p_stg_schema": {
+						"type": "string",
+						"defaultValue": "DWH"
+					},
+					"p_stg_table": {
+						"type": "string",
+						"defaultValue": "STG_CUSTOMER_DETAILS"
+					},
+					"p_dim_schema": {
+						"type": "string",
+						"defaultValue": "DWH"
+					},
+					"p_dim_table": {
+						"type": "string",
+						"defaultValue": "DIM_CUSTOMER_DETAILS"
+					},
+					"p_file_table_id": {
+						"type": "int",
+						"defaultValue": 1001
+					}
+				},
+				"variables": {
+					"StartTime": {
+						"type": "String"
+					},
+					"PreviousWatermark": {
+						"type": "String"
+					},
+					"RowsInserted": {
+						"type": "Integer",
+						"defaultValue": 0
+					},
+					"RowsExpired": {
+						"type": "Integer",
+						"defaultValue": 0
+					},
+					"RowsDeleted": {
+						"type": "Integer",
+						"defaultValue": 0
+					},
+					"SqlQuery": {
+						"type": "String"
+					},
+					"MaxWatermark": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "SCDs"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_Watermark_Tracker')]",
+				"[concat(variables('factoryId'), '/linkedServices/LS_Azure_SB_Lkp')]",
+				"[concat(variables('factoryId'), '/dataflows/DF_LoadStage_WithHash')]",
+				"[concat(variables('factoryId'), '/datasets/DS_VIVID_RAW_TABLES')]",
+				"[concat(variables('factoryId'), '/datasets/DS_DWH_DIM_SRC_KEYS')]",
+				"[concat(variables('factoryId'), '/linkedServices/LS__SB_ADVW')]",
+				"[concat(variables('factoryId'), '/datasets/DS_Get_Watermark_2308')]",
+				"[concat(variables('factoryId'), '/linkedServices/LS_LOG_MIGRATION_EVENT')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/P_Incremental_Migrate_ADVW_Azure')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -3547,7 +4265,7 @@
 									"typeProperties": {
 										"variableName": "SqlQuery",
 										"value": {
-											"value": "@concat(\r\n  'SELECT * FROM ',\r\n  pipeline().parameters.p_src_schema, '.', pipeline().parameters.p_src_table,\r\n  ' WHERE SRC_ROW_INSRT_TSTMP > CAST(''', \r\n  formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss'),\r\n  ''' AS DATETIME2)'\r\n)",
+											"value": "@concat(\r\n  'SELECT ',\r\n  'INDEX_NUM, CUSTOMER_ID, FIRST_NAME, LAST_NAME, COMPANY, CITY, COUNTRY, ',\r\n  'PHONE_1, PHONE_2, EMAIL, SUBSCRIPTION_DATE, WEBSITE, ',\r\n  'LOWER(CONVERT(VARCHAR(64), HASHBYTES(''SHA2_256'', ',\r\n  'CONCAT_WS(''|'', ',\r\n  'ISNULL(CAST(INDEX_NUM AS NVARCHAR(50)),''NA''), ',\r\n  'ISNULL(CUSTOMER_ID,''NA''), ISNULL(FIRST_NAME,''NA''), ISNULL(LAST_NAME,''NA''), ',\r\n  'ISNULL(COMPANY,''NA''), ISNULL(CITY,''NA''), ISNULL(COUNTRY,''NA''), ',\r\n  'ISNULL(PHONE_1,''NA''), ISNULL(PHONE_2,''NA''), ISNULL(EMAIL,''NA''), ',\r\n  'ISNULL(CONVERT(NVARCHAR(30), SUBSCRIPTION_DATE,126),''NA''), ',\r\n  'ISNULL(WEBSITE,''NA'') ',\r\n  ')), 2)) AS HASH_DIFF ',\r\n  'FROM ', pipeline().parameters.p_src_schema, '.', pipeline().parameters.p_src_table, ' ',\r\n  'WHERE SRC_ROW_INSRT_TSTMP > CAST(''', \r\n  formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss'),\r\n  ''' AS DATETIME2)'\r\n)\r\n",
 											"type": "Expression"
 										}
 									}
@@ -3566,7 +4284,7 @@
 									"typeProperties": {
 										"variableName": "SqlQuery",
 										"value": {
-											"value": "@concat(\n  'SELECT * FROM ',\n pipeline().parameters.p_src_schema, '.', pipeline().parameters.p_src_table\n)",
+											"value": "@concat(\r\n  'SELECT ',\r\n  'INDEX_NUM, CUSTOMER_ID, FIRST_NAME, LAST_NAME, COMPANY, CITY, COUNTRY, ',\r\n  'PHONE_1, PHONE_2, EMAIL, SUBSCRIPTION_DATE, WEBSITE, ',\r\n  'LOWER(CONVERT(VARCHAR(64), HASHBYTES(''SHA2_256'', ',\r\n  'CONCAT_WS(''|'', ',\r\n  'ISNULL(CAST(INDEX_NUM AS NVARCHAR(50)),''NA''), ',\r\n  'ISNULL(CUSTOMER_ID,''NA''), ISNULL(FIRST_NAME,''NA''), ISNULL(LAST_NAME,''NA''), ',\r\n  'ISNULL(COMPANY,''NA''), ISNULL(CITY,''NA''), ISNULL(COUNTRY,''NA''), ',\r\n  'ISNULL(PHONE_1,''NA''), ISNULL(PHONE_2,''NA''), ISNULL(EMAIL,''NA''), ',\r\n  'ISNULL(CONVERT(NVARCHAR(30), SUBSCRIPTION_DATE,126),''NA''), ',\r\n  'ISNULL(WEBSITE,''NA'') ',\r\n  ')), 2)) AS HASH_DIFF ',\r\n  'FROM ', pipeline().parameters.p_src_schema, '.', pipeline().parameters.p_src_table\r\n)\r\n",
 											"type": "Expression"
 										}
 									}
@@ -3611,71 +4329,11 @@
 						}
 					},
 					{
-						"name": "DF_LoadStage_WithHash",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [
-							{
-								"activity": "TruncStageTable",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "DF_LoadStage_WithHash",
-								"type": "DataFlowReference",
-								"parameters": {
-									"df_sqlQuery": {
-										"value": "@'SELECT * FROM VIVID.BLOB_CUSTOMER_RAW'",
-										"type": "Expression"
-									}
-								},
-								"datasetParameters": {
-									"VivivdRawTable": {
-										"Src_Schema_Name": {
-											"value": "@pipeline().parameters.p_src_schema",
-											"type": "Expression"
-										},
-										"Src_Table_Name": {
-											"value": "@pipeline().parameters.p_src_table",
-											"type": "Expression"
-										}
-									},
-									"StgCustomerDetails": {
-										"Stg_Schema_Name": {
-											"value": "@pipeline().parameters.p_stg_schema",
-											"type": "Expression"
-										},
-										"Stg_Table_Name": {
-											"value": "@pipeline().parameters.p_stg_table",
-											"type": "Expression"
-										}
-									}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					},
-					{
 						"name": "SQL_MERGE_SCD2",
 						"type": "Script",
 						"dependsOn": [
 							{
-								"activity": "DF_LoadStage_WithHash",
+								"activity": "LoadStage_WithHash",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -4075,6 +4733,83 @@
 								"type": "Expression"
 							}
 						}
+					},
+					{
+						"name": "LoadStage_WithHash",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "TruncStageTable",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@variables('SqlQuery')",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_Vivid_Raw_2408",
+								"type": "DatasetReference",
+								"parameters": {
+									"Src_Schema_Name": {
+										"value": "@pipeline().parameters.p_src_schema",
+										"type": "Expression"
+									},
+									"Src_Table_Name": {
+										"value": "@pipeline().parameters.p_src_table",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_STG_WITH_HASH",
+								"type": "DatasetReference",
+								"parameters": {
+									"Stg_Schema_Name": {
+										"value": "@pipeline().parameters.p_stg_schema",
+										"type": "Expression"
+									},
+									"Stg_Table_Name": {
+										"value": "@pipeline().parameters.p_stg_table",
+										"type": "Expression"
+									}
+								}
+							}
+						]
 					}
 				],
 				"policy": {
@@ -4144,13 +4879,13 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DS_Watermark_Tracker')]",
 				"[concat(variables('factoryId'), '/linkedServices/LS_Azure_SB_Lkp')]",
-				"[concat(variables('factoryId'), '/dataflows/DF_LoadStage_WithHash')]",
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
 				"[concat(variables('factoryId'), '/datasets/DS_VIVID_RAW_TABLES')]",
 				"[concat(variables('factoryId'), '/datasets/DS_DWH_DIM_SRC_KEYS')]",
 				"[concat(variables('factoryId'), '/linkedServices/LS__SB_ADVW')]",
 				"[concat(variables('factoryId'), '/datasets/DS_Get_Watermark_2308')]",
-				"[concat(variables('factoryId'), '/linkedServices/LS_LOG_MIGRATION_EVENT')]"
+				"[concat(variables('factoryId'), '/linkedServices/LS_LOG_MIGRATION_EVENT')]",
+				"[concat(variables('factoryId'), '/datasets/DS_Vivid_Raw_2408')]",
+				"[concat(variables('factoryId'), '/datasets/DS_STG_WITH_HASH')]"
 			]
 		},
 		{
@@ -4956,6 +5691,41 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_STG_WITH_HASH')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_SB_SCD",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Stg_Schema_Name": {
+						"type": "String"
+					},
+					"Stg_Table_Name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().Stg_Schema_Name",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().Stg_Table_Name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_SB_SCD')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_TGT_Azure_etl_orcl')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -5273,6 +6043,41 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/LS_SB_SCD')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Vivid_Raw_2408')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS__SB_ADVW",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Src_Schema_Name": {
+						"type": "String"
+					},
+					"Src_Table_Name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().Src_Schema_Name",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().Src_Table_Name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS__SB_ADVW')]"
 			]
 		},
 		{
