@@ -423,7 +423,7 @@
 					"scripts": [
 						{
 							"type": "Query",
-							"text": "DECLARE @today_ist datetime2(3) = SYSDATETIMEOFFSET() AT TIME ZONE 'India Standard Time';\r\n\r\n;WITH missing AS (\r\n  SELECT D.INDEX_NUM, D.CUSTOMER_ID\r\n  FROM DWH.DIM_CUSTOMER_DETAILS D\r\n  WHERE D.ROW_EXPIR_DT = '9999-12-31'\r\n  EXCEPT\r\n  SELECT K.INDEX_NUM, K.CUSTOMER_ID\r\n  FROM DWH.SRC_KEYS_CUSTOMER K\r\n)\r\nUPDATE D\r\n   SET D.ROW_EXPIR_DT = DATEADD(day,-1,CAST(@today_ist AS date)),\r\n       D.ROW_STS_CD   = 'D',\r\n       D.LST_UPD_TSTMP_IST = @today_ist\r\nFROM DWH.DIM_CUSTOMER_DETAILS D\r\nJOIN missing M\r\n  ON D.INDEX_NUM = M.INDEX_NUM\r\n AND D.CUSTOMER_ID = M.CUSTOMER_ID\r\nWHERE D.ROW_EXPIR_DT = '9999-12-31';\r\n\r\nSELECT @@ROWCOUNT AS RowsDeleted;"
+							"text": "DECLARE @today_ist datetime2(3) = SYSDATETIMEOFFSET() AT TIME ZONE 'India Standard Time';\r\n\r\n;WITH missing AS (\r\n  SELECT D.INDEX_NUM, D.CUSTOMER_ID\r\n  FROM DWH.DIM_CUSTOMER_DETAILS D\r\n  WHERE D.ROW_EXPIR_DT = '9999-12-31'\r\n  EXCEPT\r\n  SELECT K.INDEX_NUM, K.CUSTOMER_ID\r\n  FROM DWH.DIM_SRC_KEYS K\r\n)\r\nUPDATE D\r\n   SET D.ROW_EXPIR_DT = DATEADD(day,-1,CAST(@today_ist AS date)),\r\n       D.ROW_STS_CD   = 'D',\r\n       D.LST_UPD_TSTMP_IST = @today_ist\r\nFROM DWH.DIM_CUSTOMER_DETAILS D\r\nJOIN missing M\r\n  ON D.INDEX_NUM = M.INDEX_NUM\r\n AND D.CUSTOMER_ID = M.CUSTOMER_ID\r\nWHERE D.ROW_EXPIR_DT = '9999-12-31';\r\n\r\nSELECT @@ROWCOUNT AS RowsDeleted;"
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
