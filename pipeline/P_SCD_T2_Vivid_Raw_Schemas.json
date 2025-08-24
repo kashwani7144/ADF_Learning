@@ -601,7 +601,20 @@
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
-					"enableStaging": false
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
 				},
 				"inputs": [
 					{
@@ -610,6 +623,22 @@
 						"parameters": {
 							"Src_Schema_Name": {
 								"value": "@pipeline().parameters.p_src_schema",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_STG_WITH_HASH",
+						"type": "DatasetReference",
+						"parameters": {
+							"Stg_Schema_Name": {
+								"value": "@pipeline().parameters.p_stg_schema",
+								"type": "Expression"
+							},
+							"Stg_Table_Name": {
+								"value": "@pipeline().parameters.p_stg_table",
 								"type": "Expression"
 							}
 						}
