@@ -204,7 +204,8 @@
 									"value": {
 										"value": "@pipeline().parameters.p_batch_id",
 										"type": "Expression"
-									}
+									},
+									"direction": "Input"
 								}
 							],
 							"type": "Query",
