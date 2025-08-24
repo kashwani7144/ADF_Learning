@@ -4452,7 +4452,7 @@
 							"sink": {
 								"type": "AzureSqlSink",
 								"preCopyScript": {
-									"value": "TRUNCATE TABLE DWH.SRC_KEYS_CUSTOMER;",
+									"value": "TRUNCATE TABLE DWH.DIM_SRC_KEYS;",
 									"type": "Expression"
 								},
 								"writeBehavior": "insert",
