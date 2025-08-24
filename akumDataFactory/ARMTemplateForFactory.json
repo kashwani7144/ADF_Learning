@@ -4355,7 +4355,7 @@
 							"scripts": [
 								{
 									"type": "Query",
-									"text": "DECLARE @today_ist datetime2(3) = SYSDATETIMEOFFSET() AT TIME ZONE 'India Standard Time';\r\nDECLARE @chg TABLE(action nvarchar(10));\r\n\r\nBEGIN TRAN;\r\n\r\n-- 1) Expire rows where attributes changed\r\nMERGE DWH.DIM_CUSTOMER_DETAILS AS T\r\nUSING (\r\n  SELECT *\r\n  FROM DWH.STG_CUSTOMER_DETAILS\r\n) AS S\r\nON  T.INDEX_NUM   = S.INDEX_NUM\r\nAND T.CUSTOMER_ID = S.CUSTOMER_ID\r\nAND T.ROW_EXPIR_DT = '9999-12-31'\r\nWHEN MATCHED AND ISNULL(S.HASH_DIFF,0x) <> ISNULL(T.HASH_DIFF,0x)\r\nTHEN UPDATE SET\r\n  T.ROW_EXPIR_DT = DATEADD(day,-1,CAST(@today_ist AS date)),\r\n  T.LST_UPD_TSTMP_IST = @today_ist\r\nOUTPUT $action INTO @chg;\r\n\r\n-- 2) Insert new versions for the rows just expired\r\nINSERT INTO DWH.DIM_CUSTOMER_DETAILS\r\n(\r\n  INDEX_NUM, CUSTOMER_ID,\r\n  FIRST_NAME, LAST_NAME, COMPANY, CITY, COUNTRY,\r\n  PHONE_1, PHONE_2, EMAIL, SUBSCRIPTION_DATE, WEBSITE,\r\n  HASH_DIFF, VERSION_NUM\r\n)\r\nSELECT\r\n  S.INDEX_NUM, S.CUSTOMER_ID,\r\n  S.FIRST_NAME, S.LAST_NAME, S.COMPANY, S.CITY, S.COUNTRY,\r\n  S.PHONE_1, S.PHONE_2, S.EMAIL, S.SUBSCRIPTION_DATE, S.WEBSITE,\r\n  S.HASH_DIFF, T.VERSION_NUM + 1\r\nFROM DWH.STG_CUSTOMER_DETAILS S\r\nJOIN DWH.DIM_CUSTOMER_DETAILS T\r\n  ON T.INDEX_NUM = S.INDEX_NUM\r\n AND T.CUSTOMER_ID = S.CUSTOMER_ID\r\nWHERE T.ROW_EXPIR_DT = DATEADD(day,-1,CAST(@today_ist AS date));\r\n\r\n-- 3) Insert brand-new keys\r\nMERGE DWH.DIM_CUSTOMER_DETAILS AS T\r\nUSING (\r\n  SELECT *\r\n  FROM DWH.STG_CUSTOMER_DETAILS\r\n) AS S\r\nON  T.INDEX_NUM   = S.INDEX_NUM\r\nAND T.CUSTOMER_ID = S.CUSTOMER_ID\r\nWHEN NOT MATCHED BY TARGET\r\nTHEN INSERT\r\n(\r\n  INDEX_NUM, CUSTOMER_ID,\r\n  FIRST_NAME, LAST_NAME, COMPANY, CITY, COUNTRY,\r\n  PHONE_1, PHONE_2, EMAIL, SUBSCRIPTION_DATE, WEBSITE,\r\n  HASH_DIFF, VERSION_NUM\r\n)\r\nVALUES\r\n(\r\n  S.INDEX_NUM, S.CUSTOMER_ID,\r\n  S.FIRST_NAME, S.LAST_NAME, S.COMPANY, S.CITY, S.COUNTRY,\r\n  S.PHONE_1, S.PHONE_2, S.EMAIL, S.SUBSCRIPTION_DATE, S.WEBSITE,\r\n  S.HASH_DIFF, 1\r\n)\r\nOUTPUT $action INTO @chg;\r\n\r\nCOMMIT;\r\n\r\n-- Return counts to ADF\r\nSELECT\r\n  SUM(CASE WHEN action='INSERT' THEN 1 ELSE 0 END) AS RowsInserted,\r\n  SUM(CASE WHEN action='UPDATE' THEN 1 ELSE 0 END) AS RowsExpired\r\nFROM @chg;\r\n"
+									"text": "DECLARE @today_ist datetime2(3) = SYSDATETIMEOFFSET() AT TIME ZONE 'India Standard Time';\r\nDECLARE @chg TABLE(action nvarchar(10));\r\n\r\nBEGIN TRAN;\r\n\r\n-- 1) Expire rows where attributes changed\r\nMERGE DWH.DIM_CUSTOMER_DETAILS AS T\r\nUSING (\r\n  SELECT *\r\n  FROM DWH.STG_CUSTOMER_DETAILS\r\n) AS S\r\nON  T.INDEX_NUM   = S.INDEX_NUM\r\nAND T.CUSTOMER_ID = S.CUSTOMER_ID\r\nAND T.ROW_EXPIR_DT = '9999-12-31'\r\nWHEN MATCHED AND ISNULL(S.HASH_DIFF,0x) <> ISNULL(T.HASH_DIFF,0x)\r\nTHEN UPDATE SET\r\n  T.ROW_EXPIR_DT = DATEADD(day,-1,CAST(@today_ist AS date)),\r\n  T.LST_UPD_TSTMP_IST = @today_ist\r\nOUTPUT $action INTO @chg;\r\n\r\n-- 2) Insert new versions for the rows just expired\r\nINSERT INTO DWH.DIM_CUSTOMER_DETAILS\r\n(\r\n  INDEX_NUM, CUSTOMER_ID,\r\n  FIRST_NAME, LAST_NAME, COMPANY, CITY, COUNTRY,\r\n  PHONE_1, PHONE_2, EMAIL, SUBSCRIPTION_DATE, WEBSITE,SRC_ROW_INSRT_TSTMP\r\n  HASH_DIFF, VERSION_NUM\r\n)\r\nSELECT\r\n  S.INDEX_NUM, S.CUSTOMER_ID,\r\n  S.FIRST_NAME, S.LAST_NAME, S.COMPANY, S.CITY, S.COUNTRY,\r\n  S.PHONE_1, S.PHONE_2, S.EMAIL, S.SUBSCRIPTION_DATE, S.WEBSITE,S.SRC_ROW_INSRT_TSTMP\r\n  S.HASH_DIFF, T.VERSION_NUM + 1\r\nFROM DWH.STG_CUSTOMER_DETAILS S\r\nJOIN DWH.DIM_CUSTOMER_DETAILS T\r\n  ON T.INDEX_NUM = S.INDEX_NUM\r\n AND T.CUSTOMER_ID = S.CUSTOMER_ID\r\nWHERE T.ROW_EXPIR_DT = DATEADD(day,-1,CAST(@today_ist AS date));\r\n\r\n-- 3) Insert brand-new keys\r\nMERGE DWH.DIM_CUSTOMER_DETAILS AS T\r\nUSING (\r\n  SELECT *\r\n  FROM DWH.STG_CUSTOMER_DETAILS\r\n) AS S\r\nON  T.INDEX_NUM   = S.INDEX_NUM\r\nAND T.CUSTOMER_ID = S.CUSTOMER_ID\r\nWHEN NOT MATCHED BY TARGET\r\nTHEN INSERT\r\n(\r\n  INDEX_NUM, CUSTOMER_ID,\r\n  FIRST_NAME, LAST_NAME, COMPANY, CITY, COUNTRY,\r\n  PHONE_1, PHONE_2, EMAIL, SUBSCRIPTION_DATE, WEBSITE,SRC_ROW_INSRT_TSTMP\r\n  HASH_DIFF, VERSION_NUM\r\n)\r\nVALUES\r\n(\r\n  S.INDEX_NUM, S.CUSTOMER_ID,\r\n  S.FIRST_NAME, S.LAST_NAME, S.COMPANY, S.CITY, S.COUNTRY,\r\n  S.PHONE_1, S.PHONE_2, S.EMAIL, S.SUBSCRIPTION_DATE, S.WEBSITE,S.SRC_ROW_INSRT_TSTMP\r\n  S.HASH_DIFF, 1\r\n)\r\nOUTPUT $action INTO @chg;\r\n\r\nCOMMIT;\r\n\r\n-- Return counts to ADF\r\nSELECT\r\n  SUM(CASE WHEN action='INSERT' THEN 1 ELSE 0 END) AS RowsInserted,\r\n  SUM(CASE WHEN action='UPDATE' THEN 1 ELSE 0 END) AS RowsExpired\r\nFROM @chg;\r\n"
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -4771,6 +4771,174 @@
 							"enableStaging": false,
 							"translator": {
 								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "INDEX_NUM",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "INDEX_NUM",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "CUSTOMER_ID",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "CUSTOMER_ID",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "FIRST_NAME",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "FIRST_NAME",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "LAST_NAME",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "LAST_NAME",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "COMPANY",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "COMPANY",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CITY",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "CITY",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "COUNTRY",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "COUNTRY",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "PHONE_1",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "PHONE_1",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "PHONE_2",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "PHONE_2",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "EMAIL",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "EMAIL",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "SUBSCRIPTION_DATE",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "SUBSCRIPTION_DATE",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "WEBSITE",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "WEBSITE",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "SRC_ROW_INSRT_TSTMP",
+											"type": "DateTime",
+											"physicalType": "datetime2"
+										},
+										"sink": {
+											"name": "SRC_ROW_INSRT_TSTMP",
+											"type": "DateTime",
+											"physicalType": "datetime2"
+										}
+									},
+									{
+										"source": {
+											"name": "HASH_DIFF"
+										},
+										"sink": {
+											"name": "HASH_DIFF",
+											"type": "Byte[]",
+											"physicalType": "varbinary"
+										}
+									}
+								],
 								"typeConversion": true,
 								"typeConversionSettings": {
 									"allowDataTruncation": true,
