@@ -1,0 +1,117 @@
+{
+	"name": "DS_DIM_CUST",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_SB_SCD",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "CUSTOMER_SID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "INDEX_NUM",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CUSTOMER_ID",
+				"type": "nvarchar"
+			},
+			{
+				"name": "FIRST_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "LAST_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "COMPANY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "CITY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "COUNTRY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "PHONE_1",
+				"type": "nvarchar"
+			},
+			{
+				"name": "PHONE_2",
+				"type": "nvarchar"
+			},
+			{
+				"name": "EMAIL",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SUBSCRIPTION_DATE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "WEBSITE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SRC_ROW_INSRT_TSTMP",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "HASH_DIFF",
+				"type": "varbinary"
+			},
+			{
+				"name": "WATERMARK_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "BATCH_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ROW_EFF_DT",
+				"type": "date"
+			},
+			{
+				"name": "ROW_EXPIR_DT",
+				"type": "date"
+			},
+			{
+				"name": "ROW_STS_CD",
+				"type": "nvarchar"
+			},
+			{
+				"name": "VERSION_NUM",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "INSERT_TSTMP_IST",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "LST_UPD_TSTMP_IST",
+				"type": "datetime2",
+				"scale": 7
+			}
+		],
+		"typeProperties": {
+			"schema": "DWH",
+			"table": "DIM_CUSTOMER_DETAILS"
+		}
+	}
+}
