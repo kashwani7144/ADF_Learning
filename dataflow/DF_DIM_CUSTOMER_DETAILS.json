@@ -1,0 +1,14 @@
+{
+	"name": "DF_DIM_CUSTOMER_DETAILS",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				""
+			]
+		}
+	}
+}
