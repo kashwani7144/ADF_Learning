@@ -1,6 +1,25 @@
 {
 	"name": "P_SCD_T2_Vivid_Schema_People",
 	"properties": {
+		"activities": [
+			{
+				"name": "SetStartTime",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "StartTime",
+					"value": {
+						"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
+						"type": "Expression"
+					}
+				}
+			}
+		],
 		"parameters": {
 			"p_src_schema_name": {
 				"type": "string",
