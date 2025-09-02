@@ -201,7 +201,13 @@
 				"inputs": [
 					{
 						"referenceName": "DS_People_Raw_0209",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"Src_Schema_Name": {
+								"value": "@pipeline().parameters.p_src_schema_name",
+								"type": "Expression"
+							}
+						}
 					}
 				]
 			}
