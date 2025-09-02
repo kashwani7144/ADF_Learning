@@ -35,6 +35,29 @@
 				"defaultValue": 12001
 			}
 		},
+		"variables": {
+			"StartTime": {
+				"type": "String"
+			},
+			"PreviousWatermark": {
+				"type": "String"
+			},
+			"RowsInserted": {
+				"type": "String"
+			},
+			"RowsExpired": {
+				"type": "String"
+			},
+			"RowsDeleted": {
+				"type": "String"
+			},
+			"SqlQuery": {
+				"type": "String"
+			},
+			"MaxWatermark": {
+				"type": "String"
+			}
+		},
 		"folder": {
 			"name": "SCDs"
 		},
