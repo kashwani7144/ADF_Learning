@@ -95,6 +95,25 @@
 						"value": "@empty(variables('PreviousWatermark'))",
 						"type": "Expression"
 					},
+					"ifFalseActivities": [
+						{
+							"name": "SqlQuery_After_1_run",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "SqlQuery",
+								"value": {
+									"value": "@concat(\n  'SELECT ',\n  'INDEX_NUM,USR_ID,FIRST_NAME,LAST_NAME,SEX,EMAIL,PHONE,DATE_OF_BIRTH, ',\n  'JOB_TITLE,SRC_ROW_INSRT_TSTMP ',\n  'HASHBYTES(''SHA2_256'', ',\n    'CONCAT_WS(''|'', ',\n    'ISNULL(FIRST_NAME,'''') , ',\n    'ISNULL(LAST_NAME,'''') , ',\n    'ISNULL(SEX,'''') , ',\n    'ISNULL(DATE_OF_BIRTH,'''') , ',\n    'ISNULL(JOB_TITLE,'''') , ',\n    'ISNULL(PHONE,'''') , ',\n    'ISNULL(EMAIL,'''') , ',\n  ')) AS HASH_DIFF ',\n  'FROM ', pipeline().parameters.p_src_schema_name, '.', pipeline().parameters.p_src_table_name, ' ',\n  'WHERE SRC_ROW_INSRT_TSTMP > CAST(''', \n    formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss'),\n  ''' AS DATETIME2)'\n)",
+									"type": "Expression"
+								}
+							}
+						}
+					],
 					"ifTrueActivities": [
 						{
 							"name": "SqlQuery_1_run",
