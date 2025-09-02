@@ -53,6 +53,30 @@
 						"type": "DatasetReference"
 					}
 				}
+			},
+			{
+				"name": "SetPreviousWatermark",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetWatermarkValue",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "PreviousWatermark",
+					"value": {
+						"value": "@if(\n  or(empty(activity('GetWatermarkValue').output.firstRow), empty(activity('GetWatermarkValue').output.firstRow.WATERMARK_VALUE)),\n  '',\n  formatDateTime(activity('GetWatermarkValue').output.firstRow.WATERMARK_VALUE, 'yyyy-MM-dd HH:mm:ss.fffffff')\n)",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
