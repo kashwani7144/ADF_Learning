@@ -1,6 +1,40 @@
 {
 	"name": "P_SCD_T2_Vivid_Schema_People",
 	"properties": {
+		"parameters": {
+			"p_src_schema_name": {
+				"type": "string",
+				"defaultValue": "VIVID"
+			},
+			"p_src_table_name": {
+				"type": "string",
+				"defaultValue": "BLOB_PEOPLE_RAW"
+			},
+			"p_stg_schema_name": {
+				"type": "string",
+				"defaultValue": "DWH"
+			},
+			"p_stg_table_name": {
+				"type": "string",
+				"defaultValue": "STG_PEOPLE_DETAILS"
+			},
+			"p_dim_schema_name": {
+				"type": "string",
+				"defaultValue": "DWH"
+			},
+			"p_dim_table_name": {
+				"type": "string",
+				"defaultValue": "DIM_PEOPLE_DETAILS"
+			},
+			"p_file_table_id": {
+				"type": "int",
+				"defaultValue": 1002
+			},
+			"p_batch_id": {
+				"type": "int",
+				"defaultValue": 12001
+			}
+		},
 		"folder": {
 			"name": "SCDs"
 		},
