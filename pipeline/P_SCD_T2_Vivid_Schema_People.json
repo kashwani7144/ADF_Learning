@@ -1,0 +1,9 @@
+{
+	"name": "P_SCD_T2_Vivid_Schema_People",
+	"properties": {
+		"folder": {
+			"name": "SCDs"
+		},
+		"annotations": []
+	}
+}
