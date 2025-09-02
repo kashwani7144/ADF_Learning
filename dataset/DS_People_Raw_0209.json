@@ -1,0 +1,30 @@
+{
+	"name": "DS_People_Raw_0209",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_Azure_SB_Lkp",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"Src_Schema_Name": {
+				"type": "String"
+			},
+			"Src_Table_Name": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().Src_Schema_Name",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().Src_Table_Name",
+				"type": "Expression"
+			}
+		}
+	}
+}

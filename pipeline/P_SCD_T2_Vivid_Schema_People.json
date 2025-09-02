@@ -134,6 +134,76 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "TruncStageTable",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "IsFirstRun",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": {
+								"value": "@concat(\n  'TRUNCATE TABLE [',\n  pipeline().parameters.p_stg_schema_name, '].[', \n  pipeline().parameters.p_stg_table_name, '];'\n)",
+								"type": "Expression"
+							}
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			},
+			{
+				"name": "LoadStage_WithHash",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "TruncStageTable",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_People_Raw_0209",
+						"type": "DatasetReference"
+					}
+				]
 			}
 		],
 		"parameters": {
