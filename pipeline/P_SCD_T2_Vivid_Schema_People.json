@@ -43,13 +43,16 @@
 				"type": "String"
 			},
 			"RowsInserted": {
-				"type": "String"
+				"type": "String",
+				"defaultValue": "0"
 			},
 			"RowsExpired": {
-				"type": "String"
+				"type": "String",
+				"defaultValue": "0"
 			},
 			"RowsDeleted": {
-				"type": "String"
+				"type": "String",
+				"defaultValue": "0"
 			},
 			"SqlQuery": {
 				"type": "String"
