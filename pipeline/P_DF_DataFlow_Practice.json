@@ -15,10 +15,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "DF_DIM_CUSTOMER_DETAILS",
-						"type": "DataFlowReference"
-					},
 					"compute": {
 						"coreCount": 8,
 						"computeType": "General"
