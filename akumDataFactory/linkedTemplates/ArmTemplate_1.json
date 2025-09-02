@@ -114,6 +114,39 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_People_Raw_0209')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Src_Schema_Name": {
+						"type": "String"
+					},
+					"Src_Table_Name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().Src_Schema_Name",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().Src_Table_Name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_PhonePe_Trans_Raw')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -428,6 +461,39 @@
 				"typeProperties": {
 					"schema": "dbo",
 					"table": "SRC_STG_DIM_TABLE_MAPPING"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_STG_PEOPLE_0209')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Stg_Schema_Name": {
+						"type": "String"
+					},
+					"Stg_Table_Name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().Stg_Schema_Name",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().Stg_Table_Name",
+						"type": "Expression"
+					}
 				}
 			},
 			"dependsOn": []
@@ -769,58 +835,6 @@
 						"value": "@dataset().Src_Table_Name",
 						"type": "Expression"
 					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_Vivid_Raw_2408')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS__SB_ADVW",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"Src_Schema_Name": {
-						"type": "String"
-					},
-					"Src_Table_Name": {
-						"type": "String"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().Src_Schema_Name",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().Src_Table_Name",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_Watermark_Tracker')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_Azure_SB_Lkp",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "WATERMARK_TRACKER"
 				}
 			},
 			"dependsOn": []
