@@ -693,6 +693,30 @@
 						}
 					}
 				}
+			},
+			{
+				"name": "SetMaxWatermark",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetMaxModifiedDate",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "MaxWatermark",
+					"value": {
+						"value": "@if(\n  empty(activity('GetMaxModifiedDate').output.firstRow.MAX_MODIFIED_DATE),\n  formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss.fffffff'),\n  formatDateTime(activity('GetMaxModifiedDate').output.firstRow.MAX_MODIFIED_DATE, 'yyyy-MM-dd HH:mm:ss.fffffff')\n)",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
