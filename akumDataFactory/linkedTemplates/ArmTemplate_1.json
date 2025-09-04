@@ -114,6 +114,25 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_PEOPLE_DIM_SRC_KEYS')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "DWH",
+					"table": "DIM_SRC_KEYS"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_People_Raw_0209')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -665,94 +684,6 @@
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DS_VIVID_CUSTOMER')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_SB_SCD",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"Src_Schema_Name": {
-						"type": "String"
-					},
-					"Src_Table_Name": {
-						"type": "String"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "INDEX_NUM",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CUSTOMER_ID",
-						"type": "nvarchar"
-					},
-					{
-						"name": "FIRST_NAME",
-						"type": "nvarchar"
-					},
-					{
-						"name": "LAST_NAME",
-						"type": "nvarchar"
-					},
-					{
-						"name": "COMPANY",
-						"type": "nvarchar"
-					},
-					{
-						"name": "CITY",
-						"type": "nvarchar"
-					},
-					{
-						"name": "COUNTRY",
-						"type": "nvarchar"
-					},
-					{
-						"name": "PHONE_1",
-						"type": "nvarchar"
-					},
-					{
-						"name": "PHONE_2",
-						"type": "nvarchar"
-					},
-					{
-						"name": "EMAIL",
-						"type": "nvarchar"
-					},
-					{
-						"name": "SUBSCRIPTION_DATE",
-						"type": "nvarchar"
-					},
-					{
-						"name": "WEBSITE",
-						"type": "nvarchar"
-					},
-					{
-						"name": "SRC_ROW_INSRT_TSTMP",
-						"type": "datetime2",
-						"scale": 7
-					}
-				],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().Src_Schema_Name",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().Src_Table_Name",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_VIVID_RAW_TABLES')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {

@@ -5371,7 +5371,7 @@
 							"sink": {
 								"type": "AzureSqlSink",
 								"preCopyScript": {
-									"value": "TRUNCATE TABLE DWH.DIM_SRC_KEYS;",
+									"value": "DELETE FROM DWH.DIM_SRC_KEYS\nWHERE DIM_TAB_SCHEMA_NAME = 'DWH'\nAND DIM_TABLE_NAME = 'DIM_CUSTOMER_DETAILS';",
 									"type": "Expression"
 								},
 								"writeBehavior": "insert",
@@ -6374,6 +6374,480 @@
 								}
 							}
 						]
+					},
+					{
+						"name": "SQL_MERGE_SCD2",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "LoadStage_WithHash",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "LS_Azure_SB_Lkp",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "/* ===== Inputs from ADF Script parameters =====\r\n   Expect a Script parameter named p_batch_id (Int32, Input) */\r\nDECLARE @BatchId INT = @p_batch_id;\r\n\r\n/* ===== Session safety ===== */\r\nSET NOCOUNT ON;\r\nSET XACT_ABORT ON;\r\n\r\n/* ===== IST \"today\" ===== */\r\nDECLARE @today_ist  datetime2(7) = SYSDATETIMEOFFSET() AT TIME ZONE 'India Standard Time';\r\nDECLARE @today_date date         = CAST(@today_ist AS date);\r\n\r\n/* ===== Get latest watermark for this pipeline/table (fallback to 0 on day 1) ===== */\r\nDECLARE @WatermarkId INT;\r\nSELECT TOP 1 @WatermarkId = WATERMARK_ID\r\nFROM dbo.WATERMARK_TRACKER\r\nWHERE PIPELINE_NAME     = 'P_SCD_T2_Vivid_Schema_PEOPLE'\r\n  AND SOURCE_TABLE_NAME = 'BLOB_PEOPLE_RAW'\r\nORDER BY UPDATED_AT_TSTMP DESC;\r\n\r\nIF @WatermarkId IS NULL SET @WatermarkId = 0;\r\n\r\n/* ===== Track actions for ADF output ===== */\r\nDECLARE @chg TABLE (action nvarchar(10));\r\n\r\nBEGIN TRY\r\n    BEGIN TRAN;\r\n\r\n    /* ===========================================================\r\n       1) Insert brand-new keys (first versions) — do this first\r\n       =========================================================== */\r\n    MERGE DWH.DIM_PEOPLE_DETAILS AS T\r\n    USING (SELECT * FROM DWH.STG_PEOPLE_DETAILS) AS S\r\n      ON  T.INDEX_NUM   = S.INDEX_NUM\r\n     AND T.PEOPLE_ID = S.PEOPLE_ID\r\n    WHEN NOT MATCHED BY TARGET THEN\r\n      INSERT (\r\n\t\tINDEX_NUM,USR_ID,FIRST_NAME,LAST_NAME,SEX,EMAIL,PHONE,DATE_OF_BIRTH,\r\n\t\tJOB_TITLE, SRC_ROW_INSRT_TSTMP,\r\n        HASH_DIFF, VERSION_NUM,\r\n        WATERMARK_ID, BATCH_ID\r\n      )\r\n      VALUES (\t\t\r\n\t\tS.INDEX_NUM, S.USR_ID, S.FIRST_NAME, S.LAST_NAME, S.SEX, S.EMAIL, S.PHONE, S.DATE_OF_BIRTH,\r\n\t\tS.JOB_TITLE, S.SRC_ROW_INSRT_TSTMP,\r\n        S.HASH_DIFF, 1,\r\n        @WatermarkId, @BatchId\r\n      )\r\n      OUTPUT $action INTO @chg;\r\n\r\n    /* ==========================================================================\r\n       2) Expire current rows whose attributes changed (close them on TODAY)\r\n       (must run before step 3 which depends on these closures)\r\n       ========================================================================== */\r\n    MERGE DWH.DIM_PEOPLE_DETAILS AS T\r\n    USING (SELECT * FROM DWH.STG_PEOPLE_DETAILS) AS S\r\n      ON  T.INDEX_NUM    = S.INDEX_NUM\r\n     AND T.PEOPLE_ID  = S.PEOPLE_ID\r\n     AND T.ROW_EXPIR_DT = '9999-12-31'\r\n    WHEN MATCHED AND ISNULL(S.HASH_DIFF, 0x) <> ISNULL(T.HASH_DIFF, 0x)\r\n      THEN UPDATE SET\r\n           T.ROW_EXPIR_DT      = @today_date,\r\n           T.LST_UPD_TSTMP_IST = @today_ist\r\n      OUTPUT $action INTO @chg;\r\n\r\n    /* =======================================================================\r\n       3) Insert new versions for the keys just expired in step 1\r\n          (new rows get ROW_EFF_DT default = today; VERSION_NUM = prev+1)\r\n       ======================================================================= */\r\n    INSERT INTO DWH.DIM_PEOPLE_DETAILS (\r\n\t  INDEX_NUM,USR_ID,FIRST_NAME,LAST_NAME,SEX,EMAIL,PHONE,DATE_OF_BIRTH,\r\n\t  JOB_TITLE, SRC_ROW_INSRT_TSTMP,\r\n      HASH_DIFF, VERSION_NUM,\r\n      WATERMARK_ID, BATCH_ID\r\n    )\r\n    OUTPUT 'INSERT' INTO @chg  -- record inserts for ADF counts\r\n    SELECT\r\n\t  S.INDEX_NUM, S.USR_ID, S.FIRST_NAME, S.LAST_NAME, S.SEX, S.EMAIL, S.PHONE, S.DATE_OF_BIRTH,\r\n\t  S.JOB_TITLE, S.SRC_ROW_INSRT_TSTMP,\r\n      S.HASH_DIFF, T.VERSION_NUM + 1,\r\n      @WatermarkId, @BatchId\r\n    FROM DWH.STG_PEOPLE_DETAILS S\r\n    JOIN DWH.DIM_PEOPLE_DETAILS T\r\n      ON T.INDEX_NUM   = S.INDEX_NUM\r\n     AND T.PEOPLE_ID = S.PEOPLE_ID\r\n    WHERE T.ROW_EXPIR_DT = @today_date;  -- rows just closed above\r\n\r\n    COMMIT;\r\nEND TRY\r\nBEGIN CATCH\r\n    IF @@TRANCOUNT > 0 ROLLBACK;\r\n    THROW;\r\nEND CATCH;\r\n\r\n/* ===== Return counts back to ADF ===== */\r\nSELECT\r\n  SUM(CASE WHEN action = 'INSERT' THEN 1 ELSE 0 END) AS RowsInserted,\r\n  SUM(CASE WHEN action = 'UPDATE' THEN 1 ELSE 0 END) AS RowsExpired;\r\n"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
+						"name": "SetRowsInsertedCounts",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "SQL_MERGE_SCD2",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "RowsInserted",
+							"value": {
+								"value": "@int(activity('SQL_MERGE_SCD2').output.resultSets[0].rows[0].RowsInserted)",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "SetRowsExpiredCounts",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "SetRowsInsertedCounts",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "RowsExpired",
+							"value": {
+								"value": "@int(activity('SQL_MERGE_SCD2').output.resultSets[0].rows[0].RowsExpired)",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "SourceKeys_Full",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "SetRowsExpiredCounts",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat( 'SELECT ', '''DWH'' AS DIM_TAB_SCHEMA_NAME, ', '''DIM_PEOPLE_DETAILS'' AS DIM_TABLE_NAME, ', '''USR_ID'' AS BUSSINESS_ID_COL_NM, ', 'INDEX_NUM, ', 'USR_ID AS BUSSINESS_ID ', 'FROM ', pipeline().parameters.p_src_schema_name, '.', pipeline().parameters.p_src_table_name)",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": "DELETE FROM DWH.DIM_SRC_KEYS\nWHERE DIM_TAB_SCHEMA_NAME = 'DWH'\nAND DIM_TABLE_NAME = 'DIM_PEOPLE_DETAILS';",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false,
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "DIM_TAB_SCHEMA_NAME",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "DIM_TAB_SCHEMA_NAME",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "DIM_TABLE_NAME",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "DIM_TABLE_NAME",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "INDEX_NUM",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "INDEX_NUM",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "BUSSINESS_ID_COL_NM",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "BUSSINESS_ID_COL_NM",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "BUSSINESS_ID",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "BUSSINESS_ID",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_VIVID_PEOPLE",
+								"type": "DatasetReference",
+								"parameters": {
+									"Src_Schema_Name": {
+										"value": "@pipeline().parameters.p_src_schema_name",
+										"type": "Expression"
+									},
+									"Src_Table_Name": {
+										"value": "@pipeline().parameters.p_src_table_name",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_PEOPLE_DIM_SRC_KEYS",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "SQL_MarkDeletes",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "SourceKeys_Full",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "LS_Azure_SB_Lkp",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "SET XACT_ABORT ON;\r\n\r\nDECLARE @today_ist  datetime2(3) = SYSDATETIMEOFFSET() AT TIME ZONE 'India Standard Time';\r\nDECLARE @today_date date         = CAST(@today_ist AS date);\r\n\r\nBEGIN TRY\r\n  BEGIN TRAN;\r\n\r\n  ;WITH missing AS (\r\n    SELECT D.INDEX_NUM, D.USR_ID\r\n    FROM DWH.DIM_PEOPLE_DETAILS D\r\n    WHERE D.ROW_EXPIR_DT = '9999-12-31'              -- only current rows\r\n  EXCEPT\r\n  SELECT K.INDEX_NUM, K.BUSSINESS_ID\r\n  FROM DWH.DIM_SRC_KEYS K\r\n  WHERE BUSSINESS_ID_COL_NM = 'USR_ID'\r\n  )\r\n  UPDATE D\r\n     SET D.ROW_EXPIR_DT       = @today_date,         -- expire today (not yesterday)\r\n         D.ROW_STS_CD         = 'D',\r\n         D.LST_UPD_TSTMP_IST  = @today_ist\r\n  FROM DWH.DIM_PEOPLE_DETAILS D\r\n  JOIN missing M\r\n    ON D.INDEX_NUM   = M.INDEX_NUM\r\n   AND D.USR_ID = M.USR_ID\r\n  WHERE D.ROW_EXPIR_DT = '9999-12-31';\r\n\r\n  COMMIT;\r\nEND TRY\r\nBEGIN CATCH\r\n  IF @@TRANCOUNT > 0 ROLLBACK;\r\n  THROW;\r\nEND CATCH;\r\n\r\n-- Return count to ADF\r\nSELECT @@ROWCOUNT AS RowsDeleted;\r\n"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
+						"name": "SetRowsDeletedCounts",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "SQL_MarkDeletes",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "RowsDeleted",
+							"value": {
+								"value": "@int(activity('SQL_MarkDeletes').output.resultSets[0].rows[0].RowsDeleted)",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "GetMaxModifiedDate",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Query_DimCount",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat(\n  'SELECT MAX(SRC_ROW_INSRT_TSTMP) AS MAX_MODIFIED_DATE FROM ',\n  pipeline().parameters.p_stg_schema_name, '.', pipeline().parameters.p_stg_table_name,\n  ' WHERE SRC_ROW_INSRT_TSTMP > ''', variables('PreviousWatermark'), ''''\n)",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DS_Vivid_People_0409",
+								"type": "DatasetReference",
+								"parameters": {
+									"Stg_Schema_Name": {
+										"value": "@pipeline().parameters.p_stg_schema_name",
+										"type": "Expression"
+									},
+									"Stg_Table_Name": {
+										"value": "@pipeline().parameters.p_stg_table_name",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					},
+					{
+						"name": "SetMaxWatermark",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetMaxModifiedDate",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "MaxWatermark",
+							"value": {
+								"value": "@if(\n  empty(activity('GetMaxModifiedDate').output.firstRow.MAX_MODIFIED_DATE),\n  formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss.fffffff'),\n  formatDateTime(activity('GetMaxModifiedDate').output.firstRow.MAX_MODIFIED_DATE, 'yyyy-MM-dd HH:mm:ss.fffffff')\n)",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "SP_UpdateWatermark",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "SetMaxWatermark",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[DimUpdateWatermark]",
+							"storedProcedureParameters": {
+								"DIM_LR_ROWS_DEL": {
+									"value": {
+										"value": "@variables('RowsDeleted')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"DIM_LR_ROWS_EXP": {
+									"value": {
+										"value": "@variables('RowsExpired')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"DIM_LR_ROWS_INS": {
+									"value": {
+										"value": "@variables('RowsInserted')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"DIM_LR_ROWS_UPD": {
+									"value": {
+										"value": "@variables('RowsExpired')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"DIM_TABLE_NAME": {
+									"value": {
+										"value": "@pipeline().parameters.p_dim_table_name",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"DIM_TOTAL_ROWS": {
+									"value": {
+										"value": "@variables('DimTotalCounts')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"SSDTM_ID": {
+									"value": {
+										"value": "@pipeline().parameters.p_file_table_id",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"UPDATED_AT_TSTMP_IST": {
+									"value": {
+										"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"UPDATED_BY": {
+									"value": {
+										"value": "@pipeline().TriggerName",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"WATERMARK_VALUE": {
+									"value": {
+										"value": "@convertFromUtc(formatDateTime(variables('MaxWatermark'), 'yyyy-MM-ddTHH:mm:ssZ'), 'India Standard Time')",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "LS_LOG_MIGRATION_EVENT",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Query_DimCount",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "SetRowsDeletedCounts",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "LS_Azure_SB_Lkp",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "@concat(\n  'SELECT COUNT(*) AS total_count FROM [',\n  pipeline().parameters.p_dim_schema_name,\n  '].[', \n  pipeline().parameters.p_dim_table_name,\n  ']'\n)",
+										"type": "Expression"
+									}
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
 					}
 				],
 				"policy": {
@@ -6421,22 +6895,26 @@
 						"type": "String"
 					},
 					"RowsInserted": {
-						"type": "String",
-						"defaultValue": "0"
+						"type": "Integer",
+						"defaultValue": 0
 					},
 					"RowsExpired": {
-						"type": "String",
-						"defaultValue": "0"
+						"type": "Integer",
+						"defaultValue": 0
 					},
 					"RowsDeleted": {
-						"type": "String",
-						"defaultValue": "0"
+						"type": "Integer",
+						"defaultValue": 0
 					},
 					"SqlQuery": {
 						"type": "String"
 					},
 					"MaxWatermark": {
 						"type": "String"
+					},
+					"DimTotalCounts": {
+						"type": "String",
+						"defaultValue": "0"
 					}
 				},
 				"folder": {
@@ -6448,7 +6926,11 @@
 				"[concat(variables('factoryId'), '/datasets/DS_Watermark_Tracker')]",
 				"[concat(variables('factoryId'), '/linkedServices/LS_Azure_SB_Lkp')]",
 				"[concat(variables('factoryId'), '/datasets/DS_People_Raw_0209')]",
-				"[concat(variables('factoryId'), '/datasets/DS_STG_PEOPLE_0209')]"
+				"[concat(variables('factoryId'), '/datasets/DS_STG_PEOPLE_0209')]",
+				"[concat(variables('factoryId'), '/datasets/DS_VIVID_PEOPLE')]",
+				"[concat(variables('factoryId'), '/datasets/DS_PEOPLE_DIM_SRC_KEYS')]",
+				"[concat(variables('factoryId'), '/datasets/DS_Vivid_People_0409')]",
+				"[concat(variables('factoryId'), '/linkedServices/LS_LOG_MIGRATION_EVENT')]"
 			]
 		},
 		{
@@ -7040,6 +7522,27 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/LS__SB_ADVW')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_PEOPLE_DIM_SRC_KEYS')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "DWH",
+					"table": "DIM_SRC_KEYS"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_Azure_SB_Lkp')]"
 			]
 		},
 		{
@@ -7711,6 +8214,41 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_VIVID_PEOPLE')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Src_Schema_Name": {
+						"type": "String"
+					},
+					"Src_Table_Name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().Src_Schema_Name",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().Src_Table_Name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_Azure_SB_Lkp')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_VIVID_RAW_TABLES')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -7798,6 +8336,41 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/LS_SB_SCD')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Vivid_People_0409')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Stg_Schema_Name": {
+						"type": "String"
+					},
+					"Stg_Table_Name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().Stg_Schema_Name",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().Stg_Table_Name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_Azure_SB_Lkp')]"
 			]
 		},
 		{
