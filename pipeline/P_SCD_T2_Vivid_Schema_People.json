@@ -654,7 +654,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "SetDimTotalCounts",
+						"activity": "Query_DimCount",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -776,7 +776,10 @@
 							"type": "String"
 						},
 						"DIM_TOTAL_ROWS": {
-							"value": "",
+							"value": {
+								"value": "@variables('DimTotalCounts')",
+								"type": "Expression"
+							},
 							"type": "Int32"
 						},
 						"SSDTM_ID": {
@@ -815,8 +818,8 @@
 				}
 			},
 			{
-				"name": "SetDimTotalCounts",
-				"type": "SetVariable",
+				"name": "Query_DimCount",
+				"type": "Script",
 				"dependsOn": [
 					{
 						"activity": "SetRowsDeletedCounts",
@@ -826,10 +829,29 @@
 					}
 				],
 				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": []
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": {
+								"value": "@concat(\n  'SELECT COUNT(*) AS total_count FROM [',\n  pipeline().parameters.p_dim_schema_name,\n  '].[', \n  pipeline().parameters.p_dim_table_name,\n  ']'\n)",
+								"type": "Expression"
+							}
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
 			}
 		],
 		"parameters": {
@@ -892,8 +914,8 @@
 				"type": "String"
 			},
 			"DimTotalCounts": {
-				"type": "Integer",
-				"defaultValue": 0
+				"type": "String",
+				"defaultValue": "0"
 			}
 		},
 		"folder": {
