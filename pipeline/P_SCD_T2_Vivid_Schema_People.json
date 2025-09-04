@@ -654,7 +654,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "SetDimCounts",
+						"activity": "SetDimTotalCounts",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -815,7 +815,7 @@
 				}
 			},
 			{
-				"name": "SetDimCounts",
+				"name": "SetDimTotalCounts",
 				"type": "SetVariable",
 				"dependsOn": [
 					{
