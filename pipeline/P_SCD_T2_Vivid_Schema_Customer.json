@@ -295,7 +295,7 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": {
-							"value": "TRUNCATE TABLE DWH.DIM_SRC_KEYS;",
+							"value": "DELETE FROM DWH.DIM_SRC_KEYS\nWHERE DIM_TAB_SCHEMA_NAME = 'DWH'\nAND DIM_TABLE_NAME = 'DIM_CUSTOMER_DETAILS';",
 							"type": "Expression"
 						},
 						"writeBehavior": "insert",

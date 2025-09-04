@@ -462,7 +462,7 @@
 				}
 			},
 			{
-				"name": "Copy data1",
+				"name": "SourceKeys_Full",
 				"type": "Copy",
 				"dependsOn": [
 					{
@@ -483,14 +483,49 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "@concat( 'SELECT ', '''DWH'' AS DIM_TAB_SCHEMA_NAME, ', '''DIM_PEOPLE_DETAILS'' AS DIM_TABLE_NAME, ', '''USR_ID'' AS BUSSINESS_ID_COL_NM, ', 'INDEX_NUM, ', 'USR_ID AS BUSSINESS_ID ', 'FROM ', pipeline().parameters.p_src_schema_name, '.', pipeline().parameters.p_src_table_name)",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
-					"enableStaging": false
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "DELETE FROM DWH.DIM_SRC_KEYS\nWHERE DIM_TAB_SCHEMA_NAME = 'DWH'\nAND DIM_TABLE_NAME = 'DIM_CUSTOMER_DETAILS'",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
 				},
 				"inputs": [
 					{
 						"referenceName": "DS_VIVID_PEOPLE",
+						"type": "DatasetReference",
+						"parameters": {
+							"Src_Schema_Name": {
+								"value": "@pipeline().parameters.p_src_schema_name",
+								"type": "Expression"
+							},
+							"Src_Table_Name": {
+								"value": "@pipeline().parameters.p_src_table_name",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_PEOPLE_DIM_SRC_KEYS",
 						"type": "DatasetReference"
 					}
 				]
