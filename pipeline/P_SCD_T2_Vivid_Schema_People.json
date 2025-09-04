@@ -654,7 +654,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "SetRowsDeletedCounts",
+						"activity": "SetDimCounts",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -813,6 +813,23 @@
 					"referenceName": "LS_LOG_MIGRATION_EVENT",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "SetDimCounts",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "SetRowsDeletedCounts",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": []
 			}
 		],
 		"parameters": {
@@ -873,6 +890,10 @@
 			},
 			"MaxWatermark": {
 				"type": "String"
+			},
+			"DimTotalCounts": {
+				"type": "Integer",
+				"defaultValue": 0
 			}
 		},
 		"folder": {
