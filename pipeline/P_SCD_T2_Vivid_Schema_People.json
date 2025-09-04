@@ -671,12 +671,26 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "@concat(\n  'SELECT MAX(SRC_ROW_INSRT_TSTMP) AS MAX_MODIFIED_DATE FROM ',\n  pipeline().parameters.p_stg_schema_name, '.', pipeline().parameters.p_stg_table_name,\n  ' WHERE SRC_ROW_INSRT_TSTMP > ''', variables('PreviousWatermark'), ''''\n)",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
 					"dataset": {
 						"referenceName": "DS_Vivid_People_0409",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"Stg_Schema_Name": {
+								"value": "@pipeline().parameters.p_stg_schema_name",
+								"type": "Expression"
+							},
+							"Stg_Table_Name": {
+								"value": "@pipeline().parameters.p_stg_table_name",
+								"type": "Expression"
+							}
+						}
 					}
 				}
 			}
