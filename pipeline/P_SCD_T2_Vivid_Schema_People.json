@@ -127,7 +127,7 @@
 							"typeProperties": {
 								"variableName": "SqlQuery",
 								"value": {
-									"value": "@concat(\n  'SELECT ',\n  'INDEX_NUM,USR_ID,FIRST_NAME,LAST_NAME,SEX,EMAIL,PHONE,DATE_OF_BIRTH, ',\n  'JOB_TITLE,SRC_ROW_INSRT_TSTMP ',\n  'HASHBYTES(''SHA2_256'', ',\n  'CONCAT_WS(''|'', ',\n    'ISNULL(FIRST_NAME,'''') , ',\n    'ISNULL(LAST_NAME,'''') , ',\n    'ISNULL(SEX,'''') , ',\n    'ISNULL(DATE_OF_BIRTH,'''') , ',\n    'ISNULL(JOB_TITLE,'''') , ',\n    'ISNULL(PHONE,'''') , ',\n    'ISNULL(EMAIL,'''') , ',\n  ')) AS HASH_DIFF ',\n  'FROM ', pipeline().parameters.p_src_schema_name, '.', pipeline().parameters.p_src_table_name\n)\n",
+									"value": "@concat(\n  'SELECT ',\n  'INDEX_NUM,USR_ID,FIRST_NAME,LAST_NAME,SEX,EMAIL,PHONE,DATE_OF_BIRTH,',\n  'JOB_TITLE, SRC_ROW_INSRT_TSTMP, ',\n  'CONVERT(VARBINARY(32), HASHBYTES(''SHA2_256'', ',\n    'CONCAT_WS(''|'', ',\n      'ISNULL(LTRIM(RTRIM(FIRST_NAME)), ''''), ',\n      'ISNULL(LTRIM(RTRIM(LAST_NAME)), ''''), ',\n      'ISNULL(LTRIM(RTRIM(SEX)), ''''), ',\n      'ISNULL(CONVERT(nvarchar(30), DATE_OF_BIRTH, 126), ''''), ',   \n      'ISNULL(LTRIM(RTRIM(JOB_TITLE)), ''''), ',\n      'ISNULL(LTRIM(RTRIM(PHONE)), ''''), ',\n      'ISNULL(LTRIM(RTRIM(EMAIL)), '''')',\n    '))',\n  ')) AS HASH_DIFF ',\n  'FROM [', pipeline().parameters.p_src_schema_name, '].[',\n            pipeline().parameters.p_src_table_name, ']'\n)",
 									"type": "Expression"
 								}
 							}
