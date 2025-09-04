@@ -1,0 +1,16 @@
+{
+	"name": "DS_PEOPLE_DIM_SRC_KEYS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_Azure_SB_Lkp",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "DWH",
+			"table": "DIM_SRC_KEYS"
+		}
+	}
+}
