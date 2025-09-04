@@ -717,6 +717,102 @@
 						"type": "Expression"
 					}
 				}
+			},
+			{
+				"name": "SP_UpdateWatermark",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "SetMaxWatermark",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[DimUpdateWatermark]",
+					"storedProcedureParameters": {
+						"DIM_LR_ROWS_DEL": {
+							"value": {
+								"value": "@variables('RowsDeleted')",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"DIM_LR_ROWS_EXP": {
+							"value": {
+								"value": "@variables('RowsExpired')",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"DIM_LR_ROWS_INS": {
+							"value": {
+								"value": "@variables('RowsInserted')",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"DIM_LR_ROWS_UPD": {
+							"value": {
+								"value": "@variables('RowsExpired')",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"DIM_TABLE_NAME": {
+							"value": {
+								"value": "@pipeline().parameters.p_dim_table_name",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"DIM_TOTAL_ROWS": {
+							"value": "",
+							"type": "Int32"
+						},
+						"SSDTM_ID": {
+							"value": {
+								"value": "@pipeline().parameters.p_file_table_id",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"UPDATED_AT_TSTMP_IST": {
+							"value": {
+								"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"UPDATED_BY": {
+							"value": {
+								"value": "@pipeline().TriggerName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"WATERMARK_VALUE": {
+							"value": {
+								"value": "@convertFromUtc(formatDateTime(variables('MaxWatermark'), 'yyyy-MM-ddTHH:mm:ssZ'), 'India Standard Time')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "LS_LOG_MIGRATION_EVENT",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
 		"parameters": {
