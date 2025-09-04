@@ -42,7 +42,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat(\n  'SELECT WATERMARK_VALUE,WATERMARK_ID FROM dbo.WATERMARK_TRACKER ',\n  'WHERE SOURCE_TABLE_NAME = ''', pipeline().parameters.p_src_table_name, ''' ',\n  'AND PIPELINE_NAME = ''', pipeline().Pipeline, ''' ',\n  'AND ROW_STS_CD = ''A'''\n)",
+							"value": "@concat(\n  'SELECT WATERMARK_VALUE,WATERMARK_ID FROM dbo.DIM_WATERMARK_TRACKER ',\n  'WHERE SOURCE_TABLE_NAME = ''', pipeline().parameters.p_src_table_name, ''' ',\n  'AND PIPELINE_NAME = ''', pipeline().Pipeline, ''' ',\n  'AND ROW_STS_CD = ''A'''\n)",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
