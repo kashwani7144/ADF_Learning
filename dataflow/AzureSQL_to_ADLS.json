@@ -1,0 +1,66 @@
+{
+	"name": "AzureSQL_to_ADLS",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_DWH_DimCustomer",
+						"type": "DatasetReference"
+					},
+					"name": "DimCustomer"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "P_DimCustomer",
+						"type": "DatasetReference"
+					},
+					"name": "AdlsDimCustomer"
+				}
+			],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          CUSTOMER_SID as integer,",
+				"          INDEX_NUM as integer,",
+				"          CUSTOMER_ID as string,",
+				"          FIRST_NAME as string,",
+				"          LAST_NAME as string,",
+				"          COMPANY as string,",
+				"          CITY as string,",
+				"          COUNTRY as string,",
+				"          PHONE_1 as string,",
+				"          PHONE_2 as string,",
+				"          EMAIL as string,",
+				"          SUBSCRIPTION_DATE as string,",
+				"          WEBSITE as string,",
+				"          SRC_ROW_INSRT_TSTMP as timestamp,",
+				"          HASH_DIFF as binary,",
+				"          WATERMARK_ID as integer,",
+				"          BATCH_ID as integer,",
+				"          ROW_EFF_DT as date,",
+				"          ROW_EXPIR_DT as date,",
+				"          ROW_STS_CD as string,",
+				"          VERSION_NUM as integer,",
+				"          INSERT_TSTMP_IST as timestamp,",
+				"          LST_UPD_TSTMP_IST as timestamp",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> DimCustomer",
+				"DimCustomer sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'parquet',",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> AdlsDimCustomer"
+			]
+		}
+	}
+}

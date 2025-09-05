@@ -1,0 +1,20 @@
+{
+	"name": "P_DimCustomer",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Par_ETLSANDBOX",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "ADLS_DimCustomer.parquet",
+				"fileSystem": "akum-adls-input"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
