@@ -557,7 +557,10 @@
 							"type": "String"
 						},
 						"DIM_TOTAL_ROWS": {
-							"value": "",
+							"value": {
+								"value": "@variables('DimTotalCounts')",
+								"type": "Expression"
+							},
 							"type": "Int32"
 						},
 						"SSDTM_ID": {
