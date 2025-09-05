@@ -29,6 +29,9 @@
 		"LS__SB_ADVW_password": {
 			"value": ""
 		},
+		"Par_ETLSANDBOX_accountKey": {
+			"value": ""
+		},
 		"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
 			"value": "etl-oracle.database.windows.net"
 		},
@@ -100,6 +103,9 @@
 		},
 		"LS__SB_ADVW_properties_typeProperties_userName": {
 			"value": "akum"
+		},
+		"Par_ETLSANDBOX_properties_typeProperties_url": {
+			"value": "https://akumadlsgen2.dfs.core.windows.net/"
 		},
 		"containerUri": {
 			"value": ""

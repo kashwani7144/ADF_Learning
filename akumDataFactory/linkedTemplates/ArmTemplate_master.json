@@ -39,6 +39,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS__SB_ADVW'"
 		},
+		"Par_ETLSANDBOX_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'Par_ETLSANDBOX'"
+		},
 		"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "etl-oracle.database.windows.net"
@@ -135,6 +139,10 @@
 			"type": "string",
 			"defaultValue": "akum"
 		},
+		"Par_ETLSANDBOX_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://akumadlsgen2.dfs.core.windows.net/"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -185,6 +193,9 @@
 					},
 					"LS__SB_ADVW_password": {
 						"value": "[parameters('LS__SB_ADVW_password')]"
+					},
+					"Par_ETLSANDBOX_accountKey": {
+						"value": "[parameters('Par_ETLSANDBOX_accountKey')]"
 					},
 					"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
 						"value": "[parameters('LS_AZURE_ORACLE_2507_properties_typeProperties_server')]"
@@ -257,6 +268,9 @@
 					},
 					"LS__SB_ADVW_properties_typeProperties_userName": {
 						"value": "[parameters('LS__SB_ADVW_properties_typeProperties_userName')]"
+					},
+					"Par_ETLSANDBOX_properties_typeProperties_url": {
+						"value": "[parameters('Par_ETLSANDBOX_properties_typeProperties_url')]"
 					}
 				}
 			},
