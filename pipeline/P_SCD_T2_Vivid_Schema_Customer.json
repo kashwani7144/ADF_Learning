@@ -268,7 +268,7 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "SetRowsExpiredCounts",
+						"activity": "SetDimTotalCounts",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -863,6 +863,30 @@
 						}
 					}
 				]
+			},
+			{
+				"name": "SetDimTotalCounts",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "SetRowsExpiredCounts",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "DimTotalCounts",
+					"value": {
+						"value": "@int(activity('SQL_MERGE_SCD2').output.resultSets[0].rows[0].DimTotalCount)",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
