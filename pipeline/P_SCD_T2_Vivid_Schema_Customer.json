@@ -923,6 +923,10 @@
 			},
 			"MaxWatermark": {
 				"type": "String"
+			},
+			"DimTotalCounts": {
+				"type": "Integer",
+				"defaultValue": 0
 			}
 		},
 		"folder": {
