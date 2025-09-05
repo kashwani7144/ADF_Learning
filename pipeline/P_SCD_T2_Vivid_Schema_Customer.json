@@ -42,7 +42,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat(\n  'SELECT WATERMARK_VALUE,WATERMARK_ID FROM dbo.WATERMARK_TRACKER ',\n  'WHERE SOURCE_TABLE_NAME = ''', pipeline().parameters.p_src_table, ''' ',\n  'AND PIPELINE_NAME = ''', pipeline().Pipeline, ''' ',\n  'AND ROW_STS_CD = ''A'''\n)",
+							"value": "@concat(\n  'SELECT WATERMARK_VALUE,WATERMARK_ID FROM dbo.DIM_WATERMARK_TRACKER ',\n  'WHERE SOURCE_TABLE_NAME = ''', pipeline().parameters.p_src_table, ''' ',\n  'AND PIPELINE_NAME = ''', pipeline().Pipeline, ''' ',\n  'AND ROW_STS_CD = ''A'''\n)",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -209,7 +209,7 @@
 								}
 							],
 							"type": "Query",
-							"text": "/* ===== Inputs from ADF Script parameters ===== Expect a Script parameter named p_batch_id (Int32, Input) */\r\nDECLARE @BatchId INT = @p_batch_id;\r\n\r\n/* ===== Safer transaction behavior ===== */\r\nSET XACT_ABORT ON;\r\n\r\nDECLARE @today_ist  datetime2(3) = SYSDATETIMEOFFSET() AT TIME ZONE 'India Standard Time';\r\nDECLARE @today_date date         = CAST(@today_ist AS date);\r\n\r\nDECLARE @WatermarkId INT;\r\nSELECT TOP 1 @WatermarkId = WATERMARK_ID\r\nFROM dbo.WATERMARK_TRACKER\r\nWHERE PIPELINE_NAME = 'P_SCD_T2_Vivid_Schema_Customer'\r\n  AND SOURCE_TABLE_NAME = 'BLOB_CUSTOMER_RAW'\r\nORDER BY UPDATED_AT_TSTMP DESC;\r\n\r\nIF @WatermarkId IS NULL SET @WatermarkId = 0;  -- fallback if nothing found\r\n\r\nDECLARE @chg TABLE (action nvarchar(10));\r\n\r\nBEGIN TRY\r\n    BEGIN TRAN;\r\n\r\n    /* 1) Expire current rows whose attributes changed (close them on TODAY) */\r\n    MERGE DWH.DIM_CUSTOMER_DETAILS AS T\r\n    USING (SELECT * FROM DWH.STG_CUSTOMER_DETAILS) AS S\r\n      ON  T.INDEX_NUM    = S.INDEX_NUM\r\n      AND T.CUSTOMER_ID  = S.CUSTOMER_ID\r\n      AND T.ROW_EXPIR_DT = '9999-12-31'\r\n    WHEN MATCHED AND ISNULL(S.HASH_DIFF, 0x) <> ISNULL(T.HASH_DIFF, 0x)\r\n      THEN UPDATE SET\r\n           T.ROW_EXPIR_DT       = @today_date,       -- close on today (not yesterday)\r\n           T.LST_UPD_TSTMP_IST  = @today_ist\r\n      OUTPUT $action INTO @chg;\r\n\r\n    /* 2) Insert new versions for the keys just expired in step 1\r\n          (new rows get ROW_EFF_DT default = today; VERSION_NUM = prev+1) */\r\n    INSERT INTO DWH.DIM_CUSTOMER_DETAILS\r\n    (\r\n      INDEX_NUM, CUSTOMER_ID,\r\n      FIRST_NAME, LAST_NAME, COMPANY, CITY, COUNTRY,\r\n      PHONE_1, PHONE_2, EMAIL, SUBSCRIPTION_DATE, WEBSITE, SRC_ROW_INSRT_TSTMP,\r\n      HASH_DIFF, VERSION_NUM,\r\n      WATERMARK_ID, BATCH_ID\r\n    )\r\n    SELECT\r\n      S.INDEX_NUM, S.CUSTOMER_ID,\r\n      S.FIRST_NAME, S.LAST_NAME, S.COMPANY, S.CITY, S.COUNTRY,\r\n      S.PHONE_1, S.PHONE_2, S.EMAIL, S.SUBSCRIPTION_DATE, S.WEBSITE, S.SRC_ROW_INSRT_TSTMP,\r\n      S.HASH_DIFF, T.VERSION_NUM + 1,\r\n      @WatermarkId, @BatchId\r\n    FROM DWH.STG_CUSTOMER_DETAILS S\r\n    JOIN DWH.DIM_CUSTOMER_DETAILS T\r\n      ON T.INDEX_NUM   = S.INDEX_NUM\r\n     AND T.CUSTOMER_ID = S.CUSTOMER_ID\r\n    WHERE T.ROW_EXPIR_DT = @today_date;   -- rows just closed above\r\n\r\n    /* 3) Insert brand-new keys (first versions) */\r\n    MERGE DWH.DIM_CUSTOMER_DETAILS AS T\r\n    USING (SELECT * FROM DWH.STG_CUSTOMER_DETAILS) AS S\r\n      ON  T.INDEX_NUM   = S.INDEX_NUM\r\n      AND T.CUSTOMER_ID = S.CUSTOMER_ID\r\n    WHEN NOT MATCHED BY TARGET\r\n      THEN INSERT\r\n      (\r\n        INDEX_NUM, CUSTOMER_ID,\r\n        FIRST_NAME, LAST_NAME, COMPANY, CITY, COUNTRY,\r\n        PHONE_1, PHONE_2, EMAIL, SUBSCRIPTION_DATE, WEBSITE, SRC_ROW_INSRT_TSTMP,\r\n        HASH_DIFF, VERSION_NUM,\r\n        WATERMARK_ID, BATCH_ID\r\n      )\r\n      VALUES\r\n      (\r\n        S.INDEX_NUM, S.CUSTOMER_ID,\r\n        S.FIRST_NAME, S.LAST_NAME, S.COMPANY, S.CITY, S.COUNTRY,\r\n        S.PHONE_1, S.PHONE_2, S.EMAIL, S.SUBSCRIPTION_DATE, S.WEBSITE, S.SRC_ROW_INSRT_TSTMP,\r\n        S.HASH_DIFF, 1,\r\n        @WatermarkId, @BatchId\r\n      )\r\n      OUTPUT $action INTO @chg;\r\n\r\n    COMMIT;\r\nEND TRY\r\nBEGIN CATCH\r\n    IF @@TRANCOUNT > 0 ROLLBACK;\r\n    THROW;\r\nEND CATCH;\r\n\r\n/* ===== Return counts back to ADF ===== */\r\nSELECT\r\n  SUM(CASE WHEN action = 'INSERT' THEN 1 ELSE 0 END) AS RowsInserted,\r\n  SUM(CASE WHEN action = 'UPDATE' THEN 1 ELSE 0 END) AS RowsExpired\r\nFROM @chg;\r\n"
+							"text": "/* ===== Inputs from ADF Script parameters ===== Expect a Script parameter named p_batch_id (Int32, Input) */\r\nDECLARE @BatchId INT = @p_batch_id;\r\n\r\n/* ===== Safer transaction behavior ===== */\r\nSET XACT_ABORT ON;\r\n\r\nDECLARE @today_ist  datetime2(3) = SYSDATETIMEOFFSET() AT TIME ZONE 'India Standard Time';\r\nDECLARE @today_date date         = CAST(@today_ist AS date);\r\n\r\nDECLARE @WatermarkId INT;\r\nSELECT TOP 1 @WatermarkId = WATERMARK_ID\r\nFROM dbo.DIM_WATERMARK_TRACKER\r\nWHERE PIPELINE_NAME = 'P_SCD_T2_Vivid_Schema_Customer'\r\n  AND DIM_TABLE_NAME = 'DIM_CUSTOMER_DETAILS'\r\nORDER BY UPDATED_AT_TSTMP_IST DESC;\r\n\r\nIF @WatermarkId IS NULL SET @WatermarkId = 0;  -- fallback if nothing found\r\n\r\nDECLARE @chg TABLE (action nvarchar(10));\r\n\r\nBEGIN TRY\r\n    BEGIN TRAN;\r\n\r\n    /* 1) Expire current rows whose attributes changed (close them on TODAY) */\r\n    MERGE DWH.DIM_CUSTOMER_DETAILS AS T\r\n    USING (SELECT * FROM DWH.STG_CUSTOMER_DETAILS) AS S\r\n      ON  T.INDEX_NUM    = S.INDEX_NUM\r\n      AND T.CUSTOMER_ID  = S.CUSTOMER_ID\r\n      AND T.ROW_EXPIR_DT = '9999-12-31'\r\n    WHEN MATCHED AND ISNULL(S.HASH_DIFF, 0x) <> ISNULL(T.HASH_DIFF, 0x)\r\n      THEN UPDATE SET\r\n           T.ROW_EXPIR_DT       = @today_date,       -- close on today (not yesterday)\r\n           T.LST_UPD_TSTMP_IST  = @today_ist\r\n      OUTPUT $action INTO @chg;\r\n\r\n    /* 2) Insert new versions for the keys just expired in step 1\r\n          (new rows get ROW_EFF_DT default = today; VERSION_NUM = prev+1) */\r\n    INSERT INTO DWH.DIM_CUSTOMER_DETAILS\r\n    (\r\n      INDEX_NUM, CUSTOMER_ID,\r\n      FIRST_NAME, LAST_NAME, COMPANY, CITY, COUNTRY,\r\n      PHONE_1, PHONE_2, EMAIL, SUBSCRIPTION_DATE, WEBSITE, SRC_ROW_INSRT_TSTMP,\r\n      HASH_DIFF, VERSION_NUM,\r\n      WATERMARK_ID, BATCH_ID\r\n    )\r\n    SELECT\r\n      S.INDEX_NUM, S.CUSTOMER_ID,\r\n      S.FIRST_NAME, S.LAST_NAME, S.COMPANY, S.CITY, S.COUNTRY,\r\n      S.PHONE_1, S.PHONE_2, S.EMAIL, S.SUBSCRIPTION_DATE, S.WEBSITE, S.SRC_ROW_INSRT_TSTMP,\r\n      S.HASH_DIFF, T.VERSION_NUM + 1,\r\n      @WatermarkId, @BatchId\r\n    FROM DWH.STG_CUSTOMER_DETAILS S\r\n    JOIN DWH.DIM_CUSTOMER_DETAILS T\r\n      ON T.INDEX_NUM   = S.INDEX_NUM\r\n     AND T.CUSTOMER_ID = S.CUSTOMER_ID\r\n    WHERE T.ROW_EXPIR_DT = @today_date;   -- rows just closed above\r\n\r\n    /* 3) Insert brand-new keys (first versions) */\r\n    MERGE DWH.DIM_CUSTOMER_DETAILS AS T\r\n    USING (SELECT * FROM DWH.STG_CUSTOMER_DETAILS) AS S\r\n      ON  T.INDEX_NUM   = S.INDEX_NUM\r\n      AND T.CUSTOMER_ID = S.CUSTOMER_ID\r\n    WHEN NOT MATCHED BY TARGET\r\n      THEN INSERT\r\n      (\r\n        INDEX_NUM, CUSTOMER_ID,\r\n        FIRST_NAME, LAST_NAME, COMPANY, CITY, COUNTRY,\r\n        PHONE_1, PHONE_2, EMAIL, SUBSCRIPTION_DATE, WEBSITE, SRC_ROW_INSRT_TSTMP,\r\n        HASH_DIFF, VERSION_NUM,\r\n        WATERMARK_ID, BATCH_ID\r\n      )\r\n      VALUES\r\n      (\r\n        S.INDEX_NUM, S.CUSTOMER_ID,\r\n        S.FIRST_NAME, S.LAST_NAME, S.COMPANY, S.CITY, S.COUNTRY,\r\n        S.PHONE_1, S.PHONE_2, S.EMAIL, S.SUBSCRIPTION_DATE, S.WEBSITE, S.SRC_ROW_INSRT_TSTMP,\r\n        S.HASH_DIFF, 1,\r\n        @WatermarkId, @BatchId\r\n      )\r\n      OUTPUT $action INTO @chg;\r\n\r\n    COMMIT;\r\nEND TRY\r\nBEGIN CATCH\r\n    IF @@TRANCOUNT > 0 ROLLBACK;\r\n    THROW;\r\nEND CATCH;\r\n\r\n/* ===== Return counts back to ADF ===== */\r\nSELECT\r\n  SUM(CASE WHEN action = 'INSERT' THEN 1 ELSE 0 END) AS RowsInserted,\r\n  SUM(CASE WHEN action = 'UPDATE' THEN 1 ELSE 0 END) AS RowsExpired\r\nFROM @chg;\r\n"
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
@@ -519,23 +519,55 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[dbo].[UpdateWatermark]",
+					"storedProcedureName": "[dbo].[DimUpdateWatermark]",
 					"storedProcedureParameters": {
-						"FILE_TABLE_ID": {
+						"DIM_LR_ROWS_DEL": {
+							"value": {
+								"value": "@variables('RowsDeleted')",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"DIM_LR_ROWS_EXP": {
+							"value": {
+								"value": "@variables('RowsExpired')",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"DIM_LR_ROWS_INS": {
+							"value": {
+								"value": "@variables('RowsInserted')",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"DIM_LR_ROWS_UPD": {
+							"value": {
+								"value": "@variables('RowsExpired')",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"DIM_TABLE_NAME": {
+							"value": {
+								"value": "@pipeline().parameters.p_dim_table",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"DIM_TOTAL_ROWS": {
+							"value": "",
+							"type": "Int32"
+						},
+						"SSDTM_ID": {
 							"value": {
 								"value": "@pipeline().parameters.p_file_table_id",
 								"type": "Expression"
 							},
 							"type": "Int32"
 						},
-						"SOURCE_TABLE_NAME": {
-							"value": {
-								"value": "@pipeline().parameters.p_src_table",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"UPDATED_AT_TSTMP": {
+						"UPDATED_AT_TSTMP_IST": {
 							"value": {
 								"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
 								"type": "Expression"
@@ -551,7 +583,7 @@
 						},
 						"WATERMARK_VALUE": {
 							"value": {
-								"value": "@convertFromUtc(formatDateTime(variables('MaxWatermark'), 'yyyy-MM-ddTHH:mm:ssZ'), 'India Standard Time')\n\n",
+								"value": "@convertFromUtc(formatDateTime(variables('MaxWatermark'), 'yyyy-MM-ddTHH:mm:ssZ'), 'India Standard Time')",
 								"type": "Expression"
 							},
 							"type": "DateTime"
