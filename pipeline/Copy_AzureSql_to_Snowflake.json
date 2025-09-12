@@ -23,7 +23,8 @@
 					"sink": {
 						"type": "SnowflakeV2Sink",
 						"importSettings": {
-							"type": "SnowflakeImportCopyCommand"
+							"type": "SnowflakeImportCopyCommand",
+							"storageIntegration": "DWH_DIM_AZURE_INT"
 						}
 					},
 					"enableStaging": true,
