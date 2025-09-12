@@ -29,7 +29,7 @@
 					"enableStaging": true,
 					"stagingSettings": {
 						"linkedServiceName": {
-							"referenceName": "Par_ETLSANDBOX",
+							"referenceName": "LS_STG_ADLS_1209",
 							"type": "LinkedServiceReference"
 						},
 						"path": "akum-adls-input"
