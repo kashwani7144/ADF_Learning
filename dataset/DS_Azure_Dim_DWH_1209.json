@@ -1,0 +1,105 @@
+{
+	"name": "DS_Azure_Dim_DWH_1209",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_Azure_SB_Lkp",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "PEOPLE_SID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "INDEX_NUM",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "USR_ID",
+				"type": "nvarchar"
+			},
+			{
+				"name": "FIRST_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "LAST_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SEX",
+				"type": "nvarchar"
+			},
+			{
+				"name": "EMAIL",
+				"type": "nvarchar"
+			},
+			{
+				"name": "PHONE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DATE_OF_BIRTH",
+				"type": "nvarchar"
+			},
+			{
+				"name": "JOB_TITLE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SRC_ROW_INSRT_TSTMP",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "HASH_DIFF",
+				"type": "varbinary"
+			},
+			{
+				"name": "WATERMARK_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "BATCH_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ROW_EFF_DT",
+				"type": "date"
+			},
+			{
+				"name": "ROW_EXPIR_DT",
+				"type": "date"
+			},
+			{
+				"name": "ROW_STS_CD",
+				"type": "nvarchar"
+			},
+			{
+				"name": "VERSION_NUM",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "INSERT_TSTMP_IST",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "LST_UPD_TSTMP_IST",
+				"type": "datetime2",
+				"scale": 7
+			}
+		],
+		"typeProperties": {
+			"schema": "DWH",
+			"table": "DIM_PEOPLE_DETAILS"
+		}
+	}
+}
