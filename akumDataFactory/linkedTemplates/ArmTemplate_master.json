@@ -35,6 +35,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_SB_Tgt_SalesLT_M'"
 		},
+		"LS_SNFLK_ETLSB_VIVID_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_SNFLK_ETLSB_VIVID'"
+		},
 		"LS__SB_ADVW_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS__SB_ADVW'"
@@ -42,6 +46,10 @@
 		"Par_ETLSANDBOX_accountKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'Par_ETLSANDBOX'"
+		},
+		"LS_STG_ADLS_1209_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_STG_ADLS_1209'"
 		},
 		"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
 			"type": "string",
@@ -127,6 +135,18 @@
 			"type": "string",
 			"defaultValue": "akum"
 		},
+		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "ETLSANDBOX"
+		},
+		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role": {
+			"type": "string",
+			"defaultValue": "ACCOUNTADMIN"
+		},
+		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "LPOYIGM-IN47228.snowflakecomputing.com"
+		},
 		"LS__SB_ADVW_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "svetlsandbox.database.windows.net"
@@ -191,11 +211,17 @@
 					"LS_SB_Tgt_SalesLT_M_password": {
 						"value": "[parameters('LS_SB_Tgt_SalesLT_M_password')]"
 					},
+					"LS_SNFLK_ETLSB_VIVID_password": {
+						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_password')]"
+					},
 					"LS__SB_ADVW_password": {
 						"value": "[parameters('LS__SB_ADVW_password')]"
 					},
 					"Par_ETLSANDBOX_accountKey": {
 						"value": "[parameters('Par_ETLSANDBOX_accountKey')]"
+					},
+					"LS_STG_ADLS_1209_connectionString": {
+						"value": "[parameters('LS_STG_ADLS_1209_connectionString')]"
 					},
 					"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
 						"value": "[parameters('LS_AZURE_ORACLE_2507_properties_typeProperties_server')]"
@@ -259,6 +285,15 @@
 					},
 					"LS_SB_Tgt_SalesLT_M_properties_typeProperties_userName": {
 						"value": "[parameters('LS_SB_Tgt_SalesLT_M_properties_typeProperties_userName')]"
+					},
+					"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database": {
+						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database')]"
+					},
+					"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role": {
+						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role')]"
+					},
+					"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host": {
+						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host')]"
 					},
 					"LS__SB_ADVW_properties_typeProperties_server": {
 						"value": "[parameters('LS__SB_ADVW_properties_typeProperties_server')]"

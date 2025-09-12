@@ -26,10 +26,16 @@
 		"LS_SB_Tgt_SalesLT_M_password": {
 			"value": ""
 		},
+		"LS_SNFLK_ETLSB_VIVID_password": {
+			"value": ""
+		},
 		"LS__SB_ADVW_password": {
 			"value": ""
 		},
 		"Par_ETLSANDBOX_accountKey": {
+			"value": ""
+		},
+		"LS_STG_ADLS_1209_connectionString": {
 			"value": ""
 		},
 		"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
@@ -94,6 +100,15 @@
 		},
 		"LS_SB_Tgt_SalesLT_M_properties_typeProperties_userName": {
 			"value": "akum"
+		},
+		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database": {
+			"value": "ETLSANDBOX"
+		},
+		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role": {
+			"value": "ACCOUNTADMIN"
+		},
+		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host": {
+			"value": "LPOYIGM-IN47228.snowflakecomputing.com"
 		},
 		"LS__SB_ADVW_properties_typeProperties_server": {
 			"value": "svetlsandbox.database.windows.net"
