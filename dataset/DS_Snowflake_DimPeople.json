@@ -1,0 +1,16 @@
+{
+	"name": "DS_Snowflake_DimPeople",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_SNFLK_ETLSB_VIVID",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SnowflakeV2Table",
+		"schema": [],
+		"typeProperties": {
+			"schema": "VIVID",
+			"table": "DIM_PEOPLE_DETAILS"
+		}
+	}
+}

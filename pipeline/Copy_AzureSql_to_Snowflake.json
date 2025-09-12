@@ -20,11 +20,228 @@
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
-					"enableStaging": false
+					"sink": {
+						"type": "SnowflakeV2Sink",
+						"importSettings": {
+							"type": "SnowflakeImportCopyCommand"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "PEOPLE_SID",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "PEOPLE_SID",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
+									"name": "INDEX_NUM",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "INDEX_NUM",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
+									"name": "USR_ID",
+									"type": "String"
+								},
+								"sink": {
+									"name": "USR_ID",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "FIRST_NAME",
+									"type": "String"
+								},
+								"sink": {
+									"name": "FIRST_NAME",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "LAST_NAME",
+									"type": "String"
+								},
+								"sink": {
+									"name": "LAST_NAME",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "SEX",
+									"type": "String"
+								},
+								"sink": {
+									"name": "SEX",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "EMAIL",
+									"type": "String"
+								},
+								"sink": {
+									"name": "EMAIL",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PHONE",
+									"type": "String"
+								},
+								"sink": {
+									"name": "PHONE",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "DATE_OF_BIRTH",
+									"type": "String"
+								},
+								"sink": {
+									"name": "DATE_OF_BIRTH",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "JOB_TITLE",
+									"type": "String"
+								},
+								"sink": {
+									"name": "JOB_TITLE",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "SRC_ROW_INSRT_TSTMP",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "SRC_ROW_INSRT_TSTMP",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "HASH_DIFF",
+									"type": "Byte[]"
+								},
+								"sink": {
+									"name": "HASH_DIFF",
+									"type": "Byte[]"
+								}
+							},
+							{
+								"source": {
+									"name": "WATERMARK_ID",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "WATERMARK_ID",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
+									"name": "BATCH_ID",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "BATCH_ID",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
+									"name": "ROW_EFF_DT",
+									"type": "Date"
+								},
+								"sink": {
+									"name": "ROW_EFF_DT",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "ROW_EXPIR_DT",
+									"type": "Date"
+								},
+								"sink": {
+									"name": "ROW_EXPIR_DT",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "ROW_STS_CD",
+									"type": "String"
+								},
+								"sink": {
+									"name": "ROW_STS_CD",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "VERSION_NUM",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "VERSION_NUM",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
+									"name": "INSERT_TSTMP_IST",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "INSERT_TSTMP_IST",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "LST_UPD_TSTMP_IST",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "LST_UPD_TSTMP_IST",
+									"type": "DateTime"
+								}
+							}
+						]
+					}
 				},
 				"inputs": [
 					{
 						"referenceName": "DS_Azure_Dim_DWH_1209",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_Snowflake_DimPeople",
 						"type": "DatasetReference"
 					}
 				]
