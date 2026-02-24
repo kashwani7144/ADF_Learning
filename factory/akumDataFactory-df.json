@@ -1,0 +1,9 @@
+{
+	"name": "akumDataFactory-df",
+	"location": "centralindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "1fc21f8b-fd0a-410c-9b13-03f0ac09ee82",
+		"tenantId": "4aa59e0c-1474-4486-8cd6-f2ee7c12c576"
+	}
+}
