@@ -55,6 +55,19 @@
 					},
 					"firstRowOnly": false
 				}
+			},
+			{
+				"name": "ForEachFileToTable",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GetSrcTgtTableMapping",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": []
 			}
 		],
 		"variables": {
