@@ -155,7 +155,17 @@
 							"outputs": [
 								{
 									"referenceName": "DS_SB_VIVID_Insert_2502",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"TGT_SCHEMA_NAME": {
+											"value": "@item().TGT_SCHEMA_NAME",
+											"type": "Expression"
+										},
+										"TGT_TBL_NAME": {
+											"value": "@item().TGT_TBL_NAME",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}
