@@ -1,0 +1,1070 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "akumDataFactory-df"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_SRC_DIM_LKP_1807')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "FILE_TABLE_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SRC_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TGT_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SRC_SCHEMA_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TGT_SCHEMA_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SRC_TYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TGT_TYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ROW_ADDED_BY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ROW_STS_CD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PIPLN_NM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ROW_VERSION",
+						"type": "timestamp"
+					},
+					{
+						"name": "INSERT_TSTMP_IST",
+						"type": "datetime2",
+						"scale": 7
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "SRC_STG_DIM_TABLE_MAPPING"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_STG_PEOPLE_0209')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Stg_Schema_Name": {
+						"type": "String"
+					},
+					"Stg_Table_Name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().Stg_Schema_Name",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().Stg_Table_Name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_STG_WITH_HASH')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_SB_SCD",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Stg_Schema_Name": {
+						"type": "String"
+					},
+					"Stg_Table_Name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().Stg_Schema_Name",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().Stg_Table_Name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Snowflake_DimPeople')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_SNFLK_ETLSB_VIVID",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SnowflakeV2Table",
+				"schema": [],
+				"typeProperties": {
+					"schema": "VIVID",
+					"table": "DIM_PEOPLE_DETAILS"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_TGT_Azure_etl_orcl')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_tgt_etl_orcl",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Azure_Tgt_Table_Name": {
+						"type": "String"
+					},
+					"Azure_Tgt_Schema_Name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().Azure_Tgt_Schema_Name",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().Azure_Tgt_Table_Name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Target_Azure_etlorcl_2507')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_tgt_etl_orcl",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Tgt_Schema_Name": {
+						"type": "String"
+					},
+					"Tgt_Table_Name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().Tgt_Schema_Name",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().Tgt_Table_Name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Tgt_DWH_DimCustomer')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Dim_Schema_Name": {
+						"type": "String"
+					},
+					"Dim_Table_Name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().Dim_Schema_Name",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().Dim_Table_Name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Tgt_DWH_StgCustomer')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Stg_Schema_Name": {
+						"type": "String"
+					},
+					"Stg_Table_Name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().Stg_Schema_Name",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().Stg_Table_Name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_VIVID_CUSTOMER')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_SB_SCD",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Src_Schema_Name": {
+						"type": "String"
+					},
+					"Src_Table_Name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "INDEX_NUM",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CUSTOMER_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FIRST_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LAST_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "COMPANY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CITY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "COUNTRY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PHONE_1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PHONE_2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EMAIL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SUBSCRIPTION_DATE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "WEBSITE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SRC_ROW_INSRT_TSTMP",
+						"type": "datetime2",
+						"scale": 7
+					}
+				],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().Src_Schema_Name",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().Src_Table_Name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_VIVID_PEOPLE')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Src_Schema_Name": {
+						"type": "String"
+					},
+					"Src_Table_Name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().Src_Schema_Name",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().Src_Table_Name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_VIVID_RAW_TABLES')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_SB_SCD",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Src_Schema_Name": {
+						"type": "String"
+					},
+					"Src_Table_Name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "INDEX_NUM",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CUSTOMER_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FIRST_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LAST_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "COMPANY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CITY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "COUNTRY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PHONE_1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PHONE_2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EMAIL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SUBSCRIPTION_DATE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "WEBSITE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SRC_ROW_INSRT_TSTMP",
+						"type": "datetime2",
+						"scale": 7
+					}
+				],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().Src_Schema_Name",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().Src_Table_Name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Vivid_People_0409')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Stg_Schema_Name": {
+						"type": "String"
+					},
+					"Stg_Table_Name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().Stg_Schema_Name",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().Stg_Table_Name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Vivid_Raw_2408')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS__SB_ADVW",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Src_Schema_Name": {
+						"type": "String"
+					},
+					"Src_Table_Name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().Src_Schema_Name",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().Src_Table_Name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Watermark_Tracker')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "WATERMARK_TRACKER"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/P_DimCustomer')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Par_ETLSANDBOX",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "ADLS_DimCustomer.parquet",
+						"fileSystem": "akum-adls-input"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/People_AzureSqlTable')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS__SB_ADVW",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "VIVID",
+					"table": "BLOB_PEOPLE_RAW"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Files_To_Tables_2502')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Files_SB_Tables_Lkp_2502",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "FILE_TABLE_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SRC_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TGT_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SRC_SCHEMA_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TGT_SCHEMA_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SRC_TYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TGT_TYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ROW_ADDED_BY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ROW_STS_CD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PIPLN_NM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ROW_VERSION",
+						"type": "timestamp"
+					},
+					{
+						"name": "INSERT_TSTMP_IST",
+						"type": "datetime2",
+						"scale": 7
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "FILE_TABLE_MAPPING"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_ALL_CSV_2502')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Blob_ALL_CSV_2502",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"SRC_FILE_NAME": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().SRC_FILE_NAME",
+							"type": "Expression"
+						},
+						"container": "input"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "DEPARTMENT_ID",
+						"type": "String"
+					},
+					{
+						"name": "DEPARTMENT_NAME",
+						"type": "String"
+					},
+					{
+						"name": "LOCATION",
+						"type": "String"
+					},
+					{
+						"name": "HEAD_OF_DEPARTMENT",
+						"type": "String"
+					},
+					{
+						"name": "BUDGET",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_SB_VIVID_Insert_2502')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_SB_VIVID_Insert_2502",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"TGT_SCHEMA_NAME": {
+						"type": "String"
+					},
+					"TGT_TBL_NAME": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().TGT_SCHEMA_NAME",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().TGT_TBL_NAME",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Copy_AzureSql_to_Snowflake')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "DimPeopleDetails",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "SnowflakeV2Sink",
+								"importSettings": {
+									"type": "SnowflakeImportCopyCommand",
+									"storageIntegration": "DWH_DIM_AZURE_INT"
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "LS_STG_ADLS_1209",
+									"type": "LinkedServiceReference"
+								},
+								"path": "akum-adls-input"
+							},
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "PEOPLE_SID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "PEOPLE_SID",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"name": "INDEX_NUM",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "INDEX_NUM",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"name": "USR_ID",
+											"type": "String"
+										},
+										"sink": {
+											"name": "USR_ID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "FIRST_NAME",
+											"type": "String"
+										},
+										"sink": {
+											"name": "FIRST_NAME",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "LAST_NAME",
+											"type": "String"
+										},
+										"sink": {
+											"name": "LAST_NAME",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "SEX",
+											"type": "String"
+										},
+										"sink": {
+											"name": "SEX",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "EMAIL",
+											"type": "String"
+										},
+										"sink": {
+											"name": "EMAIL",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "PHONE",
+											"type": "String"
+										},
+										"sink": {
+											"name": "PHONE",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DATE_OF_BIRTH",
+											"type": "String"
+										},
+										"sink": {
+											"name": "DATE_OF_BIRTH",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "JOB_TITLE",
+											"type": "String"
+										},
+										"sink": {
+											"name": "JOB_TITLE",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "SRC_ROW_INSRT_TSTMP",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "SRC_ROW_INSRT_TSTMP",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "HASH_DIFF",
+											"type": "Byte[]"
+										},
+										"sink": {
+											"name": "HASH_DIFF",
+											"type": "Byte[]"
+										}
+									},
+									{
+										"source": {
+											"name": "WATERMARK_ID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "WATERMARK_ID",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"name": "BATCH_ID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "BATCH_ID",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"name": "ROW_EFF_DT",
+											"type": "Date"
+										},
+										"sink": {
+											"name": "ROW_EFF_DT",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "ROW_EXPIR_DT",
+											"type": "Date"
+										},
+										"sink": {
+											"name": "ROW_EXPIR_DT",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "ROW_STS_CD",
+											"type": "String"
+										},
+										"sink": {
+											"name": "ROW_STS_CD",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "VERSION_NUM",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "VERSION_NUM",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"name": "INSERT_TSTMP_IST",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "INSERT_TSTMP_IST",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "LST_UPD_TSTMP_IST",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "LST_UPD_TSTMP_IST",
+											"type": "DateTime"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_Azure_Dim_DWH_1209",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_Snowflake_DimPeople",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "ADLS"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_Snowflake_DimPeople')]"
+			]
+		}
+	]
+}

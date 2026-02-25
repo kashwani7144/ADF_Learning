@@ -1,0 +1,438 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "akumDataFactory-df"
+		},
+		"LS_AZURE_ORACLE_2507_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_AZURE_ORACLE_2507'"
+		},
+		"LS_Azure_SB_Lkp_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_Azure_SB_Lkp'"
+		},
+		"LS_Azure_tgt_etl_orcl_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_Azure_tgt_etl_orcl'"
+		},
+		"LS_LOG_MIGRATION_EVENT_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_LOG_MIGRATION_EVENT'"
+		},
+		"LS_Run_DDLs_Azure_2507_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_Run_DDLs_Azure_2507'"
+		},
+		"LS_SB_SCD_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_SB_SCD'"
+		},
+		"LS_SB_Tgt_SalesLT_M_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_SB_Tgt_SalesLT_M'"
+		},
+		"LS_SNFLK_ETLSB_VIVID_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_SNFLK_ETLSB_VIVID'"
+		},
+		"LS_STG_ADLS_1209_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_STG_ADLS_1209'"
+		},
+		"LS__SB_ADVW_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS__SB_ADVW'"
+		},
+		"Par_ETLSANDBOX_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'Par_ETLSANDBOX'"
+		},
+		"LS_Files_SB_Tables_Lkp_2502_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_Files_SB_Tables_Lkp_2502'"
+		},
+		"LS_Blob_ALL_CSV_2502_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_Blob_ALL_CSV_2502'"
+		},
+		"LS_SB_VIVID_Insert_2502_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_SB_VIVID_Insert_2502'"
+		},
+		"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "etl-oracle.database.windows.net"
+		},
+		"LS_AZURE_ORACLE_2507_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "etl-oracle"
+		},
+		"LS_AZURE_ORACLE_2507_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "akum"
+		},
+		"LS_Azure_SB_Lkp_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "svetlsandbox.database.windows.net"
+		},
+		"LS_Azure_SB_Lkp_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "ETLSANDBOX"
+		},
+		"LS_Azure_SB_Lkp_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "akum"
+		},
+		"LS_Azure_tgt_etl_orcl_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "svetlsandbox.database.windows.net"
+		},
+		"LS_Azure_tgt_etl_orcl_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "ETLSANDBOX"
+		},
+		"LS_Azure_tgt_etl_orcl_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "akum"
+		},
+		"LS_LOG_MIGRATION_EVENT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "svetlsandbox.database.windows.net"
+		},
+		"LS_LOG_MIGRATION_EVENT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "ETLSANDBOX"
+		},
+		"LS_LOG_MIGRATION_EVENT_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "akum"
+		},
+		"LS_Run_DDLs_Azure_2507_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "svetlsandbox.database.windows.net"
+		},
+		"LS_Run_DDLs_Azure_2507_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "etlsandbox"
+		},
+		"LS_Run_DDLs_Azure_2507_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "akum"
+		},
+		"LS_SB_SCD_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "svetlsandbox.database.windows.net"
+		},
+		"LS_SB_SCD_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "ETLSANDBOX"
+		},
+		"LS_SB_SCD_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "akum"
+		},
+		"LS_SB_Tgt_SalesLT_M_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "etlsandbox.database.windows.net"
+		},
+		"LS_SB_Tgt_SalesLT_M_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "ETLSANDBOX"
+		},
+		"LS_SB_Tgt_SalesLT_M_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "akum"
+		},
+		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "ETLSANDBOX"
+		},
+		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role": {
+			"type": "string",
+			"defaultValue": "ACCOUNTADMIN"
+		},
+		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "LPOYIGM-IN47228.snowflakecomputing.com"
+		},
+		"LS__SB_ADVW_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "svetlsandbox.database.windows.net"
+		},
+		"LS__SB_ADVW_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "ETLSANDBOX"
+		},
+		"LS__SB_ADVW_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "akum"
+		},
+		"Par_ETLSANDBOX_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://akumadlsgen2.dfs.core.windows.net/"
+		},
+		"LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "etlsandbox.database.windows.net"
+		},
+		"LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "ETLSANDBOX"
+		},
+		"LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "akum"
+		},
+		"LS_SB_VIVID_Insert_2502_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "etlsandbox.database.windows.net"
+		},
+		"LS_SB_VIVID_Insert_2502_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "ETLSANDBOX"
+		},
+		"LS_SB_VIVID_Insert_2502_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "akum"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "akumDataFactory-df_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"LS_AZURE_ORACLE_2507_password": {
+						"value": "[parameters('LS_AZURE_ORACLE_2507_password')]"
+					},
+					"LS_Azure_SB_Lkp_password": {
+						"value": "[parameters('LS_Azure_SB_Lkp_password')]"
+					},
+					"LS_Azure_tgt_etl_orcl_password": {
+						"value": "[parameters('LS_Azure_tgt_etl_orcl_password')]"
+					},
+					"LS_LOG_MIGRATION_EVENT_password": {
+						"value": "[parameters('LS_LOG_MIGRATION_EVENT_password')]"
+					},
+					"LS_Run_DDLs_Azure_2507_password": {
+						"value": "[parameters('LS_Run_DDLs_Azure_2507_password')]"
+					},
+					"LS_SB_SCD_password": {
+						"value": "[parameters('LS_SB_SCD_password')]"
+					},
+					"LS_SB_Tgt_SalesLT_M_password": {
+						"value": "[parameters('LS_SB_Tgt_SalesLT_M_password')]"
+					},
+					"LS_SNFLK_ETLSB_VIVID_password": {
+						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_password')]"
+					},
+					"LS_STG_ADLS_1209_connectionString": {
+						"value": "[parameters('LS_STG_ADLS_1209_connectionString')]"
+					},
+					"LS__SB_ADVW_password": {
+						"value": "[parameters('LS__SB_ADVW_password')]"
+					},
+					"Par_ETLSANDBOX_accountKey": {
+						"value": "[parameters('Par_ETLSANDBOX_accountKey')]"
+					},
+					"LS_Files_SB_Tables_Lkp_2502_password": {
+						"value": "[parameters('LS_Files_SB_Tables_Lkp_2502_password')]"
+					},
+					"LS_Blob_ALL_CSV_2502_connectionString": {
+						"value": "[parameters('LS_Blob_ALL_CSV_2502_connectionString')]"
+					},
+					"LS_SB_VIVID_Insert_2502_password": {
+						"value": "[parameters('LS_SB_VIVID_Insert_2502_password')]"
+					},
+					"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
+						"value": "[parameters('LS_AZURE_ORACLE_2507_properties_typeProperties_server')]"
+					},
+					"LS_AZURE_ORACLE_2507_properties_typeProperties_database": {
+						"value": "[parameters('LS_AZURE_ORACLE_2507_properties_typeProperties_database')]"
+					},
+					"LS_AZURE_ORACLE_2507_properties_typeProperties_userName": {
+						"value": "[parameters('LS_AZURE_ORACLE_2507_properties_typeProperties_userName')]"
+					},
+					"LS_Azure_SB_Lkp_properties_typeProperties_server": {
+						"value": "[parameters('LS_Azure_SB_Lkp_properties_typeProperties_server')]"
+					},
+					"LS_Azure_SB_Lkp_properties_typeProperties_database": {
+						"value": "[parameters('LS_Azure_SB_Lkp_properties_typeProperties_database')]"
+					},
+					"LS_Azure_SB_Lkp_properties_typeProperties_userName": {
+						"value": "[parameters('LS_Azure_SB_Lkp_properties_typeProperties_userName')]"
+					},
+					"LS_Azure_tgt_etl_orcl_properties_typeProperties_server": {
+						"value": "[parameters('LS_Azure_tgt_etl_orcl_properties_typeProperties_server')]"
+					},
+					"LS_Azure_tgt_etl_orcl_properties_typeProperties_database": {
+						"value": "[parameters('LS_Azure_tgt_etl_orcl_properties_typeProperties_database')]"
+					},
+					"LS_Azure_tgt_etl_orcl_properties_typeProperties_userName": {
+						"value": "[parameters('LS_Azure_tgt_etl_orcl_properties_typeProperties_userName')]"
+					},
+					"LS_LOG_MIGRATION_EVENT_properties_typeProperties_server": {
+						"value": "[parameters('LS_LOG_MIGRATION_EVENT_properties_typeProperties_server')]"
+					},
+					"LS_LOG_MIGRATION_EVENT_properties_typeProperties_database": {
+						"value": "[parameters('LS_LOG_MIGRATION_EVENT_properties_typeProperties_database')]"
+					},
+					"LS_LOG_MIGRATION_EVENT_properties_typeProperties_userName": {
+						"value": "[parameters('LS_LOG_MIGRATION_EVENT_properties_typeProperties_userName')]"
+					},
+					"LS_Run_DDLs_Azure_2507_properties_typeProperties_server": {
+						"value": "[parameters('LS_Run_DDLs_Azure_2507_properties_typeProperties_server')]"
+					},
+					"LS_Run_DDLs_Azure_2507_properties_typeProperties_database": {
+						"value": "[parameters('LS_Run_DDLs_Azure_2507_properties_typeProperties_database')]"
+					},
+					"LS_Run_DDLs_Azure_2507_properties_typeProperties_userName": {
+						"value": "[parameters('LS_Run_DDLs_Azure_2507_properties_typeProperties_userName')]"
+					},
+					"LS_SB_SCD_properties_typeProperties_server": {
+						"value": "[parameters('LS_SB_SCD_properties_typeProperties_server')]"
+					},
+					"LS_SB_SCD_properties_typeProperties_database": {
+						"value": "[parameters('LS_SB_SCD_properties_typeProperties_database')]"
+					},
+					"LS_SB_SCD_properties_typeProperties_userName": {
+						"value": "[parameters('LS_SB_SCD_properties_typeProperties_userName')]"
+					},
+					"LS_SB_Tgt_SalesLT_M_properties_typeProperties_server": {
+						"value": "[parameters('LS_SB_Tgt_SalesLT_M_properties_typeProperties_server')]"
+					},
+					"LS_SB_Tgt_SalesLT_M_properties_typeProperties_database": {
+						"value": "[parameters('LS_SB_Tgt_SalesLT_M_properties_typeProperties_database')]"
+					},
+					"LS_SB_Tgt_SalesLT_M_properties_typeProperties_userName": {
+						"value": "[parameters('LS_SB_Tgt_SalesLT_M_properties_typeProperties_userName')]"
+					},
+					"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database": {
+						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database')]"
+					},
+					"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role": {
+						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role')]"
+					},
+					"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host": {
+						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host')]"
+					},
+					"LS__SB_ADVW_properties_typeProperties_server": {
+						"value": "[parameters('LS__SB_ADVW_properties_typeProperties_server')]"
+					},
+					"LS__SB_ADVW_properties_typeProperties_database": {
+						"value": "[parameters('LS__SB_ADVW_properties_typeProperties_database')]"
+					},
+					"LS__SB_ADVW_properties_typeProperties_userName": {
+						"value": "[parameters('LS__SB_ADVW_properties_typeProperties_userName')]"
+					},
+					"Par_ETLSANDBOX_properties_typeProperties_url": {
+						"value": "[parameters('Par_ETLSANDBOX_properties_typeProperties_url')]"
+					},
+					"LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_server": {
+						"value": "[parameters('LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_server')]"
+					},
+					"LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_database": {
+						"value": "[parameters('LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_database')]"
+					},
+					"LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_userName": {
+						"value": "[parameters('LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_userName')]"
+					},
+					"LS_SB_VIVID_Insert_2502_properties_typeProperties_server": {
+						"value": "[parameters('LS_SB_VIVID_Insert_2502_properties_typeProperties_server')]"
+					},
+					"LS_SB_VIVID_Insert_2502_properties_typeProperties_database": {
+						"value": "[parameters('LS_SB_VIVID_Insert_2502_properties_typeProperties_database')]"
+					},
+					"LS_SB_VIVID_Insert_2502_properties_typeProperties_userName": {
+						"value": "[parameters('LS_SB_VIVID_Insert_2502_properties_typeProperties_userName')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "akumDataFactory-df_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'akumDataFactory-df_ArmTemplate_0')]"
+			]
+		},
+		{
+			"name": "akumDataFactory-df_ArmTemplate_2",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_2.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'akumDataFactory-df_ArmTemplate_1')]"
+			]
+		},
+		{
+			"name": "akumDataFactory-df_ArmTemplate_3",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_3.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'akumDataFactory-df_ArmTemplate_2')]"
+			]
+		}
+	]
+}
