@@ -1,0 +1,43 @@
+{
+	"name": "DS_ALL_CSV_2502",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_Blob_ALL_CSV_2502",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "input"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "DEPARTMENT_ID",
+				"type": "String"
+			},
+			{
+				"name": "DEPARTMENT_NAME",
+				"type": "String"
+			},
+			{
+				"name": "LOCATION",
+				"type": "String"
+			},
+			{
+				"name": "HEAD_OF_DEPARTMENT",
+				"type": "String"
+			},
+			{
+				"name": "BUDGET",
+				"type": "String"
+			}
+		]
+	}
+}
