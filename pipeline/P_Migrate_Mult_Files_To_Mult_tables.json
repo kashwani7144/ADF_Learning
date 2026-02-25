@@ -43,7 +43,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat(\n  'SELECT FILE_TABLE_ID, ',\n  'RIGHT(SRC_SCHEMA_NAME, 8) AS SRC_SCHEMA_NAME, ',\n  'RIGHT(TGT_SCHEMA_NAME, 5) AS TGT_SCHEMA_NAME, ',\n  'SRC_NAME AS SRC_TBL_NAME, ',\n  'TGT_NAME AS TGT_TBL_NAME ',\n  'FROM FILE_TABLE_MAPPING ',\n  'WHERE PIPLN_NM = ''', pipeline().Pipeline, ''' ',\n  'AND ROW_STS_CD = ''A'''\n)",
+							"value": "@concat(\n  'SELECT FILE_TABLE_ID, ',\n  'RIGHT(SRC_SCHEMA_NAME, 8) AS SRC_SCHEMA_NAME, ',\n  'RIGHT(TGT_SCHEMA_NAME, 5) AS TGT_SCHEMA_NAME, ',\n  'SRC_NAME AS SRC_FILE_NAME, ',\n  'TGT_NAME AS TGT_TBL_NAME ',\n  'FROM FILE_TABLE_MAPPING ',\n  'WHERE PIPLN_NM = ''', pipeline().Pipeline, ''' ',\n  'AND ROW_STS_CD = ''A'''\n)",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -89,6 +89,40 @@
 							"typeProperties": {
 								"source": {
 									"type": "DelimitedTextSource",
+									"additionalColumns": [
+										{
+											"name": "FILE_TABLE_ID",
+											"value": {
+												"value": "@item().FILE_TABLE_ID",
+												"type": "Expression"
+											}
+										},
+										{
+											"name": "BATCH_ID",
+											"value": "40001"
+										},
+										{
+											"name": "SRC_FILE_NAME",
+											"value": {
+												"value": "@item().SRC_FILE_NAME",
+												"type": "Expression"
+											}
+										},
+										{
+											"name": "PIPELINE_NAME",
+											"value": {
+												"value": "@pipeline().Pipeline",
+												"type": "Expression"
+											}
+										},
+										{
+											"name": "INSERT_TSTMP_IST",
+											"value": {
+												"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
+												"type": "Expression"
+											}
+										}
+									],
 									"storeSettings": {
 										"type": "AzureBlobStorageReadSettings",
 										"recursive": true,
@@ -103,7 +137,13 @@
 							"inputs": [
 								{
 									"referenceName": "DS_ALL_CSV_2502",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"SRC_FILE_NAME": {
+											"value": "@item().SRC_FILE_NAME",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}
