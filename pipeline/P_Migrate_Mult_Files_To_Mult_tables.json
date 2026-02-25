@@ -114,13 +114,6 @@
 												"value": "@pipeline().Pipeline",
 												"type": "Expression"
 											}
-										},
-										{
-											"name": "INSERT_TSTMP_IST",
-											"value": {
-												"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
-												"type": "Expression"
-											}
 										}
 									],
 									"storeSettings": {
@@ -132,7 +125,20 @@
 										"type": "DelimitedTextReadSettings"
 									}
 								},
-								"enableStaging": false
+								"sink": {
+									"type": "AzureSqlSink",
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
 							},
 							"inputs": [
 								{
@@ -144,6 +150,12 @@
 											"type": "Expression"
 										}
 									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_SB_VIVID_Insert_2502",
+									"type": "DatasetReference"
 								}
 							]
 						}
