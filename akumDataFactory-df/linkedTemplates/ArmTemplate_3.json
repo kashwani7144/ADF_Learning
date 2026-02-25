@@ -5998,6 +5998,7 @@
 								"value": "@activity('GetSrcTgtTableMapping').output.value",
 								"type": "Expression"
 							},
+							"isSequential": true,
 							"activities": [
 								{
 									"name": "CopyFileDataTotables",
@@ -6043,7 +6044,7 @@
 											],
 											"storeSettings": {
 												"type": "AzureBlobStorageReadSettings",
-												"recursive": true,
+												"recursive": false,
 												"enablePartitionDiscovery": false
 											},
 											"formatSettings": {
