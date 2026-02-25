@@ -1,5 +1,5 @@
 {
-	"name": "Migrate_Mult_Files_To_Mult_tables",
+	"name": "P_Migrate_Mult_Files_To_Mult_tables",
 	"properties": {
 		"description": "It migrates multiple csv files to multiple respective tables.",
 		"activities": [
