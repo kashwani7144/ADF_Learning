@@ -14,6 +14,12 @@
 		"LS_Azure_tgt_etl_orcl_password": {
 			"value": ""
 		},
+		"LS_Blob_ALL_CSV_2502_connectionString": {
+			"value": ""
+		},
+		"LS_Files_SB_Tables_Lkp_2502_password": {
+			"value": ""
+		},
 		"LS_LOG_MIGRATION_EVENT_password": {
 			"value": ""
 		},
@@ -26,6 +32,9 @@
 		"LS_SB_Tgt_SalesLT_M_password": {
 			"value": ""
 		},
+		"LS_SB_VIVID_Insert_2502_password": {
+			"value": ""
+		},
 		"LS_SNFLK_ETLSB_VIVID_password": {
 			"value": ""
 		},
@@ -36,15 +45,6 @@
 			"value": ""
 		},
 		"Par_ETLSANDBOX_accountKey": {
-			"value": ""
-		},
-		"LS_Files_SB_Tables_Lkp_2502_password": {
-			"value": ""
-		},
-		"LS_Blob_ALL_CSV_2502_connectionString": {
-			"value": ""
-		},
-		"LS_SB_VIVID_Insert_2502_password": {
 			"value": ""
 		},
 		"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
@@ -72,6 +72,15 @@
 			"value": "ETLSANDBOX"
 		},
 		"LS_Azure_tgt_etl_orcl_properties_typeProperties_userName": {
+			"value": "akum"
+		},
+		"LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_server": {
+			"value": "etlsandbox.database.windows.net"
+		},
+		"LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_database": {
+			"value": "ETLSANDBOX"
+		},
+		"LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_userName": {
 			"value": "akum"
 		},
 		"LS_LOG_MIGRATION_EVENT_properties_typeProperties_server": {
@@ -110,6 +119,15 @@
 		"LS_SB_Tgt_SalesLT_M_properties_typeProperties_userName": {
 			"value": "akum"
 		},
+		"LS_SB_VIVID_Insert_2502_properties_typeProperties_server": {
+			"value": "etlsandbox.database.windows.net"
+		},
+		"LS_SB_VIVID_Insert_2502_properties_typeProperties_database": {
+			"value": "ETLSANDBOX"
+		},
+		"LS_SB_VIVID_Insert_2502_properties_typeProperties_userName": {
+			"value": "akum"
+		},
 		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database": {
 			"value": "ETLSANDBOX"
 		},
@@ -130,24 +148,6 @@
 		},
 		"Par_ETLSANDBOX_properties_typeProperties_url": {
 			"value": "https://akumadlsgen2.dfs.core.windows.net/"
-		},
-		"LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_server": {
-			"value": "etlsandbox.database.windows.net"
-		},
-		"LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_database": {
-			"value": "ETLSANDBOX"
-		},
-		"LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_userName": {
-			"value": "akum"
-		},
-		"LS_SB_VIVID_Insert_2502_properties_typeProperties_server": {
-			"value": "etlsandbox.database.windows.net"
-		},
-		"LS_SB_VIVID_Insert_2502_properties_typeProperties_database": {
-			"value": "ETLSANDBOX"
-		},
-		"LS_SB_VIVID_Insert_2502_properties_typeProperties_userName": {
-			"value": "akum"
 		},
 		"containerUri": {
 			"value": ""

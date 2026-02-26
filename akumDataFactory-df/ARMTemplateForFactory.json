@@ -19,6 +19,14 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_Azure_tgt_etl_orcl'"
 		},
+		"LS_Blob_ALL_CSV_2502_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_Blob_ALL_CSV_2502'"
+		},
+		"LS_Files_SB_Tables_Lkp_2502_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_Files_SB_Tables_Lkp_2502'"
+		},
 		"LS_LOG_MIGRATION_EVENT_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_LOG_MIGRATION_EVENT'"
@@ -35,6 +43,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_SB_Tgt_SalesLT_M'"
 		},
+		"LS_SB_VIVID_Insert_2502_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_SB_VIVID_Insert_2502'"
+		},
 		"LS_SNFLK_ETLSB_VIVID_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_SNFLK_ETLSB_VIVID'"
@@ -50,18 +62,6 @@
 		"Par_ETLSANDBOX_accountKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'Par_ETLSANDBOX'"
-		},
-		"LS_Files_SB_Tables_Lkp_2502_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'LS_Files_SB_Tables_Lkp_2502'"
-		},
-		"LS_Blob_ALL_CSV_2502_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'LS_Blob_ALL_CSV_2502'"
-		},
-		"LS_SB_VIVID_Insert_2502_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'LS_SB_VIVID_Insert_2502'"
 		},
 		"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
 			"type": "string",
@@ -96,6 +96,18 @@
 			"defaultValue": "ETLSANDBOX"
 		},
 		"LS_Azure_tgt_etl_orcl_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "akum"
+		},
+		"LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "etlsandbox.database.windows.net"
+		},
+		"LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "ETLSANDBOX"
+		},
+		"LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "akum"
 		},
@@ -147,6 +159,18 @@
 			"type": "string",
 			"defaultValue": "akum"
 		},
+		"LS_SB_VIVID_Insert_2502_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "etlsandbox.database.windows.net"
+		},
+		"LS_SB_VIVID_Insert_2502_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "ETLSANDBOX"
+		},
+		"LS_SB_VIVID_Insert_2502_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "akum"
+		},
 		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database": {
 			"type": "string",
 			"defaultValue": "ETLSANDBOX"
@@ -174,30 +198,6 @@
 		"Par_ETLSANDBOX_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://akumadlsgen2.dfs.core.windows.net/"
-		},
-		"LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "etlsandbox.database.windows.net"
-		},
-		"LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "ETLSANDBOX"
-		},
-		"LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "akum"
-		},
-		"LS_SB_VIVID_Insert_2502_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "etlsandbox.database.windows.net"
-		},
-		"LS_SB_VIVID_Insert_2502_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "ETLSANDBOX"
-		},
-		"LS_SB_VIVID_Insert_2502_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "akum"
 		}
 	},
 	"variables": {
@@ -2830,6 +2830,204 @@
 				"[concat(variables('factoryId'), '/datasets/DS_ADVW_Src_2807')]",
 				"[concat(variables('factoryId'), '/datasets/DS_SB_Tgt_SalesLT_M')]",
 				"[concat(variables('factoryId'), '/linkedServices/LS_LOG_MIGRATION_EVENT')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/P_Migrate_Mult_Files_To_Mult_tables')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "It migrates multiple csv files to multiple respective tables.",
+				"activities": [
+					{
+						"name": "SetStartTime",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "StartTime",
+							"value": {
+								"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "GetSrcTgtTableMapping",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "SetStartTime",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat(\n  'SELECT FILE_TABLE_ID, ',\n  'RIGHT(SRC_SCHEMA_NAME, 8) AS SRC_SCHEMA_NAME, ',\n  'RIGHT(TGT_SCHEMA_NAME, 5) AS TGT_SCHEMA_NAME, ',\n  'SRC_NAME AS SRC_FILE_NAME, ',\n  'TGT_NAME AS TGT_TBL_NAME ',\n  'FROM FILE_TABLE_MAPPING ',\n  'WHERE PIPLN_NM = ''', pipeline().Pipeline, ''' ',\n  'AND ROW_STS_CD = ''A'''\n)",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DS_Files_To_Tables_2502",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEachFileToTable",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GetSrcTgtTableMapping",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetSrcTgtTableMapping').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"activities": [
+								{
+									"name": "CopyFileDataTotables",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"additionalColumns": [
+												{
+													"name": "FILE_TABLE_ID",
+													"value": {
+														"value": "@item().FILE_TABLE_ID",
+														"type": "Expression"
+													}
+												},
+												{
+													"name": "BATCH_ID",
+													"value": "40001"
+												},
+												{
+													"name": "SRC_FILE_NAME",
+													"value": {
+														"value": "@item().SRC_FILE_NAME",
+														"type": "Expression"
+													}
+												},
+												{
+													"name": "PIPELINE_NAME",
+													"value": {
+														"value": "@pipeline().Pipeline",
+														"type": "Expression"
+													}
+												}
+											],
+											"storeSettings": {
+												"type": "AzureBlobStorageReadSettings",
+												"recursive": false,
+												"enablePartitionDiscovery": false
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"writeBehavior": "insert",
+											"sqlWriterUseTableLock": false
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "DS_ALL_CSV_2502",
+											"type": "DatasetReference",
+											"parameters": {
+												"SRC_FILE_NAME": {
+													"value": "@item().SRC_FILE_NAME",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DS_SB_VIVID_Insert_2502",
+											"type": "DatasetReference",
+											"parameters": {
+												"TGT_SCHEMA_NAME": {
+													"value": "@item().TGT_SCHEMA_NAME",
+													"type": "Expression"
+												},
+												"TGT_TBL_NAME": {
+													"value": "@item().TGT_TBL_NAME",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"StartTime": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "File_To_Tables_Migration"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_Files_To_Tables_2502')]",
+				"[concat(variables('factoryId'), '/datasets/DS_ALL_CSV_2502')]",
+				"[concat(variables('factoryId'), '/datasets/DS_SB_VIVID_Insert_2502')]"
 			]
 		},
 		{
@@ -7466,204 +7664,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/P_Migrate_Mult_Files_To_Mult_tables')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "It migrates multiple csv files to multiple respective tables.",
-				"activities": [
-					{
-						"name": "SetStartTime",
-						"type": "SetVariable",
-						"dependsOn": [],
-						"policy": {
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "StartTime",
-							"value": {
-								"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "GetSrcTgtTableMapping",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "SetStartTime",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "@concat(\n  'SELECT FILE_TABLE_ID, ',\n  'RIGHT(SRC_SCHEMA_NAME, 8) AS SRC_SCHEMA_NAME, ',\n  'RIGHT(TGT_SCHEMA_NAME, 5) AS TGT_SCHEMA_NAME, ',\n  'SRC_NAME AS SRC_FILE_NAME, ',\n  'TGT_NAME AS TGT_TBL_NAME ',\n  'FROM FILE_TABLE_MAPPING ',\n  'WHERE PIPLN_NM = ''', pipeline().Pipeline, ''' ',\n  'AND ROW_STS_CD = ''A'''\n)",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "DS_Files_To_Tables_2502",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "ForEachFileToTable",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "GetSrcTgtTableMapping",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('GetSrcTgtTableMapping').output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"activities": [
-								{
-									"name": "CopyFileDataTotables",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "DelimitedTextSource",
-											"additionalColumns": [
-												{
-													"name": "FILE_TABLE_ID",
-													"value": {
-														"value": "@item().FILE_TABLE_ID",
-														"type": "Expression"
-													}
-												},
-												{
-													"name": "BATCH_ID",
-													"value": "40001"
-												},
-												{
-													"name": "SRC_FILE_NAME",
-													"value": {
-														"value": "@item().SRC_FILE_NAME",
-														"type": "Expression"
-													}
-												},
-												{
-													"name": "PIPELINE_NAME",
-													"value": {
-														"value": "@pipeline().Pipeline",
-														"type": "Expression"
-													}
-												}
-											],
-											"storeSettings": {
-												"type": "AzureBlobStorageReadSettings",
-												"recursive": false,
-												"enablePartitionDiscovery": false
-											},
-											"formatSettings": {
-												"type": "DelimitedTextReadSettings"
-											}
-										},
-										"sink": {
-											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
-											"sqlWriterUseTableLock": false
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "DS_ALL_CSV_2502",
-											"type": "DatasetReference",
-											"parameters": {
-												"SRC_FILE_NAME": {
-													"value": "@item().SRC_FILE_NAME",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "DS_SB_VIVID_Insert_2502",
-											"type": "DatasetReference",
-											"parameters": {
-												"TGT_SCHEMA_NAME": {
-													"value": "@item().TGT_SCHEMA_NAME",
-													"type": "Expression"
-												},
-												"TGT_TBL_NAME": {
-													"value": "@item().TGT_TBL_NAME",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"variables": {
-					"StartTime": {
-						"type": "String"
-					}
-				},
-				"folder": {
-					"name": "File_To_Tables_Migration"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DS_Files_To_Tables_2502')]",
-				"[concat(variables('factoryId'), '/datasets/DS_ALL_CSV_2502')]",
-				"[concat(variables('factoryId'), '/datasets/DS_SB_VIVID_Insert_2502')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/DS_ADVW_Src_2807')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -7696,6 +7696,63 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/LS__SB_ADVW')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_ALL_CSV_2502')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Blob_ALL_CSV_2502",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"SRC_FILE_NAME": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().SRC_FILE_NAME",
+							"type": "Expression"
+						},
+						"container": "input"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "DEPARTMENT_ID",
+						"type": "String"
+					},
+					{
+						"name": "DEPARTMENT_NAME",
+						"type": "String"
+					},
+					{
+						"name": "LOCATION",
+						"type": "String"
+					},
+					{
+						"name": "HEAD_OF_DEPARTMENT",
+						"type": "String"
+					},
+					{
+						"name": "BUDGET",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_Blob_ALL_CSV_2502')]"
 			]
 		},
 		{
@@ -8331,6 +8388,78 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_Files_To_Tables_2502')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Files_SB_Tables_Lkp_2502",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "FILE_TABLE_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SRC_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TGT_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SRC_SCHEMA_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TGT_SCHEMA_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SRC_TYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TGT_TYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ROW_ADDED_BY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ROW_STS_CD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PIPLN_NM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ROW_VERSION",
+						"type": "timestamp"
+					},
+					{
+						"name": "INSERT_TSTMP_IST",
+						"type": "datetime2",
+						"scale": 7
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "FILE_TABLE_MAPPING"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_Files_SB_Tables_Lkp_2502')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_Get_Watermark_2308')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -8684,6 +8813,41 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/LS_SB_Tgt_SalesLT_M')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_SB_VIVID_Insert_2502')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_SB_VIVID_Insert_2502",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"TGT_SCHEMA_NAME": {
+						"type": "String"
+					},
+					"TGT_TBL_NAME": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().TGT_SCHEMA_NAME",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().TGT_TBL_NAME",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_SB_VIVID_Insert_2502')]"
 			]
 		},
 		{
@@ -9461,6 +9625,53 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/LS_Blob_ALL_CSV_2502')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('LS_Blob_ALL_CSV_2502_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_Files_SB_Tables_Lkp_2502')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_server')]",
+					"database": "[parameters('LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_Files_SB_Tables_Lkp_2502_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/LS_LOG_MIGRATION_EVENT')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -9561,6 +9772,34 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('LS_SB_Tgt_SalesLT_M_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_SB_VIVID_Insert_2502')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS_SB_VIVID_Insert_2502_properties_typeProperties_server')]",
+					"database": "[parameters('LS_SB_VIVID_Insert_2502_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_SB_VIVID_Insert_2502_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_SB_VIVID_Insert_2502_password')]"
 					}
 				},
 				"connectVia": {
@@ -11083,245 +11322,6 @@
 			"apiVersion": "2018-06-01",
 			"properties": {},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_Files_SB_Tables_Lkp_2502')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_server')]",
-					"database": "[parameters('LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS_Files_SB_Tables_Lkp_2502_password')]"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_Files_To_Tables_2502')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_Files_SB_Tables_Lkp_2502",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "FILE_TABLE_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "SRC_NAME",
-						"type": "nvarchar"
-					},
-					{
-						"name": "TGT_NAME",
-						"type": "nvarchar"
-					},
-					{
-						"name": "SRC_SCHEMA_NAME",
-						"type": "nvarchar"
-					},
-					{
-						"name": "TGT_SCHEMA_NAME",
-						"type": "nvarchar"
-					},
-					{
-						"name": "SRC_TYPE",
-						"type": "nvarchar"
-					},
-					{
-						"name": "TGT_TYPE",
-						"type": "nvarchar"
-					},
-					{
-						"name": "ROW_ADDED_BY",
-						"type": "nvarchar"
-					},
-					{
-						"name": "ROW_STS_CD",
-						"type": "nvarchar"
-					},
-					{
-						"name": "PIPLN_NM",
-						"type": "nvarchar"
-					},
-					{
-						"name": "ROW_VERSION",
-						"type": "timestamp"
-					},
-					{
-						"name": "INSERT_TSTMP_IST",
-						"type": "datetime2",
-						"scale": 7
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "FILE_TABLE_MAPPING"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS_Files_SB_Tables_Lkp_2502')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_Blob_ALL_CSV_2502')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('LS_Blob_ALL_CSV_2502_connectionString')]"
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_ALL_CSV_2502')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_Blob_ALL_CSV_2502",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"SRC_FILE_NAME": {
-						"type": "String"
-					}
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": {
-							"value": "@dataset().SRC_FILE_NAME",
-							"type": "Expression"
-						},
-						"container": "input"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "DEPARTMENT_ID",
-						"type": "String"
-					},
-					{
-						"name": "DEPARTMENT_NAME",
-						"type": "String"
-					},
-					{
-						"name": "LOCATION",
-						"type": "String"
-					},
-					{
-						"name": "HEAD_OF_DEPARTMENT",
-						"type": "String"
-					},
-					{
-						"name": "BUDGET",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS_Blob_ALL_CSV_2502')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_SB_VIVID_Insert_2502')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('LS_SB_VIVID_Insert_2502_properties_typeProperties_server')]",
-					"database": "[parameters('LS_SB_VIVID_Insert_2502_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('LS_SB_VIVID_Insert_2502_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS_SB_VIVID_Insert_2502_password')]"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_SB_VIVID_Insert_2502')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_SB_VIVID_Insert_2502",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"TGT_SCHEMA_NAME": {
-						"type": "String"
-					},
-					"TGT_TBL_NAME": {
-						"type": "String"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().TGT_SCHEMA_NAME",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().TGT_TBL_NAME",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS_SB_VIVID_Insert_2502')]"
-			]
 		}
 	]
 }
