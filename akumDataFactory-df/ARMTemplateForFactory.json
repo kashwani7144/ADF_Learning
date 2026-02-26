@@ -2965,6 +2965,10 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
+											"preCopyScript": {
+												"value": "TRUNCATE TABLE @{item().TGT_SCHEMA_NAME}.@{item().TGT_TBL_NAME};",
+												"type": "Expression"
+											},
 											"writeBehavior": "insert",
 											"sqlWriterUseTableLock": false
 										},
@@ -3084,7 +3088,7 @@
 											},
 											"src_table_name": {
 												"value": {
-													"value": "@item().SRC_TBL_NAME",
+													"value": "@item().SRC_FILE_NAME",
 													"type": "Expression"
 												},
 												"type": "String"
@@ -3208,7 +3212,7 @@
 											},
 											"src_table_name": {
 												"value": {
-													"value": "@item().SRC_TBL_NAME",
+													"value": "@item().SRC_FILE_NAME",
 													"type": "Expression"
 												},
 												"type": "String"
