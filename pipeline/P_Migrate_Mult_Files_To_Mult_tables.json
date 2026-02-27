@@ -8,7 +8,7 @@
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "Get_File_Details",
+						"activity": "IF_Validate_File",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -467,6 +467,25 @@
 					},
 					"formatSettings": {
 						"type": "DelimitedTextReadSettings"
+					}
+				}
+			},
+			{
+				"name": "IF_Validate_File",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Get_File_Details",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@and(\n   equals(activity('Get_File_Details').output.exists, true),\n   greater(activity('Get_File_Details').output.size, 0)\n)",
+						"type": "Expression"
 					}
 				}
 			}
