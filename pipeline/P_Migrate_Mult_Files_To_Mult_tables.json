@@ -6,7 +6,14 @@
 			{
 				"name": "Get_File_Details",
 				"type": "GetMetadata",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "SetStartTime",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -210,28 +217,11 @@
 					],
 					"ifTrueActivities": [
 						{
-							"name": "SetStartTime",
-							"type": "SetVariable",
-							"dependsOn": [],
-							"policy": {
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "StartTime",
-								"value": {
-									"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
-									"type": "Expression"
-								}
-							}
-						},
-						{
 							"name": "GetSrcTgtTableMapping",
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "SetStartTime",
+									"activity": "Copy_Landing_To_Raw",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -627,8 +617,68 @@
 									}
 								]
 							}
+						},
+						{
+							"name": "Copy_Landing_To_Raw",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "AzureBlobStorageReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "DS_Landing_Generic_2702",
+									"type": "DatasetReference",
+									"parameters": {
+										"folderPath": {
+											"value": "@pipeline().parameters.p_folderPath",
+											"type": "Expression"
+										},
+										"fileName": {
+											"value": "@pipeline().parameters.p_fileName",
+											"type": "Expression"
+										}
+									}
+								}
+							]
 						}
 					]
+				}
+			},
+			{
+				"name": "SetStartTime",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "StartTime",
+					"value": {
+						"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
+						"type": "Expression"
+					}
 				}
 			}
 		],
