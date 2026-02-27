@@ -69,7 +69,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"message": "File validation failed: Either file does not exist or size is zero.",
-								"errorCode": "FILE_VALIDATION_FAILED"
+								"errorCode": "FILE_EMPTY_OR_NOT_FOUND"
 							}
 						}
 					],
