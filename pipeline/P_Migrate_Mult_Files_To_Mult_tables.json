@@ -614,6 +614,55 @@
 											"referenceName": "LS_Files_SB_Tables_Lkp_2502",
 											"type": "LinkedServiceReference"
 										}
+									},
+									{
+										"name": "Delete_From_Landing2",
+										"type": "Delete",
+										"dependsOn": [
+											{
+												"activity": "SP_Success_Log",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"dataset": {
+												"referenceName": "DS_Landing_Generic_2702",
+												"type": "DatasetReference",
+												"parameters": {
+													"folderPath": {
+														"value": "@pipeline().parameters.p_folderPath",
+														"type": "Expression"
+													},
+													"fileName": {
+														"value": "@pipeline().parameters.p_fileName",
+														"type": "Expression"
+													}
+												}
+											},
+											"logStorageSettings": {
+												"linkedServiceName": {
+													"referenceName": "LS_Error_Log_Generic_2702",
+													"type": "LinkedServiceReference"
+												},
+												"path": "logs"
+											},
+											"enableLogging": true,
+											"storeSettings": {
+												"type": "AzureBlobStorageReadSettings",
+												"recursive": true,
+												"enablePartitionDiscovery": false
+											}
+										}
 									}
 								]
 							}
