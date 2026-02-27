@@ -1,5 +1,5 @@
 {
-	"name": "DS_Error_Generic",
+	"name": "DS_Error_Generic_2702",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "LS_Blob_Storage_2702",
