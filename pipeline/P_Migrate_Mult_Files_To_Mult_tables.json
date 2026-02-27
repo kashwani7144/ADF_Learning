@@ -61,6 +61,18 @@
 						"value": "@and(\n   equals(activity('Get_File_Details').output.exists, true),\n   greater(activity('Get_File_Details').output.size, 0)\n)",
 						"type": "Expression"
 					},
+					"ifFalseActivities": [
+						{
+							"name": "Fail_the Pipeline",
+							"type": "Fail",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"message": "File validation failed: Either file does not exist or size is zero.",
+								"errorCode": "FILE_VALIDATION_FAILED"
+							}
+						}
+					],
 					"ifTrueActivities": [
 						{
 							"name": "SetStartTime",
