@@ -192,6 +192,13 @@
 										}
 									}
 								},
+								"logStorageSettings": {
+									"linkedServiceName": {
+										"referenceName": "LS_Error_Log_Generic_2702",
+										"type": "LinkedServiceReference"
+									},
+									"path": "logs"
+								},
 								"enableLogging": true,
 								"storeSettings": {
 									"type": "AzureBlobStorageReadSettings",
