@@ -19,7 +19,7 @@
 					"value": "@dataset().SRC_FILE_NAME",
 					"type": "Expression"
 				},
-				"container": "input"
+				"container": "raw-files"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
