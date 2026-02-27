@@ -23,6 +23,14 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'LS_Blob_ALL_CSV_2502'"
 		},
+		"LS_Blob_Storage_2702_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_Blob_Storage_2702'"
+		},
+		"LS_Error_Log_Generic_2702_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_Error_Log_Generic_2702'"
+		},
 		"LS_Files_SB_Tables_Lkp_2502_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_Files_SB_Tables_Lkp_2502'"
@@ -30,6 +38,10 @@
 		"LS_LOG_MIGRATION_EVENT_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_LOG_MIGRATION_EVENT'"
+		},
+		"LS_RawFiles_Generic_2702_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_RawFiles_Generic_2702'"
 		},
 		"LS_Run_DDLs_Azure_2507_password": {
 			"type": "secureString",
@@ -238,11 +250,20 @@
 					"LS_Blob_ALL_CSV_2502_connectionString": {
 						"value": "[parameters('LS_Blob_ALL_CSV_2502_connectionString')]"
 					},
+					"LS_Blob_Storage_2702_connectionString": {
+						"value": "[parameters('LS_Blob_Storage_2702_connectionString')]"
+					},
+					"LS_Error_Log_Generic_2702_connectionString": {
+						"value": "[parameters('LS_Error_Log_Generic_2702_connectionString')]"
+					},
 					"LS_Files_SB_Tables_Lkp_2502_password": {
 						"value": "[parameters('LS_Files_SB_Tables_Lkp_2502_password')]"
 					},
 					"LS_LOG_MIGRATION_EVENT_password": {
 						"value": "[parameters('LS_LOG_MIGRATION_EVENT_password')]"
+					},
+					"LS_RawFiles_Generic_2702_connectionString": {
+						"value": "[parameters('LS_RawFiles_Generic_2702_connectionString')]"
 					},
 					"LS_Run_DDLs_Azure_2507_password": {
 						"value": "[parameters('LS_Run_DDLs_Azure_2507_password')]"
@@ -264,9 +285,6 @@
 					},
 					"LS__SB_ADVW_password": {
 						"value": "[parameters('LS__SB_ADVW_password')]"
-					},
-					"Par_ETLSANDBOX_accountKey": {
-						"value": "[parameters('Par_ETLSANDBOX_accountKey')]"
 					},
 					"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
 						"value": "[parameters('LS_AZURE_ORACLE_2507_properties_typeProperties_server')]"
@@ -366,9 +384,6 @@
 					},
 					"LS__SB_ADVW_properties_typeProperties_userName": {
 						"value": "[parameters('LS__SB_ADVW_properties_typeProperties_userName')]"
-					},
-					"Par_ETLSANDBOX_properties_typeProperties_url": {
-						"value": "[parameters('Par_ETLSANDBOX_properties_typeProperties_url')]"
 					}
 				}
 			},
@@ -387,6 +402,12 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"Par_ETLSANDBOX_accountKey": {
+						"value": "[parameters('Par_ETLSANDBOX_accountKey')]"
+					},
+					"Par_ETLSANDBOX_properties_typeProperties_url": {
+						"value": "[parameters('Par_ETLSANDBOX_properties_typeProperties_url')]"
 					}
 				}
 			},
@@ -432,6 +453,26 @@
 			},
 			"dependsOn": [
 				"[resourceId('Microsoft.Resources/deployments', 'akumDataFactory-df_ArmTemplate_2')]"
+			]
+		},
+		{
+			"name": "akumDataFactory-df_ArmTemplate_4",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_4.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'akumDataFactory-df_ArmTemplate_3')]"
 			]
 		}
 	]

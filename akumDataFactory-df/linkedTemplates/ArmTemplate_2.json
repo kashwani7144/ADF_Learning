@@ -13,6 +13,263 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_People_Raw_0209')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Src_Schema_Name": {
+						"type": "String"
+					},
+					"Src_Table_Name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().Src_Schema_Name",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().Src_Table_Name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_PhonePe_Trans_Raw')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS__SB_ADVW",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Products_0805')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS__SB_ADVW",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "VIVID",
+					"table": "BLOB_PRODUCTS_RAW"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Raw_Generic_2702')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_RawFiles_Generic_2702",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"folderPath": {
+						"type": "String"
+					},
+					"fileName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().fileName",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().folderPath",
+							"type": "Expression"
+						},
+						"container": "raw-files"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_SB_TGT_DWH_1808')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Stg_Schema_Name": {
+						"type": "String"
+					},
+					"Stg_Table_Name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().Stg_Schema_Name",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().Stg_Table_Name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_SB_TGT_SCD')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_SB_SCD",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "CUSTOMER_SID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CUSTOMER_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FIRST_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LAST_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "COMPANY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CITY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "COUNTRY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PHONE_1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PHONE_2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EMAIL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SUBSCRIPTION_DATE",
+						"type": "date"
+					},
+					{
+						"name": "WEBSITE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SRC_ROW_INSRT_TSTMP",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "WATERMARK_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ROW_EFF_DT",
+						"type": "date"
+					},
+					{
+						"name": "ROW_EXPIR_DT",
+						"type": "date"
+					},
+					{
+						"name": "ROW_STS_CD",
+						"type": "nchar"
+					},
+					{
+						"name": "VERSION_NUM",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "HASHDIFF",
+						"type": "varbinary"
+					},
+					{
+						"name": "INSERT_TSTMP_IST",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "LST_UPD_TSTMP_IST",
+						"type": "datetime2",
+						"scale": 7
+					}
+				],
+				"typeProperties": {
+					"schema": "DWH",
+					"table": "DIM_CUSTOMER_DETAILS"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_SB_Tgt_SalesLT_M')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -606,406 +863,6 @@
 				}
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_Vivid_People_0409')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_Azure_SB_Lkp",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"Stg_Schema_Name": {
-						"type": "String"
-					},
-					"Stg_Table_Name": {
-						"type": "String"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().Stg_Schema_Name",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().Stg_Table_Name",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_Vivid_Raw_2408')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS__SB_ADVW",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"Src_Schema_Name": {
-						"type": "String"
-					},
-					"Src_Table_Name": {
-						"type": "String"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().Src_Schema_Name",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().Src_Table_Name",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_Watermark_Tracker')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_Azure_SB_Lkp",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "WATERMARK_TRACKER"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/P_DimCustomer')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "Par_ETLSANDBOX",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Parquet",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": "ADLS_DimCustomer.parquet",
-						"fileSystem": "akum-adls-input"
-					},
-					"compressionCodec": "snappy"
-				},
-				"schema": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/People_AzureSqlTable')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS__SB_ADVW",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "VIVID",
-					"table": "BLOB_PEOPLE_RAW"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Copy_AzureSql_to_Snowflake')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "DimPeopleDetails",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "SnowflakeV2Sink",
-								"importSettings": {
-									"type": "SnowflakeImportCopyCommand",
-									"storageIntegration": "DWH_DIM_AZURE_INT"
-								}
-							},
-							"enableStaging": true,
-							"stagingSettings": {
-								"linkedServiceName": {
-									"referenceName": "LS_STG_ADLS_1209",
-									"type": "LinkedServiceReference"
-								},
-								"path": "akum-adls-input"
-							},
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "PEOPLE_SID",
-											"type": "Int32"
-										},
-										"sink": {
-											"name": "PEOPLE_SID",
-											"type": "Int64"
-										}
-									},
-									{
-										"source": {
-											"name": "INDEX_NUM",
-											"type": "Int32"
-										},
-										"sink": {
-											"name": "INDEX_NUM",
-											"type": "Int64"
-										}
-									},
-									{
-										"source": {
-											"name": "USR_ID",
-											"type": "String"
-										},
-										"sink": {
-											"name": "USR_ID",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "FIRST_NAME",
-											"type": "String"
-										},
-										"sink": {
-											"name": "FIRST_NAME",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "LAST_NAME",
-											"type": "String"
-										},
-										"sink": {
-											"name": "LAST_NAME",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "SEX",
-											"type": "String"
-										},
-										"sink": {
-											"name": "SEX",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "EMAIL",
-											"type": "String"
-										},
-										"sink": {
-											"name": "EMAIL",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "PHONE",
-											"type": "String"
-										},
-										"sink": {
-											"name": "PHONE",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "DATE_OF_BIRTH",
-											"type": "String"
-										},
-										"sink": {
-											"name": "DATE_OF_BIRTH",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "JOB_TITLE",
-											"type": "String"
-										},
-										"sink": {
-											"name": "JOB_TITLE",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "SRC_ROW_INSRT_TSTMP",
-											"type": "DateTime"
-										},
-										"sink": {
-											"name": "SRC_ROW_INSRT_TSTMP",
-											"type": "DateTime"
-										}
-									},
-									{
-										"source": {
-											"name": "HASH_DIFF",
-											"type": "Byte[]"
-										},
-										"sink": {
-											"name": "HASH_DIFF",
-											"type": "Byte[]"
-										}
-									},
-									{
-										"source": {
-											"name": "WATERMARK_ID",
-											"type": "Int32"
-										},
-										"sink": {
-											"name": "WATERMARK_ID",
-											"type": "Int64"
-										}
-									},
-									{
-										"source": {
-											"name": "BATCH_ID",
-											"type": "Int32"
-										},
-										"sink": {
-											"name": "BATCH_ID",
-											"type": "Int64"
-										}
-									},
-									{
-										"source": {
-											"name": "ROW_EFF_DT",
-											"type": "Date"
-										},
-										"sink": {
-											"name": "ROW_EFF_DT",
-											"type": "DateTime"
-										}
-									},
-									{
-										"source": {
-											"name": "ROW_EXPIR_DT",
-											"type": "Date"
-										},
-										"sink": {
-											"name": "ROW_EXPIR_DT",
-											"type": "DateTime"
-										}
-									},
-									{
-										"source": {
-											"name": "ROW_STS_CD",
-											"type": "String"
-										},
-										"sink": {
-											"name": "ROW_STS_CD",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "VERSION_NUM",
-											"type": "Int32"
-										},
-										"sink": {
-											"name": "VERSION_NUM",
-											"type": "Int64"
-										}
-									},
-									{
-										"source": {
-											"name": "INSERT_TSTMP_IST",
-											"type": "DateTime"
-										},
-										"sink": {
-											"name": "INSERT_TSTMP_IST",
-											"type": "DateTime"
-										}
-									},
-									{
-										"source": {
-											"name": "LST_UPD_TSTMP_IST",
-											"type": "DateTime"
-										},
-										"sink": {
-											"name": "LST_UPD_TSTMP_IST",
-											"type": "DateTime"
-										}
-									}
-								]
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "DS_Azure_Dim_DWH_1209",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "DS_Snowflake_DimPeople",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "ADLS"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DS_Snowflake_DimPeople')]"
-			]
 		}
 	]
 }

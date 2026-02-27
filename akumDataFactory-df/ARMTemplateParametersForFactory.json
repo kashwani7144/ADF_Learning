@@ -17,10 +17,19 @@
 		"LS_Blob_ALL_CSV_2502_connectionString": {
 			"value": ""
 		},
+		"LS_Blob_Storage_2702_connectionString": {
+			"value": ""
+		},
+		"LS_Error_Log_Generic_2702_connectionString": {
+			"value": ""
+		},
 		"LS_Files_SB_Tables_Lkp_2502_password": {
 			"value": ""
 		},
 		"LS_LOG_MIGRATION_EVENT_password": {
+			"value": ""
+		},
+		"LS_RawFiles_Generic_2702_connectionString": {
 			"value": ""
 		},
 		"LS_Run_DDLs_Azure_2507_password": {
