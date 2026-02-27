@@ -65,12 +65,62 @@
 						{
 							"name": "Fail_the Pipeline",
 							"type": "Fail",
-							"dependsOn": [],
+							"dependsOn": [
+								{
+									"activity": "Copy_Landing_To_Error",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
 							"userProperties": [],
 							"typeProperties": {
 								"message": "File validation failed: Either file does not exist or size is zero.",
 								"errorCode": "FILE_EMPTY_OR_NOT_FOUND"
 							}
+						},
+						{
+							"name": "Copy_Landing_To_Error",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "AzureBlobStorageReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "DS_Landing_Generic_2702",
+									"type": "DatasetReference",
+									"parameters": {
+										"folderPath": {
+											"value": "@pipeline().parameters.p_folderPath",
+											"type": "Expression"
+										},
+										"fileName": {
+											"value": "@pipeline().parameters.p_fileName",
+											"type": "Expression"
+										}
+									}
+								}
+							]
 						}
 					],
 					"ifTrueActivities": [
