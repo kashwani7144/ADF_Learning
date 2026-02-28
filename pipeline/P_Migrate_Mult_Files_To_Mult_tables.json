@@ -671,7 +671,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"folderPath": {
-											"value": "@concat(\r\n   pipeline().parameters.p_folderPath,\r\n   '/',\r\n   formatDateTime(utcNow(),'yyyy/MM/dd')\r\n)",
+											"value": "@pipeline().parameters.p_folderPath",
 											"type": "Expression"
 										},
 										"fileName": {
@@ -687,7 +687,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"folderPath": {
-											"value": "@pipeline().parameters.p_folderPath",
+											"value": "@concat(\r\n   pipeline().parameters.p_folderPath,\r\n   '/',\r\n   formatDateTime(utcNow(),'yyyy/MM/dd')\r\n)",
 											"type": "Expression"
 										},
 										"fileName": {
