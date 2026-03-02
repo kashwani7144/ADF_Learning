@@ -6,6 +6,18 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "akumDataFactory-df"
+		},
+		"Tg_Event_properties_P_Migrate_Mult_Files_To_Mult_tables_parameters_p_folderPath": {
+			"type": "string",
+			"defaultValue": "@triggerBody().folderPath"
+		},
+		"Tg_Event_properties_P_Migrate_Mult_Files_To_Mult_tables_parameters_p_fileName": {
+			"type": "string",
+			"defaultValue": "@triggerBody().fileName"
+		},
+		"Tg_Event_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/a1d9a437-725c-4dbd-8317-df8176ad8c3a/resourceGroups/MyResourceGroup/providers/Microsoft.Storage/storageAccounts/mystorageaccountde"
 		}
 	},
 	"variables": {
@@ -880,6 +892,38 @@
 					"name": "SCDs"
 				},
 				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Tg_Event')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "P_Migrate_Mult_Files_To_Mult_tables",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"p_folderPath": "[parameters('Tg_Event_properties_P_Migrate_Mult_Files_To_Mult_tables_parameters_p_folderPath')]",
+							"p_fileName": "[parameters('Tg_Event_properties_P_Migrate_Mult_Files_To_Mult_tables_parameters_p_fileName')]"
+						}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/files-landing-zone/blobs/",
+					"blobPathEndsWith": ".csv",
+					"ignoreEmptyBlobs": true,
+					"scope": "[parameters('Tg_Event_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated"
+					]
+				}
 			},
 			"dependsOn": []
 		}
