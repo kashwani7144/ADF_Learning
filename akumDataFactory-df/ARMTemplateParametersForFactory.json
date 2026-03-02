@@ -158,14 +158,11 @@
 		"Par_ETLSANDBOX_properties_typeProperties_url": {
 			"value": "https://akumadlsgen2.dfs.core.windows.net/"
 		},
-		"Tg_Event_properties_P_Migrate_Mult_Files_To_Mult_tables_parameters_p_folderPath": {
+		"Tg_Scheduled_properties_P_Migrate_Mult_Files_To_Mult_tables_parameters_p_folderPath": {
 			"value": "@triggerBody().folderPath"
 		},
-		"Tg_Event_properties_P_Migrate_Mult_Files_To_Mult_tables_parameters_p_fileName": {
+		"Tg_Scheduled_properties_P_Migrate_Mult_Files_To_Mult_tables_parameters_p_fileName": {
 			"value": "@triggerBody().fileName"
-		},
-		"Tg_Event_properties_typeProperties_scope": {
-			"value": "/subscriptions/a1d9a437-725c-4dbd-8317-df8176ad8c3a/resourceGroups/MyResourceGroup/providers/Microsoft.Storage/storageAccounts/mystorageaccountde"
 		}
 	}
 }

@@ -7,17 +7,13 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "akumDataFactory-df"
 		},
-		"Tg_Event_properties_P_Migrate_Mult_Files_To_Mult_tables_parameters_p_folderPath": {
+		"Tg_Scheduled_properties_P_Migrate_Mult_Files_To_Mult_tables_parameters_p_folderPath": {
 			"type": "string",
 			"defaultValue": "@triggerBody().folderPath"
 		},
-		"Tg_Event_properties_P_Migrate_Mult_Files_To_Mult_tables_parameters_p_fileName": {
+		"Tg_Scheduled_properties_P_Migrate_Mult_Files_To_Mult_tables_parameters_p_fileName": {
 			"type": "string",
 			"defaultValue": "@triggerBody().fileName"
-		},
-		"Tg_Event_properties_typeProperties_scope": {
-			"type": "string",
-			"defaultValue": "/subscriptions/a1d9a437-725c-4dbd-8317-df8176ad8c3a/resourceGroups/MyResourceGroup/providers/Microsoft.Storage/storageAccounts/mystorageaccountde"
 		}
 	},
 	"variables": {
@@ -896,12 +892,12 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Tg_Event')]",
+			"name": "[concat(parameters('factoryName'), '/Tg_Scheduled')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"runtimeState": "Started",
+				"runtimeState": "Stopped",
 				"pipelines": [
 					{
 						"pipelineReference": {
@@ -909,20 +905,19 @@
 							"type": "PipelineReference"
 						},
 						"parameters": {
-							"p_folderPath": "[parameters('Tg_Event_properties_P_Migrate_Mult_Files_To_Mult_tables_parameters_p_folderPath')]",
-							"p_fileName": "[parameters('Tg_Event_properties_P_Migrate_Mult_Files_To_Mult_tables_parameters_p_fileName')]"
+							"p_folderPath": "[parameters('Tg_Scheduled_properties_P_Migrate_Mult_Files_To_Mult_tables_parameters_p_folderPath')]",
+							"p_fileName": "[parameters('Tg_Scheduled_properties_P_Migrate_Mult_Files_To_Mult_tables_parameters_p_fileName')]"
 						}
 					}
 				],
-				"type": "BlobEventsTrigger",
+				"type": "ScheduleTrigger",
 				"typeProperties": {
-					"blobPathBeginsWith": "/files-landing-zone/blobs/",
-					"blobPathEndsWith": ".csv",
-					"ignoreEmptyBlobs": true,
-					"scope": "[parameters('Tg_Event_properties_typeProperties_scope')]",
-					"events": [
-						"Microsoft.Storage.BlobCreated"
-					]
+					"recurrence": {
+						"frequency": "Minute",
+						"interval": 30,
+						"startTime": "2026-03-02T10:45:00",
+						"timeZone": "India Standard Time"
+					}
 				}
 			},
 			"dependsOn": []
