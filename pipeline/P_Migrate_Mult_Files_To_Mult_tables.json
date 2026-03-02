@@ -124,6 +124,92 @@
 									"value": "@greater(length(activity('Get_File_Details').output.childItems), 0)",
 									"type": "Expression"
 								},
+								"ifFalseActivities": [
+									{
+										"name": "SP_Failure_Log_copy2",
+										"type": "SqlServerStoredProcedure",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"storedProcedureName": "[dbo].[LOG_MIGRATION_EVENT]",
+											"storedProcedureParameters": {
+												"audit_key": {
+													"value": null,
+													"type": "String"
+												},
+												"batch_id": {
+													"value": null,
+													"type": "Int32"
+												},
+												"end_time": {
+													"value": null,
+													"type": "DateTime"
+												},
+												"error_msg": {
+													"value": "File Doesn't Exists in the landing zone.",
+													"type": "String"
+												},
+												"file_table_id": {
+													"value": null,
+													"type": "Int32"
+												},
+												"pipeline_name": {
+													"value": {
+														"value": "@pipeline().Pipeline",
+														"type": "Expression"
+													},
+													"type": "String"
+												},
+												"row_count": {
+													"value": null,
+													"type": "Int32"
+												},
+												"src_schema_name": {
+													"value": null,
+													"type": "String"
+												},
+												"src_table_name": {
+													"value": null,
+													"type": "String"
+												},
+												"start_time": {
+													"value": null,
+													"type": "DateTime"
+												},
+												"status": {
+													"value": "File Doesn't Exists",
+													"type": "String"
+												},
+												"tgt_schema_name": {
+													"value": null,
+													"type": "String"
+												},
+												"tgt_table_name": {
+													"value": null,
+													"type": "String"
+												},
+												"triggered_by": {
+													"value": {
+														"value": "@pipeline().TriggerName",
+														"type": "Expression"
+													},
+													"type": "String"
+												}
+											}
+										},
+										"linkedServiceName": {
+											"referenceName": "LS_Files_SB_Tables_Lkp_2502",
+											"type": "LinkedServiceReference"
+										}
+									}
+								],
 								"ifTrueActivities": [
 									{
 										"name": "Delete_From_Landing",
