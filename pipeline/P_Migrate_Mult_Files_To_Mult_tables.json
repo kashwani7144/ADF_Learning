@@ -8,7 +8,7 @@
 				"type": "GetMetadata",
 				"dependsOn": [
 					{
-						"activity": "SetStartTime",
+						"activity": "GetSrcTgtTableMapping",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -208,52 +208,9 @@
 					],
 					"ifTrueActivities": [
 						{
-							"name": "GetSrcTgtTableMapping",
-							"type": "Lookup",
-							"dependsOn": [
-								{
-									"activity": "Copy_Landing_To_Raw",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"source": {
-									"type": "AzureSqlSource",
-									"sqlReaderQuery": {
-										"value": "@concat(\n  'SELECT FILE_TABLE_ID, ',\n  'RIGHT(SRC_SCHEMA_NAME, 8) AS SRC_SCHEMA_NAME, ',\n  'RIGHT(TGT_SCHEMA_NAME, 5) AS TGT_SCHEMA_NAME, ',\n  'SRC_NAME AS SRC_FILE_NAME, ',\n  'TGT_NAME AS TGT_TBL_NAME ',\n  'FROM FILE_TABLE_MAPPING ',\n  'WHERE PIPLN_NM = ''', pipeline().Pipeline, ''' ',\n  'AND ROW_STS_CD = ''A'''\n)",
-										"type": "Expression"
-									},
-									"queryTimeout": "02:00:00",
-									"partitionOption": "None"
-								},
-								"dataset": {
-									"referenceName": "DS_Files_To_Tables_2502",
-									"type": "DatasetReference"
-								},
-								"firstRowOnly": false
-							}
-						},
-						{
 							"name": "ForEachFileToTable",
 							"type": "ForEach",
-							"dependsOn": [
-								{
-									"activity": "GetSrcTgtTableMapping",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
+							"dependsOn": [],
 							"userProperties": [],
 							"typeProperties": {
 								"items": {
@@ -265,7 +222,14 @@
 									{
 										"name": "CopyFileDataTotables",
 										"type": "Copy",
-										"dependsOn": [],
+										"dependsOn": [
+											{
+												"activity": "Copy_Landing_To_Raw",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
 										"policy": {
 											"timeout": "0.12:00:00",
 											"retry": 0,
@@ -605,88 +569,88 @@
 											"referenceName": "LS_Files_SB_Tables_Lkp_2502",
 											"type": "LinkedServiceReference"
 										}
+									},
+									{
+										"name": "Copy_Landing_To_Raw",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "DelimitedTextSource",
+												"storeSettings": {
+													"type": "AzureBlobStorageReadSettings",
+													"recursive": false,
+													"enablePartitionDiscovery": false
+												},
+												"formatSettings": {
+													"type": "DelimitedTextReadSettings"
+												}
+											},
+											"sink": {
+												"type": "DelimitedTextSink",
+												"storeSettings": {
+													"type": "AzureBlobStorageWriteSettings",
+													"copyBehavior": "PreserveHierarchy"
+												},
+												"formatSettings": {
+													"type": "DelimitedTextWriteSettings",
+													"quoteAllText": true,
+													"fileExtension": ".txt"
+												}
+											},
+											"enableStaging": false,
+											"translator": {
+												"type": "TabularTranslator",
+												"typeConversion": true,
+												"typeConversionSettings": {
+													"allowDataTruncation": true,
+													"treatBooleanAsNumber": false
+												}
+											}
+										},
+										"inputs": [
+											{
+												"referenceName": "DS_Landing_Generic_2702",
+												"type": "DatasetReference",
+												"parameters": {
+													"folderPath": {
+														"value": "@pipeline().parameters.p_folderPath",
+														"type": "Expression"
+													},
+													"fileName": {
+														"value": "@pipeline().parameters.p_fileName",
+														"type": "Expression"
+													}
+												}
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "DS_Raw_Generic_2702",
+												"type": "DatasetReference",
+												"parameters": {
+													"folderPath": {
+														"value": "@concat(\r\n   pipeline().parameters.p_folderPath,\r\n   '/',\r\n   formatDateTime(utcNow(),'yyyy/MM/dd')\r\n)",
+														"type": "Expression"
+													},
+													"fileName": {
+														"value": "@pipeline().parameters.p_fileName",
+														"type": "Expression"
+													}
+												}
+											}
+										]
 									}
 								]
 							}
-						},
-						{
-							"name": "Copy_Landing_To_Raw",
-							"type": "Copy",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"source": {
-									"type": "DelimitedTextSource",
-									"storeSettings": {
-										"type": "AzureBlobStorageReadSettings",
-										"recursive": false,
-										"enablePartitionDiscovery": false
-									},
-									"formatSettings": {
-										"type": "DelimitedTextReadSettings"
-									}
-								},
-								"sink": {
-									"type": "DelimitedTextSink",
-									"storeSettings": {
-										"type": "AzureBlobStorageWriteSettings",
-										"copyBehavior": "PreserveHierarchy"
-									},
-									"formatSettings": {
-										"type": "DelimitedTextWriteSettings",
-										"quoteAllText": true,
-										"fileExtension": ".txt"
-									}
-								},
-								"enableStaging": false,
-								"translator": {
-									"type": "TabularTranslator",
-									"typeConversion": true,
-									"typeConversionSettings": {
-										"allowDataTruncation": true,
-										"treatBooleanAsNumber": false
-									}
-								}
-							},
-							"inputs": [
-								{
-									"referenceName": "DS_Landing_Generic_2702",
-									"type": "DatasetReference",
-									"parameters": {
-										"folderPath": {
-											"value": "@pipeline().parameters.p_folderPath",
-											"type": "Expression"
-										},
-										"fileName": {
-											"value": "@pipeline().parameters.p_fileName",
-											"type": "Expression"
-										}
-									}
-								}
-							],
-							"outputs": [
-								{
-									"referenceName": "DS_Raw_Generic_2702",
-									"type": "DatasetReference",
-									"parameters": {
-										"folderPath": {
-											"value": "@concat(\r\n   pipeline().parameters.p_folderPath,\r\n   '/',\r\n   formatDateTime(utcNow(),'yyyy/MM/dd')\r\n)",
-											"type": "Expression"
-										},
-										"fileName": {
-											"value": "@pipeline().parameters.p_fileName",
-											"type": "Expression"
-										}
-									}
-								}
-							]
 						},
 						{
 							"name": "Delete_From_Landing2",
@@ -755,6 +719,42 @@
 						"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
 						"type": "Expression"
 					}
+				}
+			},
+			{
+				"name": "GetSrcTgtTableMapping",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "SetStartTime",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "@concat(\n  'SELECT FILE_TABLE_ID, ',\n  'RIGHT(SRC_SCHEMA_NAME, 8) AS SRC_SCHEMA_NAME, ',\n  'RIGHT(TGT_SCHEMA_NAME, 5) AS TGT_SCHEMA_NAME, ',\n  'SRC_NAME AS SRC_FILE_NAME, ',\n  'TGT_NAME AS TGT_TBL_NAME ',\n  'FROM FILE_TABLE_MAPPING ',\n  'WHERE PIPLN_NM = ''', pipeline().Pipeline, ''' ',\n  'AND ROW_STS_CD = ''A'''\n)",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DS_Files_To_Tables_2502",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
 				}
 			}
 		],
