@@ -271,7 +271,7 @@
 										"type": "Copy",
 										"dependsOn": [
 											{
-												"activity": "Copy_Landing_To_Raw",
+												"activity": "CopyFiles_Landing_To_Raw",
 												"dependencyConditions": [
 													"Succeeded"
 												]
@@ -618,7 +618,7 @@
 										}
 									},
 									{
-										"name": "Copy_Landing_To_Raw",
+										"name": "CopyFiles_Landing_To_Raw",
 										"type": "Copy",
 										"dependsOn": [],
 										"policy": {
