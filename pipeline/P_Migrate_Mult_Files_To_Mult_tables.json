@@ -56,7 +56,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@and(\n   equals(activity('Get_File_Details').output.exists, true),\n   greater(activity('Get_File_Details').output.size, 0)\n)",
+						"value": "@greater(length(activity('Get_File_Details').output.childItems), 0)",
 						"type": "Expression"
 					},
 					"ifFalseActivities": [
