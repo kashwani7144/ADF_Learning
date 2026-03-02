@@ -257,7 +257,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"items": {
-									"value": "@activity('GetSrcTgtTableMapping').output.value",
+									"value": "@activity('Get_File_Details').output.childItems",
 									"type": "Expression"
 								},
 								"isSequential": false,
