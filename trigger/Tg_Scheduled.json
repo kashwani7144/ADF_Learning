@@ -8,10 +8,6 @@
 				"pipelineReference": {
 					"referenceName": "P_Migrate_Mult_Files_To_Mult_tables",
 					"type": "PipelineReference"
-				},
-				"parameters": {
-					"p_folderPath": "@triggerBody().folderPath",
-					"p_fileName": "@triggerBody().fileName"
 				}
 			}
 		],
