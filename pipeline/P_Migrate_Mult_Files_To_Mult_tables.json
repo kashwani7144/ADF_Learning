@@ -126,7 +126,7 @@
 								},
 								"ifTrueActivities": [
 									{
-										"name": "Delete_From_Landing2",
+										"name": "Delete_From_Landing",
 										"type": "Delete",
 										"dependsOn": [
 											{
