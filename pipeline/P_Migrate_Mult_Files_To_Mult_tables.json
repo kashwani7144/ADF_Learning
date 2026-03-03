@@ -1,0 +1,9 @@
+{
+	"name": "P_Migrate_Mult_Files_To_Mult_tables",
+	"properties": {
+		"folder": {
+			"name": "File_To_Tables_Migration"
+		},
+		"annotations": []
+	}
+}
