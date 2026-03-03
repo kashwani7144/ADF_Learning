@@ -3284,13 +3284,7 @@
 													{
 														"referenceName": "DS_Landing_Generic_2702",
 														"type": "DatasetReference",
-														"parameters": {
-															"folderPath": "files-landing-zone",
-															"fileName": {
-																"value": "@item().SRC_FILE_NAME",
-																"type": "Expression"
-															}
-														}
+														"parameters": {}
 													}
 												],
 												"outputs": [
