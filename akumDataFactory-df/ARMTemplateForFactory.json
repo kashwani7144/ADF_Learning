@@ -9902,6 +9902,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
+						"fileName": "*.csv",
 						"container": "files-landing-zone"
 					},
 					"columnDelimiter": ",",
