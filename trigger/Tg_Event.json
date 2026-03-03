@@ -3,18 +3,7 @@
 	"properties": {
 		"annotations": [],
 		"runtimeState": "Started",
-		"pipelines": [
-			{
-				"pipelineReference": {
-					"referenceName": "P_Migrate_Mult_Files_To_Mult_tables",
-					"type": "PipelineReference"
-				},
-				"parameters": {
-					"p_folderPath": "@triggerBody().folderPath",
-					"p_fileName": "@triggerBody().fileName"
-				}
-			}
-		],
+		"pipelines": [],
 		"type": "BlobEventsTrigger",
 		"typeProperties": {
 			"blobPathBeginsWith": "/files-landing-zone/blobs/",
