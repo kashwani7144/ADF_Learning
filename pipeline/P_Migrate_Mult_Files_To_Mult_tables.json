@@ -100,7 +100,8 @@
 									}
 								},
 								"fieldList": [
-									"exists"
+									"exists",
+									"itemName"
 								],
 								"storeSettings": {
 									"type": "AzureBlobStorageReadSettings",
