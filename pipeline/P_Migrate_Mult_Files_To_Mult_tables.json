@@ -639,7 +639,7 @@
 												"type": "DelimitedTextSource",
 												"storeSettings": {
 													"type": "AzureBlobStorageReadSettings",
-													"recursive": false,
+													"recursive": true,
 													"enablePartitionDiscovery": false
 												},
 												"formatSettings": {
@@ -670,7 +670,7 @@
 										},
 										"inputs": [
 											{
-												"referenceName": "DS_Landing_Generic_2702",
+												"referenceName": "DS_Landing_Generic_0303",
 												"type": "DatasetReference"
 											}
 										],

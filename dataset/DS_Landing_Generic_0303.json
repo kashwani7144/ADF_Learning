@@ -1,0 +1,80 @@
+{
+	"name": "DS_Landing_Generic_0303",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_Blob_Storage_2702",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"SRC_FILE_NAME": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().SRC_FILE_NAME",
+					"type": "Expression"
+				},
+				"container": "files-landing-zone"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "INDEX_NUM",
+				"type": "String"
+			},
+			{
+				"name": "CUSTOMER_ID",
+				"type": "String"
+			},
+			{
+				"name": "FIRST_NAME",
+				"type": "String"
+			},
+			{
+				"name": "LAST_NAME",
+				"type": "String"
+			},
+			{
+				"name": "COMPANY",
+				"type": "String"
+			},
+			{
+				"name": "CITY",
+				"type": "String"
+			},
+			{
+				"name": "COUNTRY",
+				"type": "String"
+			},
+			{
+				"name": "PHONE_1",
+				"type": "String"
+			},
+			{
+				"name": "PHONE_2",
+				"type": "String"
+			},
+			{
+				"name": "EMAIL",
+				"type": "String"
+			},
+			{
+				"name": "SUBSCRIPTION_DATE",
+				"type": "String"
+			},
+			{
+				"name": "WEBSITE",
+				"type": "String"
+			}
+		]
+	}
+}
