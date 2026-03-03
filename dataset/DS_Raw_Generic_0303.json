@@ -1,0 +1,22 @@
+{
+	"name": "DS_Raw_Generic_0303",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_RawFiles_Generic_2702",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "raw-files"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
