@@ -1,5 +1,5 @@
 {
-	"name": "P_Incremental_Migrate_ADVW_Azure_BKP",
+	"name": "BKP_P_Incremental_Migrate_ADVW_Azure",
 	"properties": {
 		"description": "It migrates the Oracle HR schema tables to an Azure SQL database with incremental runs.",
 		"activities": [
