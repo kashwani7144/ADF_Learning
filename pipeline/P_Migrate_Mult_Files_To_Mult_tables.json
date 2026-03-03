@@ -667,13 +667,30 @@
 										"inputs": [
 											{
 												"referenceName": "DS_Landing_Generic_2702",
-												"type": "DatasetReference"
+												"type": "DatasetReference",
+												"parameters": {
+													"folderPath": "'files-landing-zone'",
+													"fileName": {
+														"value": "@item().SRC_FILE_NAME",
+														"type": "Expression"
+													}
+												}
 											}
 										],
 										"outputs": [
 											{
 												"referenceName": "DS_Raw_Generic_2702",
-												"type": "DatasetReference"
+												"type": "DatasetReference",
+												"parameters": {
+													"folderPath": {
+														"value": "@concat('raw/', formatDateTime(utcNow(),'yyyy/MM/dd'))",
+														"type": "Expression"
+													},
+													"fileName": {
+														"value": "@item().SRC_FILE_NAME",
+														"type": "Expression"
+													}
+												}
 											}
 										]
 									}
