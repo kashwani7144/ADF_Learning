@@ -703,14 +703,6 @@
 				}
 			}
 		],
-		"parameters": {
-			"p_folderPath": {
-				"type": "string"
-			},
-			"p_fileName": {
-				"type": "string"
-			}
-		},
 		"variables": {
 			"StartTime": {
 				"type": "String"
