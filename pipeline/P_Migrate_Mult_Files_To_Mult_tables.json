@@ -299,7 +299,10 @@
 													},
 													{
 														"name": "BATCH_ID",
-														"value": "40001"
+														"value": {
+															"value": "@string(formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMdd'))",
+															"type": "Expression"
+														}
 													},
 													{
 														"name": "SRC_FILE_NAME",
