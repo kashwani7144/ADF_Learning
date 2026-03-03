@@ -90,7 +90,13 @@
 							"typeProperties": {
 								"dataset": {
 									"referenceName": "DS_Landing_Generic_2702",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"fileName": {
+											"value": "@item().SRC_FILE_NAME",
+											"type": "Expression"
+										}
+									}
 								},
 								"fieldList": [
 									"exists",
