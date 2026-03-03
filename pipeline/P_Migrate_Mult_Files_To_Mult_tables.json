@@ -99,8 +99,7 @@
 									}
 								},
 								"fieldList": [
-									"exists",
-									"lastModified"
+									"exists"
 								],
 								"storeSettings": {
 									"type": "AzureBlobStorageReadSettings",
@@ -126,7 +125,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"expression": {
-									"value": "@greater(length(activity('Get_File_Details').output.childItems), 0)",
+									"value": "@activity('Get_File_Details').output.exists",
 									"type": "Expression"
 								},
 								"ifFalseActivities": [
