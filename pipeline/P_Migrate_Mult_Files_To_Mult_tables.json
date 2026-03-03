@@ -1,6 +1,30 @@
 {
 	"name": "P_Migrate_Mult_Files_To_Mult_tables",
 	"properties": {
+		"activities": [
+			{
+				"name": "SetStartTimestamp",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "StartTimestamp",
+					"value": {
+						"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"StartTimestamp": {
+				"type": "String"
+			}
+		},
 		"folder": {
 			"name": "File_To_Tables_Migration"
 		},
