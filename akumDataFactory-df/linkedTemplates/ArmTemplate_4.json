@@ -7,19 +7,62 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "akumDataFactory-df"
 		},
-		"Tg_Scheduled_properties_P_Migrate_Mult_Files_To_Mult_tables_parameters_p_folderPath": {
+		"Tg_Event_properties_typeProperties_scope": {
 			"type": "string",
-			"defaultValue": "@triggerBody().folderPath"
-		},
-		"Tg_Scheduled_properties_P_Migrate_Mult_Files_To_Mult_tables_parameters_p_fileName": {
-			"type": "string",
-			"defaultValue": "@triggerBody().fileName"
+			"defaultValue": "/subscriptions/a1d9a437-725c-4dbd-8317-df8176ad8c3a/resourceGroups/MyResourceGroup/providers/Microsoft.Storage/storageAccounts/mystorageaccountde"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/Copy_SQL_to_ADLS')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy_AzureSQL_ADLS_Snowflake",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "AzureSQL_to_ADLS",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"DimCustomer": {},
+									"AdlsDimCustomer": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "ADLS"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/P_DF_SCD_T2_Inc_Vivid_Customer')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
@@ -892,6 +935,35 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Tg_Event')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "P_Migrate_Mult_Files_To_Mult_tables",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/files-landing-zone/blobs/",
+					"blobPathEndsWith": ".csv",
+					"ignoreEmptyBlobs": true,
+					"scope": "[parameters('Tg_Event_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Tg_Scheduled')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
@@ -904,10 +976,7 @@
 							"referenceName": "P_Migrate_Mult_Files_To_Mult_tables",
 							"type": "PipelineReference"
 						},
-						"parameters": {
-							"p_folderPath": "[parameters('Tg_Scheduled_properties_P_Migrate_Mult_Files_To_Mult_tables_parameters_p_folderPath')]",
-							"p_fileName": "[parameters('Tg_Scheduled_properties_P_Migrate_Mult_Files_To_Mult_tables_parameters_p_fileName')]"
-						}
+						"parameters": {}
 					}
 				],
 				"type": "ScheduleTrigger",
