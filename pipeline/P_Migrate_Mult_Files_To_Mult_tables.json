@@ -197,7 +197,13 @@
 							"inputs": [
 								{
 									"referenceName": "DS_Landing_Generic_0303",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"FileName": {
+											"value": "@item().name",
+											"type": "Expression"
+										}
+									}
 								}
 							],
 							"outputs": [
