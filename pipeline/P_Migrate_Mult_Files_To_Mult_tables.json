@@ -22,14 +22,7 @@
 			{
 				"name": "CopyFiles_Landing_To_Raw",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "SetStartTimestamp",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -100,6 +93,65 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "GetSrcTgtTableMapping",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "SetStartTimestamp",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "@concat(\n  'SELECT FILE_TABLE_ID, ',\n  'RIGHT(SRC_SCHEMA_NAME, 8) AS SRC_SCHEMA_NAME, ',\n  'RIGHT(TGT_SCHEMA_NAME, 5) AS TGT_SCHEMA_NAME, ',\n  'SRC_NAME AS SRC_FILE_NAME, ',\n  'TGT_NAME AS TGT_TBL_NAME ',\n  'FROM FILE_TABLE_MAPPING ',\n  'WHERE PIPLN_NM = ''', pipeline().Pipeline, ''' ',\n  'AND ROW_STS_CD = ''A'''\n)",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DS_Files_To_Tables_2502",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Get_File_Details",
+				"type": "GetMetadata",
+				"dependsOn": [
+					{
+						"activity": "GetSrcTgtTableMapping",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"fieldList": []
+				}
 			}
 		],
 		"variables": {
