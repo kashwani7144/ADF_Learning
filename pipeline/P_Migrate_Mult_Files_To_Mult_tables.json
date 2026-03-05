@@ -165,6 +165,29 @@
 						"type": "DelimitedTextReadSettings"
 					}
 				}
+			},
+			{
+				"name": "Filter_Valid_Files",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "Get_File_Details",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get_File_Details').output.childItems",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@contains(\n    join(activity('GetSrcTgtTableMapping').output.value,'|'),\n    item().name\n)",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"variables": {
