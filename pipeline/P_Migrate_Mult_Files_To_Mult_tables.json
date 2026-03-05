@@ -208,7 +208,13 @@
 							"outputs": [
 								{
 									"referenceName": "DS_Raw_Generic_0303",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"sink_file_name": {
+											"value": "@item().name",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}
