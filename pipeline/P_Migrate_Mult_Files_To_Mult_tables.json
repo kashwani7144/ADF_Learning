@@ -20,81 +20,6 @@
 				}
 			},
 			{
-				"name": "CopyFiles_Landing_To_Raw",
-				"type": "Copy",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "DelimitedTextSource",
-						"storeSettings": {
-							"type": "AzureBlobStorageReadSettings",
-							"recursive": false,
-							"wildcardFileName": "*",
-							"enablePartitionDiscovery": false
-						},
-						"formatSettings": {
-							"type": "DelimitedTextReadSettings"
-						}
-					},
-					"sink": {
-						"type": "DelimitedTextSink",
-						"storeSettings": {
-							"type": "AzureBlobStorageWriteSettings",
-							"copyBehavior": "PreserveHierarchy"
-						},
-						"formatSettings": {
-							"type": "DelimitedTextWriteSettings",
-							"quoteAllText": true,
-							"fileExtension": ".csv"
-						}
-					},
-					"enableStaging": false,
-					"validateDataConsistency": true,
-					"logSettings": {
-						"enableCopyActivityLog": true,
-						"copyActivityLogSettings": {
-							"logLevel": "Warning",
-							"enableReliableLogging": false
-						},
-						"logLocationSettings": {
-							"linkedServiceName": {
-								"referenceName": "LS_Error_Log_Generic_2702",
-								"type": "LinkedServiceReference"
-							},
-							"path": "logs"
-						}
-					},
-					"translator": {
-						"type": "TabularTranslator",
-						"typeConversion": true,
-						"typeConversionSettings": {
-							"allowDataTruncation": true,
-							"treatBooleanAsNumber": false
-						}
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "DS_Landing_Generic_0303",
-						"type": "DatasetReference"
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "DS_Raw_Generic_0303",
-						"type": "DatasetReference"
-					}
-				]
-			},
-			{
 				"name": "GetSrcTgtTableMapping",
 				"type": "Lookup",
 				"dependsOn": [
@@ -187,6 +112,102 @@
 						"value": "@contains(\n    join(activity('GetSrcTgtTableMapping').output.value,'|'),\n    item().name\n)",
 						"type": "Expression"
 					}
+				}
+			},
+			{
+				"name": "ForEachValidFiles",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Filter_Valid_Files",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Filter_Valid_Files').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "CopyFiles_Landing_To_Raw",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "AzureBlobStorageReadSettings",
+										"recursive": false,
+										"wildcardFileName": "*",
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobStorageWriteSettings",
+										"copyBehavior": "PreserveHierarchy"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".csv"
+									}
+								},
+								"enableStaging": false,
+								"validateDataConsistency": true,
+								"logSettings": {
+									"enableCopyActivityLog": true,
+									"copyActivityLogSettings": {
+										"logLevel": "Warning",
+										"enableReliableLogging": false
+									},
+									"logLocationSettings": {
+										"linkedServiceName": {
+											"referenceName": "LS_Error_Log_Generic_2702",
+											"type": "LinkedServiceReference"
+										},
+										"path": "logs"
+									}
+								},
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "DS_Landing_Generic_0303",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_Raw_Generic_0303",
+									"type": "DatasetReference"
+								}
+							]
+						}
+					]
 				}
 			}
 		],
