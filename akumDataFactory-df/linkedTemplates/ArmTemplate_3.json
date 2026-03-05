@@ -261,6 +261,31 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_Landing_Generic_0503')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Blob_Storage_2702",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": "files-landing-zone"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/BKP_P_Incremental_Migrate_ADVW_Azure')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -3473,8 +3498,8 @@
 						}
 					},
 					{
-						"name": "CopyFiles_Landing_To_Raw",
-						"type": "Copy",
+						"name": "GetSrcTgtTableMapping",
+						"type": "Lookup",
 						"dependsOn": [
 							{
 								"activity": "SetStartTimestamp",
@@ -3493,68 +3518,188 @@
 						"userProperties": [],
 						"typeProperties": {
 							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": false,
-									"wildcardFileName": "*",
-									"enablePartitionDiscovery": false
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat(\n  'SELECT FILE_TABLE_ID, ',\n  'RIGHT(SRC_SCHEMA_NAME, 8) AS SRC_SCHEMA_NAME, ',\n  'RIGHT(TGT_SCHEMA_NAME, 5) AS TGT_SCHEMA_NAME, ',\n  'SRC_NAME AS SRC_FILE_NAME, ',\n  'TGT_NAME AS TGT_TBL_NAME ',\n  'FROM FILE_TABLE_MAPPING ',\n  'WHERE PIPLN_NM = ''', pipeline().Pipeline, ''' ',\n  'AND ROW_STS_CD = ''A'''\n)",
+									"type": "Expression"
 								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
 							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings",
-									"copyBehavior": "PreserveHierarchy"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".csv"
-								}
-							},
-							"enableStaging": false,
-							"validateDataConsistency": true,
-							"logSettings": {
-								"enableCopyActivityLog": true,
-								"copyActivityLogSettings": {
-									"logLevel": "Warning",
-									"enableReliableLogging": false
-								},
-								"logLocationSettings": {
-									"linkedServiceName": {
-										"referenceName": "LS_Error_Log_Generic_2702",
-										"type": "LinkedServiceReference"
-									},
-									"path": "logs"
-								}
-							},
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "DS_Landing_Generic_0303",
+							"dataset": {
+								"referenceName": "DS_Files_To_Tables_2502",
 								"type": "DatasetReference",
 								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "Get_File_Details",
+						"type": "GetMetadata",
+						"dependsOn": [
+							{
+								"activity": "GetSrcTgtTableMapping",
+								"dependencyConditions": [
+									"Succeeded"
+								]
 							}
 						],
-						"outputs": [
-							{
-								"referenceName": "DS_Raw_Generic_0303",
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "DS_Landing_Generic_0503",
 								"type": "DatasetReference",
 								"parameters": {}
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobStorageReadSettings",
+								"enablePartitionDiscovery": false
+							},
+							"formatSettings": {
+								"type": "DelimitedTextReadSettings"
 							}
-						]
+						}
+					},
+					{
+						"name": "Filter_Valid_Files",
+						"type": "Filter",
+						"dependsOn": [
+							{
+								"activity": "Get_File_Details",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get_File_Details').output.childItems",
+								"type": "Expression"
+							},
+							"condition": {
+								"value": "@contains(\n    join(activity('GetSrcTgtTableMapping').output.value,'|'),\n    item().name\n)",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "ForEachValidFiles",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Filter_Valid_Files",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Filter_Valid_Files').output.value",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "CopyFiles_Landing_To_Raw",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"storeSettings": {
+												"type": "AzureBlobStorageReadSettings",
+												"recursive": false,
+												"enablePartitionDiscovery": false
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobStorageWriteSettings",
+												"copyBehavior": "PreserveHierarchy"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".csv"
+											}
+										},
+										"enableStaging": false,
+										"validateDataConsistency": true,
+										"logSettings": {
+											"enableCopyActivityLog": true,
+											"copyActivityLogSettings": {
+												"logLevel": "Warning",
+												"enableReliableLogging": false
+											},
+											"logLocationSettings": {
+												"linkedServiceName": {
+													"referenceName": "LS_Error_Log_Generic_2702",
+													"type": "LinkedServiceReference"
+												},
+												"path": "logs"
+											}
+										},
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "DS_Landing_Generic_0303",
+											"type": "DatasetReference",
+											"parameters": {
+												"FileName": {
+													"value": "@item().name",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DS_Raw_Generic_0303",
+											"type": "DatasetReference",
+											"parameters": {
+												"sink_file_name": {
+													"value": "@item().name",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
 					}
 				],
 				"policy": {
@@ -3570,7 +3715,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_Landing_Generic_0503')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/P_SCD_T2_Inc_Vivid_Customer')]",
@@ -8160,94 +8307,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/P_DimCustomer')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DF_LoadStage_WithHash')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "DS_VIVID_RAW_TABLES",
-								"type": "DatasetReference"
-							},
-							"name": "VivivdRawTable"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "DS_DWH_STG",
-								"type": "DatasetReference"
-							},
-							"name": "StgCustomerDetails"
-						}
-					],
-					"transformations": [
-						{
-							"name": "addHashDiffColumn"
-						}
-					],
-					"scriptLines": [
-						"parameters{",
-						"     df_sqlQuery as string",
-						"}",
-						"source(output(",
-						"          INDEX_NUM as integer,",
-						"          CUSTOMER_ID as string,",
-						"          FIRST_NAME as string,",
-						"          LAST_NAME as string,",
-						"          COMPANY as string,",
-						"          CITY as string,",
-						"          COUNTRY as string,",
-						"          PHONE_1 as string,",
-						"          PHONE_2 as string,",
-						"          EMAIL as string,",
-						"          SUBSCRIPTION_DATE as string,",
-						"          WEBSITE as string,",
-						"          SRC_ROW_INSRT_TSTMP as timestamp",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     query: (toString($df_sqlQuery)),",
-						"     format: 'query') ~> VivivdRawTable",
-						"VivivdRawTable derive(HASH_DIFF = unhex(\r",
-						"  md5(\r",
-						"    concat(\r",
-						"      toString(upper(trim(FIRST_NAME))), '|',\r",
-						"      toString(upper(trim(LAST_NAME))),  '|',\r",
-						"      toString(trim(COMPANY)),           '|',\r",
-						"      toString(upper(trim(CITY))),       '|',\r",
-						"      toString(upper(trim(COUNTRY))),    '|',\r",
-						"      toString(replace(PHONE_1,' ','')), '|',\r",
-						"      toString(replace(PHONE_2,' ','')), '|',\r",
-						"      toString(lower(trim(EMAIL))),      '|',\r",
-						"      toString(trim(SUBSCRIPTION_DATE)), '|',\r",
-						"      toString(trim(WEBSITE))\r",
-						"    )\r",
-						"  )\r",
-						")) ~> addHashDiffColumn",
-						"addHashDiffColumn sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     deletable:false,",
-						"     insertable:true,",
-						"     updateable:false,",
-						"     upsertable:false,",
-						"     truncate:true,",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError') ~> StgCustomerDetails"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DS_VIVID_RAW_TABLES')]"
 			]
 		}
 	]

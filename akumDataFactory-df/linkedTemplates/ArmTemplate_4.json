@@ -13,6 +13,92 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/DF_LoadStage_WithHash')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_VIVID_RAW_TABLES",
+								"type": "DatasetReference"
+							},
+							"name": "VivivdRawTable"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DS_DWH_STG",
+								"type": "DatasetReference"
+							},
+							"name": "StgCustomerDetails"
+						}
+					],
+					"transformations": [
+						{
+							"name": "addHashDiffColumn"
+						}
+					],
+					"scriptLines": [
+						"parameters{",
+						"     df_sqlQuery as string",
+						"}",
+						"source(output(",
+						"          INDEX_NUM as integer,",
+						"          CUSTOMER_ID as string,",
+						"          FIRST_NAME as string,",
+						"          LAST_NAME as string,",
+						"          COMPANY as string,",
+						"          CITY as string,",
+						"          COUNTRY as string,",
+						"          PHONE_1 as string,",
+						"          PHONE_2 as string,",
+						"          EMAIL as string,",
+						"          SUBSCRIPTION_DATE as string,",
+						"          WEBSITE as string,",
+						"          SRC_ROW_INSRT_TSTMP as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     query: (toString($df_sqlQuery)),",
+						"     format: 'query') ~> VivivdRawTable",
+						"VivivdRawTable derive(HASH_DIFF = unhex(\r",
+						"  md5(\r",
+						"    concat(\r",
+						"      toString(upper(trim(FIRST_NAME))), '|',\r",
+						"      toString(upper(trim(LAST_NAME))),  '|',\r",
+						"      toString(trim(COMPANY)),           '|',\r",
+						"      toString(upper(trim(CITY))),       '|',\r",
+						"      toString(upper(trim(COUNTRY))),    '|',\r",
+						"      toString(replace(PHONE_1,' ','')), '|',\r",
+						"      toString(replace(PHONE_2,' ','')), '|',\r",
+						"      toString(lower(trim(EMAIL))),      '|',\r",
+						"      toString(trim(SUBSCRIPTION_DATE)), '|',\r",
+						"      toString(trim(WEBSITE))\r",
+						"    )\r",
+						"  )\r",
+						")) ~> addHashDiffColumn",
+						"addHashDiffColumn sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     truncate:true,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> StgCustomerDetails"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DF_SCD_T2_Vivid_Customer')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -1575,7 +1661,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DF_LoadStage_WithHash')]"
+			]
 		}
 	]
 }

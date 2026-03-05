@@ -108,11 +108,20 @@
 					"referenceName": "LS_RawFiles_Generic_2702",
 					"type": "LinkedServiceReference"
 				},
+				"parameters": {
+					"sink_file_name": {
+						"type": "String"
+					}
+				},
 				"annotations": [],
 				"type": "DelimitedText",
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().sink_file_name",
+							"type": "Expression"
+						},
 						"folderPath": {
 							"value": "@concat(\n    'raw/',\n    formatDateTime(\n        convertFromUtc(utcNow(), 'India Standard Time'),\n        'yyyy/MM/dd'\n    )\n)",
 							"type": "Expression"
