@@ -254,7 +254,39 @@
 										"type": "DelimitedTextReadSettings"
 									}
 								},
-								"enableStaging": false
+								"sink": {
+									"type": "AzureSqlSink",
+									"writeBehavior": "upsert",
+									"upsertSettings": {
+										"useTempDB": true
+									},
+									"sqlWriterUseTableLock": false,
+									"disableMetricsCollection": false
+								},
+								"enableStaging": false,
+								"validateDataConsistency": true,
+								"logSettings": {
+									"enableCopyActivityLog": true,
+									"copyActivityLogSettings": {
+										"logLevel": "Warning",
+										"enableReliableLogging": false
+									},
+									"logLocationSettings": {
+										"linkedServiceName": {
+											"referenceName": "LS_Error_Log_Generic_2702",
+											"type": "LinkedServiceReference"
+										},
+										"path": "logs"
+									}
+								},
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
 							},
 							"inputs": [
 								{
@@ -267,6 +299,22 @@
 										},
 										"Raw_Files_Prefix": {
 											"value": "@concat(replace(item().SRC_FILE_NAME,'.csv',''),'*')",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_SB_VIVID_Insert_2502",
+									"type": "DatasetReference",
+									"parameters": {
+										"TGT_SCHEMA_NAME": {
+											"value": "@item().TGT_SCHEMA_NAME",
+											"type": "Expression"
+										},
+										"TGT_TBL_NAME": {
+											"value": "@item().TGT_TBL_NAME",
 											"type": "Expression"
 										}
 									}
