@@ -4485,7 +4485,7 @@
 								"type": "Expression"
 							},
 							"condition": {
-								"value": "@contains(\n    join(activity('GetSrcTgtTableMapping').output.value,'|'),\n    item().name\n)",
+								"value": "@contains(\r\n    toLower(join(activity('GetSrcTgtTableMapping').output.value,'|')),\r\n    toLower(item().name)\r\n)",
 								"type": "Expression"
 							}
 						}
