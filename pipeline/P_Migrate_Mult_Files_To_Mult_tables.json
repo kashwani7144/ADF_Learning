@@ -244,8 +244,11 @@
 									"storeSettings": {
 										"type": "AzureBlobStorageReadSettings",
 										"recursive": true,
-										"wildcardFileName": "*",
-										"enablePartitionDiscovery": false
+										"enablePartitionDiscovery": false,
+										"prefix": {
+											"value": "@replace(item().SRC_FILE_NAME,'.csv','')",
+											"type": "Expression"
+										}
 									},
 									"formatSettings": {
 										"type": "DelimitedTextReadSettings"
@@ -256,7 +259,17 @@
 							"inputs": [
 								{
 									"referenceName": "DS_Raw_Source_Generic_0603",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"Raw_Files_Folder_Path": {
+											"value": "@concat(\n    'raw/',\n    formatDateTime(convertFromUtc(utcNow(),'India Standard Time'),'yyyy/MMM/dd')\n)",
+											"type": "Expression"
+										},
+										"Raw_Files_Prefix": {
+											"value": "@concat(replace(item().SRC_FILE_NAME,'.csv',''),'*')",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}
