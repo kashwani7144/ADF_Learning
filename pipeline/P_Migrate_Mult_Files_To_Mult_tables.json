@@ -243,10 +243,10 @@
 									"type": "DelimitedTextSource",
 									"storeSettings": {
 										"type": "AzureBlobStorageReadSettings",
-										"recursive": true,
+										"recursive": false,
 										"enablePartitionDiscovery": false,
 										"prefix": {
-											"value": "@replace(item().SRC_FILE_NAME,'.csv','')",
+											"value": "@{replace(item().SRC_FILE_NAME,'.csv','')}",
 											"type": "Expression"
 										}
 									},
