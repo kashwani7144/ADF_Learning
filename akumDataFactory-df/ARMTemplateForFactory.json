@@ -4459,6 +4459,7 @@
 							],
 							"storeSettings": {
 								"type": "AzureBlobStorageReadSettings",
+								"recursive": true,
 								"enablePartitionDiscovery": false
 							},
 							"formatSettings": {
@@ -10211,6 +10212,33 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_Landing_Generic_0503')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Blob_Storage_2702",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": "files-landing-zone"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_Blob_Storage_2702')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_Landing_Generic_2702')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -10404,7 +10432,7 @@
 							"type": "Expression"
 						},
 						"folderPath": {
-							"value": "@concat(\n    'raw/',\n    formatDateTime(\n        convertFromUtc(utcNow(), 'India Standard Time'),\n        'yyyy/MM/dd'\n    )\n)",
+							"value": "@concat(\n    'raw/',\n    formatDateTime(\n        convertFromUtc(utcNow(), 'India Standard Time'),\n        'yyyy/MMM/dd'\n    )\n)",
 							"type": "Expression"
 						},
 						"container": "raw-files"
@@ -13214,33 +13242,6 @@
 			"apiVersion": "2018-06-01",
 			"properties": {},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_Landing_Generic_0503')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_Blob_Storage_2702",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"container": "files-landing-zone"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS_Blob_Storage_2702')]"
-			]
 		}
 	]
 }
