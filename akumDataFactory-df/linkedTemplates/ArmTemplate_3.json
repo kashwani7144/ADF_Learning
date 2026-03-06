@@ -3755,7 +3755,7 @@
 											"type": "DatasetReference",
 											"parameters": {
 												"sink_file_name": {
-													"value": "@item().name",
+													"value": "@concat(\r\n    replace(item().name,'.csv',''),\r\n    '_',\r\n    formatDateTime(\r\n        convertFromUtc(utcNow(),'India Standard Time'),\r\n        'yyyyMMdd_HHmmss'\r\n    ),\r\n    '.csv'\r\n)",
 													"type": "Expression"
 												}
 											}
