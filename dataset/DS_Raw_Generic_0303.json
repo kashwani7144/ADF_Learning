@@ -20,7 +20,7 @@
 					"type": "Expression"
 				},
 				"folderPath": {
-					"value": "@concat(\n    'raw/',\n    formatDateTime(\n        convertFromUtc(utcNow(), 'India Standard Time'),\n        'yyyy/MM/dd'\n    )\n)",
+					"value": "@concat(\n    'raw/',\n    formatDateTime(\n        convertFromUtc(utcNow(), 'India Standard Time'),\n        'yyyy/MMM/dd'\n    )\n)",
 					"type": "Expression"
 				},
 				"container": "raw-files"
