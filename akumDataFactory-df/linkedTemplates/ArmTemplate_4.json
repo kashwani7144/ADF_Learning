@@ -13,6 +13,76 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/AzureSQL_to_ADLS')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_DWH_DimCustomer",
+								"type": "DatasetReference"
+							},
+							"name": "DimCustomer"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "P_DimCustomer",
+								"type": "DatasetReference"
+							},
+							"name": "AdlsDimCustomer"
+						}
+					],
+					"transformations": [],
+					"scriptLines": [
+						"source(output(",
+						"          CUSTOMER_SID as integer,",
+						"          INDEX_NUM as integer,",
+						"          CUSTOMER_ID as string,",
+						"          FIRST_NAME as string,",
+						"          LAST_NAME as string,",
+						"          COMPANY as string,",
+						"          CITY as string,",
+						"          COUNTRY as string,",
+						"          PHONE_1 as string,",
+						"          PHONE_2 as string,",
+						"          EMAIL as string,",
+						"          SUBSCRIPTION_DATE as string,",
+						"          WEBSITE as string,",
+						"          SRC_ROW_INSRT_TSTMP as timestamp,",
+						"          HASH_DIFF_HEX as string,",
+						"          WATERMARK_ID as integer,",
+						"          BATCH_ID as integer,",
+						"          ROW_EFF_DT as date,",
+						"          ROW_EXPIR_DT as date,",
+						"          ROW_STS_CD as string,",
+						"          VERSION_NUM as integer,",
+						"          INSERT_TSTMP_IST as timestamp,",
+						"          LST_UPD_TSTMP_IST as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     query: 'SELECT\\r\\n  CUSTOMER_SID, INDEX_NUM, CUSTOMER_ID, FIRST_NAME, LAST_NAME, COMPANY, CITY, COUNTRY,\\r\\n  PHONE_1, PHONE_2, EMAIL, SUBSCRIPTION_DATE, WEBSITE, SRC_ROW_INSRT_TSTMP,\\r\\n  -- HEX without 0x; add 0x prefix if you like\\r\\n  CONVERT(VARCHAR(64), HASH_DIFF, 2) AS HASH_DIFF_HEX,\\r\\n  WATERMARK_ID, BATCH_ID, ROW_EFF_DT, ROW_EXPIR_DT, ROW_STS_CD, VERSION_NUM,\\r\\n  INSERT_TSTMP_IST, LST_UPD_TSTMP_IST\\r\\nFROM DWH.DIM_CUSTOMER_DETAILS',",
+						"     format: 'query') ~> DimCustomer",
+						"DimCustomer sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     umask: 0777,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> AdlsDimCustomer"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DF_LoadStage_WithHash')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -784,7 +854,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/AzureSQL_to_ADLS')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/P_DF_SCD_T2_Inc_Vivid_Customer')]",
