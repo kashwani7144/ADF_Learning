@@ -56,8 +56,8 @@
 				}
 			},
 			{
-				"name": "Get_File_Details",
-				"type": "GetMetadata",
+				"name": "ForEachValidFiles",
+				"type": "ForEach",
 				"dependsOn": [
 					{
 						"activity": "GetSrcTgtTableMapping",
@@ -66,70 +66,10 @@
 						]
 					}
 				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"dataset": {
-						"referenceName": "DS_Landing_Generic_0503",
-						"type": "DatasetReference"
-					},
-					"fieldList": [
-						"childItems"
-					],
-					"storeSettings": {
-						"type": "AzureBlobStorageReadSettings",
-						"recursive": true,
-						"enablePartitionDiscovery": false
-					},
-					"formatSettings": {
-						"type": "DelimitedTextReadSettings"
-					}
-				}
-			},
-			{
-				"name": "Filter_Valid_Files",
-				"type": "Filter",
-				"dependsOn": [
-					{
-						"activity": "Get_File_Details",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Get_File_Details').output.childItems",
-						"type": "Expression"
-					},
-					"condition": {
-						"value": "@contains(\r\n    toLower(join(activity('GetSrcTgtTableMapping').output.value,'|')),\r\n    toLower(item().name)\r\n)",
-						"type": "Expression"
-					}
-				}
-			},
-			{
-				"name": "ForEachValidFiles",
-				"type": "ForEach",
-				"dependsOn": [
-					{
-						"activity": "Filter_Valid_Files",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"items": {
-						"value": "@activity('Filter_Valid_Files').output.value",
+						"value": "@activity('GetSrcTgtTableMapping').output.value",
 						"type": "Expression"
 					},
 					"activities": [
