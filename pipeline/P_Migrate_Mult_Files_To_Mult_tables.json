@@ -337,7 +337,7 @@
 													"recursive": false,
 													"enablePartitionDiscovery": false,
 													"prefix": {
-														"value": "@{replace(item().SRC_FILE_NAME,'.csv','')}",
+														"value": "@concat(\n    'raw/',\n    formatDateTime(\n        convertFromUtc(utcNow(),'India Standard Time'),\n        'yyyy/MM/dd'\n    ),\n    '/',\n    replace(item().SRC_FILE_NAME,'.csv','')\n)",
 														"type": "Expression"
 													}
 												},
@@ -381,12 +381,8 @@
 												"referenceName": "DS_Raw_Source_Generic_0603",
 												"type": "DatasetReference",
 												"parameters": {
-													"Raw_Files_Folder_Path": {
-														"value": "@concat(\n    'raw/',\n    formatDateTime(convertFromUtc(utcNow(),'India Standard Time'),'yyyy/MMM/dd')\n)",
-														"type": "Expression"
-													},
 													"Raw_Files_Prefix": {
-														"value": "@replace(item().SRC_FILE_NAME,'.csv','')",
+														"value": "@concat(\r\n    'raw/',\r\n    formatDateTime(\r\n        convertFromUtc(utcNow(),'India Standard Time'),\r\n        'yyyy/MM/dd'\r\n    ),\r\n    '/',\r\n    replace(item().SRC_FILE_NAME,'.csv','')\r\n)",
 														"type": "Expression"
 													}
 												}
