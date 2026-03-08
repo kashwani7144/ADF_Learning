@@ -125,6 +125,104 @@
 									"value": "@activity('GetFileDetails').output.exists",
 									"type": "Expression"
 								},
+								"ifFalseActivities": [
+									{
+										"name": "SP_Failure_Log_1",
+										"type": "SqlServerStoredProcedure",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"storedProcedureName": "[dbo].[LOG_MIGRATION_EVENT]",
+											"storedProcedureParameters": {
+												"audit_key": {
+													"value": {
+														"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMddHHmmssfffffff')",
+														"type": "Expression"
+													},
+													"type": "String"
+												},
+												"batch_id": {
+													"value": {
+														"value": "@int(formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMdd'))",
+														"type": "Expression"
+													},
+													"type": "Int32"
+												},
+												"end_time": {
+													"value": null,
+													"type": "DateTime"
+												},
+												"error_msg": {
+													"value": {
+														"value": "@concat('File ', item().SRC_FILE_NAME, ' doesn''t exist in the landing')",
+														"type": "Expression"
+													},
+													"type": "String"
+												},
+												"file_table_id": {
+													"value": null,
+													"type": "Int32"
+												},
+												"pipeline_name": {
+													"value": {
+														"value": "@pipeline().Pipeline",
+														"type": "Expression"
+													},
+													"type": "String"
+												},
+												"row_count": {
+													"value": null,
+													"type": "Int32"
+												},
+												"src_schema_name": {
+													"value": null,
+													"type": "String"
+												},
+												"src_table_name": {
+													"value": null,
+													"type": "String"
+												},
+												"start_time": {
+													"value": null,
+													"type": "DateTime"
+												},
+												"status": {
+													"value": {
+														"value": "@concat('File ', item().SRC_FILE_NAME, ' doesn''t exist in the landing')",
+														"type": "Expression"
+													},
+													"type": "String"
+												},
+												"tgt_schema_name": {
+													"value": null,
+													"type": "String"
+												},
+												"tgt_table_name": {
+													"value": null,
+													"type": "String"
+												},
+												"triggered_by": {
+													"value": {
+														"value": "@pipeline().TriggerName",
+														"type": "Expression"
+													},
+													"type": "String"
+												}
+											}
+										},
+										"linkedServiceName": {
+											"referenceName": "LS_Files_SB_Tables_Lkp_2502",
+											"type": "LinkedServiceReference"
+										}
+									}
+								],
 								"ifTrueActivities": [
 									{
 										"name": "CopyFiles_Landing_To_Raw",
