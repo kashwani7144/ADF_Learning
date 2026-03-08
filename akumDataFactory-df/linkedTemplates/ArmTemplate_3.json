@@ -2172,6 +2172,7 @@
 								"value": "@activity('GetSrcTgtTableMapping').output.value",
 								"type": "Expression"
 							},
+							"batchCount": 5,
 							"activities": [
 								{
 									"name": "GetFileDetails",
