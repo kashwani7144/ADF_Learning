@@ -246,7 +246,7 @@
 										"recursive": false,
 										"enablePartitionDiscovery": false,
 										"prefix": {
-											"value": "@{replace(item().SRC_FILE_NAME,'.csv','')}",
+											"value": "@replace(item().name,'.csv','')",
 											"type": "Expression"
 										}
 									},
