@@ -56,7 +56,7 @@
 				}
 			},
 			{
-				"name": "ForEachValidFiles",
+				"name": "ForEachFiles",
 				"type": "ForEach",
 				"dependsOn": [
 					{
