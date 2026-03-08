@@ -6,9 +6,6 @@
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"Raw_Files_Folder_Path": {
-				"type": "String"
-			},
 			"Raw_Files_Prefix": {
 				"type": "String"
 			}

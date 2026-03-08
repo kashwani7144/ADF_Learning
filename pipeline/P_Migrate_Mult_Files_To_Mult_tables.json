@@ -331,21 +331,6 @@
 										},
 										"userProperties": [],
 										"typeProperties": {
-											"source": {
-												"type": "DelimitedTextSource",
-												"storeSettings": {
-													"type": "AzureBlobStorageReadSettings",
-													"recursive": false,
-													"enablePartitionDiscovery": false,
-													"prefix": {
-														"value": "@concat(\n    'raw/',\n    formatDateTime(\n        convertFromUtc(utcNow(),'India Standard Time'),\n        'yyyy/MM/dd'\n    ),\n    '/',\n    replace(item().SRC_FILE_NAME,'.csv','')\n)",
-														"type": "Expression"
-													}
-												},
-												"formatSettings": {
-													"type": "DelimitedTextReadSettings"
-												}
-											},
 											"sink": {
 												"type": "AzureSqlSink",
 												"writeBehavior": "insert",
@@ -353,7 +338,6 @@
 												"disableMetricsCollection": false
 											},
 											"enableStaging": false,
-											"validateDataConsistency": true,
 											"logSettings": {
 												"enableCopyActivityLog": true,
 												"copyActivityLogSettings": {
@@ -367,28 +351,8 @@
 													},
 													"path": "logs"
 												}
-											},
-											"translator": {
-												"type": "TabularTranslator",
-												"typeConversion": true,
-												"typeConversionSettings": {
-													"allowDataTruncation": true,
-													"treatBooleanAsNumber": false
-												}
 											}
 										},
-										"inputs": [
-											{
-												"referenceName": "DS_Raw_Source_Generic_0603",
-												"type": "DatasetReference",
-												"parameters": {
-													"Raw_Files_Prefix": {
-														"value": "@concat(\r\n    'raw/',\r\n    formatDateTime(\r\n        convertFromUtc(utcNow(),'India Standard Time'),\r\n        'yyyy/MM/dd'\r\n    ),\r\n    '/',\r\n    replace(item().SRC_FILE_NAME,'.csv','')\r\n)",
-														"type": "Expression"
-													}
-												}
-											}
-										],
 										"outputs": [
 											{
 												"referenceName": "DS_SB_VIVID_Insert_2502",
