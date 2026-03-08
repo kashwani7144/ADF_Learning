@@ -5303,7 +5303,7 @@
 															{
 																"name": "FILE_TABLE_ID",
 																"value": {
-																	"value": "@item().FILE_TBL_ID",
+																	"value": "@item().FILE_TABLE_ID",
 																	"type": "Expression"
 																}
 															},
