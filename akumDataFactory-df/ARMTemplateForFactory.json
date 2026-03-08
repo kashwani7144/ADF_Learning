@@ -5303,7 +5303,7 @@
 															"type": "AzureBlobStorageReadSettings",
 															"recursive": true,
 															"wildcardFolderPath": {
-																"value": "@concat(\n    'raw/',\n    formatDateTime(\n        convertFromUtc(utcNow(),'India Standard Time'),\n        'yyyy/MM/dd'\n    )\n)",
+																"value": "@concat(\n    'raw/',\n    formatDateTime(\n        convertFromUtc(utcNow(),'India Standard Time'),\n        'yyyy/MMM/dd'\n    )\n)",
 																"type": "Expression"
 															},
 															"wildcardFileName": {
