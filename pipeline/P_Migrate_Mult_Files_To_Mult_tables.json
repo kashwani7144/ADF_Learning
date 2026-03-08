@@ -335,7 +335,11 @@
 												"storeSettings": {
 													"type": "AzureBlobStorageReadSettings",
 													"recursive": false,
-													"enablePartitionDiscovery": false
+													"enablePartitionDiscovery": false,
+													"prefix": {
+														"value": "@{replace(item().SRC_FILE_NAME,'.csv','')}",
+														"type": "Expression"
+													}
 												},
 												"formatSettings": {
 													"type": "DelimitedTextReadSettings"
