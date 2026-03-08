@@ -4670,7 +4670,7 @@
 													"type": "Expression"
 												},
 												"Raw_Files_Prefix": {
-													"value": "@concat(replace(item().SRC_FILE_NAME,'.csv',''),'*')",
+													"value": "@replace(item().name,'.csv','')",
 													"type": "Expression"
 												}
 											}
