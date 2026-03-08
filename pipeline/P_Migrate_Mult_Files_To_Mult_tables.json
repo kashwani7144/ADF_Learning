@@ -193,7 +193,7 @@
 												"type": "DatasetReference",
 												"parameters": {
 													"FileName": {
-														"value": "@item().name",
+														"value": "@item().SRC_FILE_NAME",
 														"type": "Expression"
 													}
 												}
@@ -205,7 +205,7 @@
 												"type": "DatasetReference",
 												"parameters": {
 													"sink_file_name": {
-														"value": "@concat(\r\n    replace(item().name,'.csv',''),\r\n    '_',\r\n    formatDateTime(\r\n        convertFromUtc(utcNow(),'India Standard Time'),\r\n        'yyyyMMdd_HHmmss'\r\n    ),\r\n    '.csv'\r\n)",
+														"value": "@concat(\n replace(item().SRC_FILE_NAME,'.csv',''),\n '_',\n formatDateTime(convertFromUtc(utcNow(),'India Standard Time'),'yyyyMMdd_HHmmss'),\n '.csv'\n)",
 														"type": "Expression"
 													}
 												}
