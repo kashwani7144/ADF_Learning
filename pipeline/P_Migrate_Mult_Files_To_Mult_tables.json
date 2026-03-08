@@ -76,7 +76,14 @@
 						{
 							"name": "CopyFiles_Landing_To_Raw",
 							"type": "Copy",
-							"dependsOn": [],
+							"dependsOn": [
+								{
+									"activity": "GetFileDetails",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
 							"policy": {
 								"timeout": "0.12:00:00",
 								"retry": 0,
@@ -501,6 +508,41 @@
 							"linkedServiceName": {
 								"referenceName": "LS_Files_SB_Tables_Lkp_2502",
 								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "GetFileDetails",
+							"type": "GetMetadata",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "DS_Landing_Generic_0303",
+									"type": "DatasetReference",
+									"parameters": {
+										"FileName": {
+											"value": "@item().SRC_FILE_NAME",
+											"type": "Expression"
+										}
+									}
+								},
+								"fieldList": [
+									"exists"
+								],
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
 							}
 						}
 					]
