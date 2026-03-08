@@ -5,11 +5,6 @@
 			"referenceName": "LS_Blob_ALL_CSV_2502",
 			"type": "LinkedServiceReference"
 		},
-		"parameters": {
-			"Raw_Files_Prefix": {
-				"type": "String"
-			}
-		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
