@@ -203,23 +203,11 @@
 					"referenceName": "LS_Blob_ALL_CSV_2502",
 					"type": "LinkedServiceReference"
 				},
-				"parameters": {
-					"Raw_Files_Folder_Path": {
-						"type": "String"
-					},
-					"Raw_Files_Prefix": {
-						"type": "String"
-					}
-				},
 				"annotations": [],
 				"type": "DelimitedText",
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"folderPath": {
-							"value": "@dataset().Raw_Files_Folder_Path",
-							"type": "Expression"
-						},
 						"container": "raw-files"
 					},
 					"columnDelimiter": ",",
