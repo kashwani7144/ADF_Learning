@@ -5299,6 +5299,36 @@
 												"typeProperties": {
 													"source": {
 														"type": "DelimitedTextSource",
+														"additionalColumns": [
+															{
+																"name": "FILE_TABLE_ID",
+																"value": {
+																	"value": "@item().FILE_TBL_ID",
+																	"type": "Expression"
+																}
+															},
+															{
+																"name": "BATCH_ID",
+																"value": {
+																	"value": "@string(formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMdd'))",
+																	"type": "Expression"
+																}
+															},
+															{
+																"name": "SRC_FILE_NAME",
+																"value": {
+																	"value": "@item().SRC_FILE_NAME",
+																	"type": "Expression"
+																}
+															},
+															{
+																"name": "PIPELINE_NAME",
+																"value": {
+																	"value": "@pipeline().Pipeline",
+																	"type": "Expression"
+																}
+															}
+														],
 														"storeSettings": {
 															"type": "AzureBlobStorageReadSettings",
 															"recursive": true,
