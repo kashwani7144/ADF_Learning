@@ -239,7 +239,7 @@
 													"recursive": false,
 													"enablePartitionDiscovery": false,
 													"prefix": {
-														"value": "@replace(item().name,'.csv','')",
+														"value": "@replace(item().SRC_FILE_NAME,'.csv','')",
 														"type": "Expression"
 													}
 												},
@@ -288,7 +288,7 @@
 														"type": "Expression"
 													},
 													"Raw_Files_Prefix": {
-														"value": "@replace(item().name,'.csv','')",
+														"value": "@replace(item().SRC_FILE_NAME,'.csv','')",
 														"type": "Expression"
 													}
 												}
