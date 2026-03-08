@@ -18,10 +18,6 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"folderPath": {
-					"value": "@dataset().Raw_Files_Folder_Path",
-					"type": "Expression"
-				},
 				"container": "raw-files"
 			},
 			"columnDelimiter": ",",
