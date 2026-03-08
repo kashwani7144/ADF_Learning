@@ -336,6 +336,14 @@
 												"storeSettings": {
 													"type": "AzureBlobStorageReadSettings",
 													"recursive": true,
+													"wildcardFolderPath": {
+														"value": "@concat(\n    'raw/',\n    formatDateTime(\n        convertFromUtc(utcNow(),'India Standard Time'),\n        'yyyy/MM/dd'\n    )\n)",
+														"type": "Expression"
+													},
+													"wildcardFileName": {
+														"value": "@concat(\n    replace(item().SRC_FILE_NAME,'.csv',''),\n    '_*.csv'\n)",
+														"type": "Expression"
+													},
 													"enablePartitionDiscovery": false
 												},
 												"formatSettings": {
