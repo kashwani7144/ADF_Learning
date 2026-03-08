@@ -75,6 +75,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'Par_ETLSANDBOX'"
 		},
+		"LS_Delete_Blob_From_Landing_0803_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_Delete_Blob_From_Landing_0803'"
+		},
 		"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "etl-oracle.database.windows.net"
@@ -405,6 +409,9 @@
 					},
 					"Par_ETLSANDBOX_accountKey": {
 						"value": "[parameters('Par_ETLSANDBOX_accountKey')]"
+					},
+					"LS_Delete_Blob_From_Landing_0803_connectionString": {
+						"value": "[parameters('LS_Delete_Blob_From_Landing_0803_connectionString')]"
 					},
 					"Par_ETLSANDBOX_properties_typeProperties_url": {
 						"value": "[parameters('Par_ETLSANDBOX_properties_typeProperties_url')]"

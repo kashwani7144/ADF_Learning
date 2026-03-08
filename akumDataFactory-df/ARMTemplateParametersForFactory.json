@@ -56,6 +56,9 @@
 		"Par_ETLSANDBOX_accountKey": {
 			"value": ""
 		},
+		"LS_Delete_Blob_From_Landing_0803_connectionString": {
+			"value": ""
+		},
 		"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
 			"value": "etl-oracle.database.windows.net"
 		},

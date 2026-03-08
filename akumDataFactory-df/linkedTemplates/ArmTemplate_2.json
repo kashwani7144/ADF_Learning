@@ -13,6 +13,25 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_Leads_0805')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS__SB_ADVW",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "VIVID",
+					"table": "BLOB_LEAD_RAW"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_Org_0805')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -730,39 +749,6 @@
 					},
 					"table": {
 						"value": "@dataset().Tgt_Table_Name",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_Tgt_DWH_DimCustomer')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_Azure_SB_Lkp",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"Dim_Schema_Name": {
-						"type": "String"
-					},
-					"Dim_Table_Name": {
-						"type": "String"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().Dim_Schema_Name",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().Dim_Table_Name",
 						"type": "Expression"
 					}
 				}
