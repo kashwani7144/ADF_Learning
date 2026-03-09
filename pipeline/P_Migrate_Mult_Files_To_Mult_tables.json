@@ -129,7 +129,7 @@
 								},
 								"ifFalseActivities": [
 									{
-										"name": "SP_Failure_Log_1",
+										"name": "SP_No_File_Exists_Log",
 										"type": "SqlServerStoredProcedure",
 										"dependsOn": [],
 										"policy": {
