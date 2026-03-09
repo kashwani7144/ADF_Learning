@@ -121,7 +121,7 @@
 		},
 		"LS_LOG_MIGRATION_EVENT_properties_typeProperties_server": {
 			"type": "string",
-			"defaultValue": "svetlsandbox.database.windows.net"
+			"defaultValue": "etlsandbox.database.windows.net"
 		},
 		"LS_LOG_MIGRATION_EVENT_properties_typeProperties_database": {
 			"type": "string",

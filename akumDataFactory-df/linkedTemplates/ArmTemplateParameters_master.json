@@ -96,7 +96,7 @@
 			"value": "akum"
 		},
 		"LS_LOG_MIGRATION_EVENT_properties_typeProperties_server": {
-			"value": "svetlsandbox.database.windows.net"
+			"value": "etlsandbox.database.windows.net"
 		},
 		"LS_LOG_MIGRATION_EVENT_properties_typeProperties_database": {
 			"value": "ETLSANDBOX"
@@ -150,7 +150,7 @@
 			"value": "LPOYIGM-IN47228.snowflakecomputing.com"
 		},
 		"LS__SB_ADVW_properties_typeProperties_server": {
-			"value": "svetlsandbox.database.windows.net"
+			"value": "etlsandbox.database.windows.net"
 		},
 		"LS__SB_ADVW_properties_typeProperties_database": {
 			"value": "ETLSANDBOX"
