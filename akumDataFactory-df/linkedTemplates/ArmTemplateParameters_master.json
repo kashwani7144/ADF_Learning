@@ -69,7 +69,7 @@
 			"value": "akum"
 		},
 		"LS_Azure_SB_Lkp_properties_typeProperties_server": {
-			"value": "svetlsandbox.database.windows.net"
+			"value": "etlsandbox.database.windows.net"
 		},
 		"LS_Azure_SB_Lkp_properties_typeProperties_database": {
 			"value": "ETLSANDBOX"

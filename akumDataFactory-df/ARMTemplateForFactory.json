@@ -93,7 +93,7 @@
 		},
 		"LS_Azure_SB_Lkp_properties_typeProperties_server": {
 			"type": "string",
-			"defaultValue": "svetlsandbox.database.windows.net"
+			"defaultValue": "etlsandbox.database.windows.net"
 		},
 		"LS_Azure_SB_Lkp_properties_typeProperties_database": {
 			"type": "string",
@@ -3812,7 +3812,7 @@
 														},
 														"status": {
 															"value": {
-																"value": "@concat('File ', item().SRC_FILE_NAME, ' doesn''t exist in the landing')",
+																"value": "No File Exists",
 																"type": "Expression"
 															},
 															"type": "String"

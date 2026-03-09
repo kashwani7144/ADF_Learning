@@ -85,7 +85,7 @@
 		},
 		"LS_Azure_SB_Lkp_properties_typeProperties_server": {
 			"type": "string",
-			"defaultValue": "svetlsandbox.database.windows.net"
+			"defaultValue": "etlsandbox.database.windows.net"
 		},
 		"LS_Azure_SB_Lkp_properties_typeProperties_database": {
 			"type": "string",

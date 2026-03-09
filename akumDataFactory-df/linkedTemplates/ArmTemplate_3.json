@@ -3050,7 +3050,7 @@
 														},
 														"status": {
 															"value": {
-																"value": "@concat('File ', item().SRC_FILE_NAME, ' doesn''t exist in the landing')",
+																"value": "No File Exists",
 																"type": "Expression"
 															},
 															"type": "String"
