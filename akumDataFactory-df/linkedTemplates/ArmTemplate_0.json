@@ -27,6 +27,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'LS_Blob_Storage_2702'"
 		},
+		"LS_Delete_Blob_From_Landing_0803_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_Delete_Blob_From_Landing_0803'"
+		},
 		"LS_Error_Log_Generic_2702_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'LS_Error_Log_Generic_2702'"
@@ -66,10 +70,6 @@
 		"LS_STG_ADLS_1209_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'LS_STG_ADLS_1209'"
-		},
-		"LS__SB_ADVW_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'LS__SB_ADVW'"
 		},
 		"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
 			"type": "string",
@@ -190,18 +190,6 @@
 		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host": {
 			"type": "string",
 			"defaultValue": "LPOYIGM-IN47228.snowflakecomputing.com"
-		},
-		"LS__SB_ADVW_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "svetlsandbox.database.windows.net"
-		},
-		"LS__SB_ADVW_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "ETLSANDBOX"
-		},
-		"LS__SB_ADVW_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "akum"
 		}
 	},
 	"variables": {
@@ -930,6 +918,25 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/LS_Delete_Blob_From_Landing_0803')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('LS_Delete_Blob_From_Landing_0803_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/LS_Error_Log_Generic_2702')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -1174,34 +1181,6 @@
 				"type": "AzureBlobStorage",
 				"typeProperties": {
 					"connectionString": "[parameters('LS_STG_ADLS_1209_connectionString')]"
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS__SB_ADVW')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('LS__SB_ADVW_properties_typeProperties_server')]",
-					"database": "[parameters('LS__SB_ADVW_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('LS__SB_ADVW_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS__SB_ADVW_password')]"
-					}
 				},
 				"connectVia": {
 					"referenceName": "AutoResolveIntegrationRuntime",

@@ -20,6 +20,9 @@
 		"LS_Blob_Storage_2702_connectionString": {
 			"value": ""
 		},
+		"LS_Delete_Blob_From_Landing_0803_connectionString": {
+			"value": ""
+		},
 		"LS_Error_Log_Generic_2702_connectionString": {
 			"value": ""
 		},
@@ -54,9 +57,6 @@
 			"value": ""
 		},
 		"Par_ETLSANDBOX_accountKey": {
-			"value": ""
-		},
-		"LS_Delete_Blob_From_Landing_0803_connectionString": {
 			"value": ""
 		},
 		"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {

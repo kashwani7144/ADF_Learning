@@ -7,13 +7,25 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "akumDataFactory-df"
 		},
+		"LS__SB_ADVW_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS__SB_ADVW'"
+		},
 		"Par_ETLSANDBOX_accountKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'Par_ETLSANDBOX'"
 		},
-		"LS_Delete_Blob_From_Landing_0803_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'LS_Delete_Blob_From_Landing_0803'"
+		"LS__SB_ADVW_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "svetlsandbox.database.windows.net"
+		},
+		"LS__SB_ADVW_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "ETLSANDBOX"
+		},
+		"LS__SB_ADVW_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "akum"
 		},
 		"Par_ETLSANDBOX_properties_typeProperties_url": {
 			"type": "string",
@@ -24,6 +36,32 @@
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/LS__SB_ADVW')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS__SB_ADVW_properties_typeProperties_server')]",
+					"database": "[parameters('LS__SB_ADVW_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS__SB_ADVW_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS__SB_ADVW_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/Par_ETLSANDBOX')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -37,23 +75,6 @@
 						"type": "SecureString",
 						"value": "[parameters('Par_ETLSANDBOX_accountKey')]"
 					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_Delete_Blob_From_Landing_0803')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('LS_Delete_Blob_From_Landing_0803_connectionString')]"
 				},
 				"connectVia": {
 					"referenceName": "AutoResolveIntegrationRuntime",
@@ -173,7 +194,9 @@
 					}
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS__SB_ADVW')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DS_ALL_CSV_2502')]",
@@ -407,7 +430,9 @@
 					"table": "BLOB_CUSTOMER_RAW"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS__SB_ADVW')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DS_DIM_CUST')]",
@@ -986,7 +1011,9 @@
 					}
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS__SB_ADVW')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DS_Landing_Generic_0303')]",

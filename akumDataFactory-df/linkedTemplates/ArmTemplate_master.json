@@ -27,6 +27,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'LS_Blob_Storage_2702'"
 		},
+		"LS_Delete_Blob_From_Landing_0803_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_Delete_Blob_From_Landing_0803'"
+		},
 		"LS_Error_Log_Generic_2702_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'LS_Error_Log_Generic_2702'"
@@ -74,10 +78,6 @@
 		"Par_ETLSANDBOX_accountKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'Par_ETLSANDBOX'"
-		},
-		"LS_Delete_Blob_From_Landing_0803_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'LS_Delete_Blob_From_Landing_0803'"
 		},
 		"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
 			"type": "string",
@@ -257,6 +257,9 @@
 					"LS_Blob_Storage_2702_connectionString": {
 						"value": "[parameters('LS_Blob_Storage_2702_connectionString')]"
 					},
+					"LS_Delete_Blob_From_Landing_0803_connectionString": {
+						"value": "[parameters('LS_Delete_Blob_From_Landing_0803_connectionString')]"
+					},
 					"LS_Error_Log_Generic_2702_connectionString": {
 						"value": "[parameters('LS_Error_Log_Generic_2702_connectionString')]"
 					},
@@ -286,9 +289,6 @@
 					},
 					"LS_STG_ADLS_1209_connectionString": {
 						"value": "[parameters('LS_STG_ADLS_1209_connectionString')]"
-					},
-					"LS__SB_ADVW_password": {
-						"value": "[parameters('LS__SB_ADVW_password')]"
 					},
 					"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
 						"value": "[parameters('LS_AZURE_ORACLE_2507_properties_typeProperties_server')]"
@@ -379,15 +379,6 @@
 					},
 					"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host": {
 						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host')]"
-					},
-					"LS__SB_ADVW_properties_typeProperties_server": {
-						"value": "[parameters('LS__SB_ADVW_properties_typeProperties_server')]"
-					},
-					"LS__SB_ADVW_properties_typeProperties_database": {
-						"value": "[parameters('LS__SB_ADVW_properties_typeProperties_database')]"
-					},
-					"LS__SB_ADVW_properties_typeProperties_userName": {
-						"value": "[parameters('LS__SB_ADVW_properties_typeProperties_userName')]"
 					}
 				}
 			},
@@ -407,11 +398,20 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"LS__SB_ADVW_password": {
+						"value": "[parameters('LS__SB_ADVW_password')]"
+					},
 					"Par_ETLSANDBOX_accountKey": {
 						"value": "[parameters('Par_ETLSANDBOX_accountKey')]"
 					},
-					"LS_Delete_Blob_From_Landing_0803_connectionString": {
-						"value": "[parameters('LS_Delete_Blob_From_Landing_0803_connectionString')]"
+					"LS__SB_ADVW_properties_typeProperties_server": {
+						"value": "[parameters('LS__SB_ADVW_properties_typeProperties_server')]"
+					},
+					"LS__SB_ADVW_properties_typeProperties_database": {
+						"value": "[parameters('LS__SB_ADVW_properties_typeProperties_database')]"
+					},
+					"LS__SB_ADVW_properties_typeProperties_userName": {
+						"value": "[parameters('LS__SB_ADVW_properties_typeProperties_userName')]"
 					},
 					"Par_ETLSANDBOX_properties_typeProperties_url": {
 						"value": "[parameters('Par_ETLSANDBOX_properties_typeProperties_url')]"
