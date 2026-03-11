@@ -125,6 +125,44 @@
 									"type": "Expression"
 								}
 							}
+						},
+						{
+							"name": "IsFirstRun",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "SetPreviousWatermark",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@empty(variables('PreviousWatermark'))",
+									"type": "Expression"
+								},
+								"ifTrueActivities": [
+									{
+										"name": "SqlQuery_1st_run",
+										"type": "SetVariable",
+										"dependsOn": [],
+										"policy": {
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"variableName": "SqlQuery",
+											"value": {
+												"value": "@concat(\n  'SELECT * FROM ',\n  item().SRC_SCHEMA_NAME, '.', item().SRC_TBL_NAME\n)",
+												"type": "Expression"
+											}
+										}
+									}
+								]
+							}
 						}
 					]
 				}
@@ -135,6 +173,9 @@
 				"type": "String"
 			},
 			"PreviousWatermark": {
+				"type": "String"
+			},
+			"SqlQuery": {
 				"type": "String"
 			}
 		},
