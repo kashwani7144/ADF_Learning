@@ -101,6 +101,30 @@
 									"type": "DatasetReference"
 								}
 							}
+						},
+						{
+							"name": "SetPreviousWatermark",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "GetWatermarkValue",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "PreviousWatermark",
+								"value": {
+									"value": "@activity('GetWatermarkValue').output.firstRow.WATERMARK_VALUE",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
@@ -108,6 +132,9 @@
 		],
 		"variables": {
 			"StartTimestamp": {
+				"type": "String"
+			},
+			"PreviousWatermark": {
 				"type": "String"
 			}
 		},
