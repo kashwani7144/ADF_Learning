@@ -1,6 +1,30 @@
 {
 	"name": "P_Incremental_Migrate_SalesLT_To_SalesLT_M",
 	"properties": {
+		"activities": [
+			{
+				"name": "SetStartTimestamp",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "StartTimestamp",
+					"value": {
+						"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"StartTimestamp": {
+				"type": "String"
+			}
+		},
 		"folder": {
 			"name": "Table_To_Table_Migrations"
 		},
