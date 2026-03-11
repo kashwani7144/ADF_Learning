@@ -1,0 +1,9 @@
+{
+	"name": "P_Incremental_Migrate_SalesLT_To_SalesLT_M",
+	"properties": {
+		"folder": {
+			"name": "Table_To_Table_Migrations"
+		},
+		"annotations": []
+	}
+}
