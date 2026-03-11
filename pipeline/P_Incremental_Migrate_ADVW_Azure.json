@@ -687,7 +687,7 @@
 			}
 		},
 		"folder": {
-			"name": "Migrations"
+			"name": "Table_To_Table_Migrations"
 		},
 		"annotations": [],
 		"lastPublishTime": "2025-08-14T03:03:29Z"
