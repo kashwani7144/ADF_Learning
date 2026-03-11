@@ -143,6 +143,25 @@
 									"value": "@empty(variables('PreviousWatermark'))",
 									"type": "Expression"
 								},
+								"ifFalseActivities": [
+									{
+										"name": "SqlQuery_After_1st_Run",
+										"type": "SetVariable",
+										"dependsOn": [],
+										"policy": {
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"variableName": "SqlQuery",
+											"value": {
+												"value": "@concat(\n  'SELECT * FROM ', item().SRC_SCHEMA_NAME, '.', item().SRC_TBL_NAME,\n  ' WHERE ModifiedDate > CAST(''', \n  formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss'), \n  ''' AS DATETIME2)'\n)",
+												"type": "Expression"
+											}
+										}
+									}
+								],
 								"ifTrueActivities": [
 									{
 										"name": "SqlQuery_1st_run",
