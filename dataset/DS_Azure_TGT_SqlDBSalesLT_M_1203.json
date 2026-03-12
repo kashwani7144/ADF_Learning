@@ -1,0 +1,30 @@
+{
+	"name": "DS_Azure_TGT_SqlDBSalesLT_M_1203",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_Files_SB_Tables_Lkp_2502",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"TGT_SCHEMA_NAME": {
+				"type": "String"
+			},
+			"TGT_TABLE_NAME": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().TGT_SCHEMA_NAME",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().TGT_TABLE_NAME",
+				"type": "Expression"
+			}
+		}
+	}
+}
