@@ -216,7 +216,7 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "DS_Azure_SqlDBSalesLT_1203",
+									"referenceName": "DS_Azure_SRC_SqlDBSalesLT_1203",
 									"type": "DatasetReference",
 									"parameters": {
 										"SRC_SCHEMA_NAME": {

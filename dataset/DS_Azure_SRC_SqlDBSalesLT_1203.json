@@ -1,5 +1,5 @@
 {
-	"name": "DS_Azure_SqlDBSalesLT_1203",
+	"name": "DS_Azure_SRC_SqlDBSalesLT_1203",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "LS_Files_SB_Tables_Lkp_2502",
