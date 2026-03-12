@@ -219,6 +219,20 @@
 									"disableMetricsCollection": false
 								},
 								"enableStaging": false,
+								"logSettings": {
+									"enableCopyActivityLog": true,
+									"copyActivityLogSettings": {
+										"logLevel": "Warning",
+										"enableReliableLogging": false
+									},
+									"logLocationSettings": {
+										"linkedServiceName": {
+											"referenceName": "LS_STG_ADLS_1209",
+											"type": "LinkedServiceReference"
+										},
+										"path": "logs"
+									}
+								},
 								"translator": {
 									"type": "TabularTranslator",
 									"typeConversion": true,
