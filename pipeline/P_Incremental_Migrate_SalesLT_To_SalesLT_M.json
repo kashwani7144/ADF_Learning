@@ -246,7 +246,17 @@
 							"outputs": [
 								{
 									"referenceName": "DS_Azure_TGT_SqlDBSalesLT_M_1203",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"TGT_SCHEMA_NAME": {
+											"value": "@item().TGT_SCHEMA_NAME",
+											"type": "Expression"
+										},
+										"TGT_TABLE_NAME": {
+											"value": "@item().TGT_TABLE_NAME",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}
