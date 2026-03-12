@@ -543,6 +543,139 @@
 								"referenceName": "LS_LOG_MIGRATION_EVENT",
 								"type": "LinkedServiceReference"
 							}
+						},
+						{
+							"name": "GetMaxModifiedDate",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "Copy_SalesLT_To_SalesLT_M",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "@concat(\n  'SELECT MAX(ModifiedDate) AS MAX_MODIFIED_DATE FROM ',\n  item().SRC_SCHEMA_NAME, '.', item().SRC_TABLE_NAME,\n  ' WHERE ModifiedDate > ''', variables('PreviousWatermark'), ''''\n)",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "DS_Azure_SRC_SqlDBSalesLT_1203",
+									"type": "DatasetReference",
+									"parameters": {
+										"SRC_SCHEMA_NAME": {
+											"value": "@item().SRC_SCHEMA_NAME",
+											"type": "Expression"
+										},
+										"SRC_TABLE_NAME": {
+											"value": "@item().SRC_TABLE_NAME",
+											"type": "Expression"
+										}
+									}
+								}
+							}
+						},
+						{
+							"name": "SP_UpdateWatermark",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "SetMaxWatermark",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[UpdateWatermark]",
+								"storedProcedureParameters": {
+									"FILE_TABLE_ID": {
+										"value": {
+											"value": "@item().FILE_TABLE_ID",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"SOURCE_TABLE_NAME": {
+										"value": {
+											"value": "@item().SRC_TABLE_NAME",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"UPDATED_AT_TSTMP": {
+										"value": {
+											"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"UPDATED_BY": {
+										"value": {
+											"value": "@pipeline().TriggerName",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"WATERMARK_VALUE": {
+										"value": {
+											"value": "@variables('MaxWatermark')",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "LS_LOG_MIGRATION_EVENT",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "SetMaxWatermark",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "GetMaxModifiedDate",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "MaxWatermark",
+								"value": {
+									"value": "@if(\n  empty(activity('GetMaxModifiedDate').output.firstRow.MAX_MODIFIED_DATE),\n  variables('PreviousWatermark'),\n  activity('GetMaxModifiedDate').output.firstRow.MAX_MODIFIED_DATE\n)",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
@@ -556,6 +689,9 @@
 				"type": "String"
 			},
 			"SqlQuery": {
+				"type": "String"
+			},
+			"MaxWatermark": {
 				"type": "String"
 			}
 		},
