@@ -205,6 +205,10 @@
 							"typeProperties": {
 								"source": {
 									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "@variables('SqlQuery')",
+										"type": "Expression"
+									},
 									"queryTimeout": "02:00:00",
 									"partitionOption": "None"
 								},
@@ -213,7 +217,17 @@
 							"inputs": [
 								{
 									"referenceName": "DS_Azure_SqlDBSalesLT_1203",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"SRC_SCHEMA_NAME": {
+											"value": "@item().SRC_SCHEMA_NAME",
+											"type": "Expression"
+										},
+										"SRC_TABLE_NAME": {
+											"value": "@item().SRC_TABLE_NAME",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}
