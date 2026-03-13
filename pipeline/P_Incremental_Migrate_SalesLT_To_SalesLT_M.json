@@ -468,7 +468,7 @@
 									},
 									"error_msg": {
 										"value": {
-											"value": "@activity('Copy_SalesLT_To_SalesLT_M').error.messsage",
+											"value": "@activity('Copy_SalesLT_To_SalesLT_M').error.message",
 											"type": "Expression"
 										},
 										"type": "String"
