@@ -567,7 +567,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "@concat(\n  'SELECT MAX(ModifiedDate) AS MAX_MODIFIED_DATE FROM ',\n  item().SRC_SCHEMA_NAME, '.', item().SRC_TABLE_NAME,\n  ' WHERE ModifiedDate > ''', variables('PreviousWatermark'), ''''\n)",
+										"value": "@concat(\n  'SELECT MAX(ModifiedDate) AS MAX_MODIFIED_DATE FROM ',\n  item().SRC_SCHEMA_NAME, '.', item().SRC_TBL_NAME,\n  ' WHERE ModifiedDate > ''', variables('PreviousWatermark'), ''''\n)",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
