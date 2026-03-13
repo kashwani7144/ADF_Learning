@@ -382,7 +382,7 @@
 									},
 									"src_table_name": {
 										"value": {
-											"value": "@item().SRC_TABLE_NAME",
+											"value": "@item().SRC_TBL_NAME",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -407,7 +407,7 @@
 									},
 									"tgt_table_name": {
 										"value": {
-											"value": "@item().TGT_TABLE_NAME",
+											"value": "@item().TGT_TBL_NAME",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -500,7 +500,7 @@
 									},
 									"src_table_name": {
 										"value": {
-											"value": "@item().SRC_TABLE_NAME",
+											"value": "@item().SRC_TBL_NAME",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -525,7 +525,7 @@
 									},
 									"tgt_table_name": {
 										"value": {
-											"value": "@item().TGT_TABLE_NAME",
+											"value": "@item().TGT_TBL_NAME",
 											"type": "Expression"
 										},
 										"type": "String"
