@@ -3547,7 +3547,7 @@
 													"type": "Expression"
 												},
 												"SRC_TABLE_NAME": {
-													"value": "@item().SRC_TABLE_NAME",
+													"value": "@item().SRC_TBL_NAME",
 													"type": "Expression"
 												}
 											}
