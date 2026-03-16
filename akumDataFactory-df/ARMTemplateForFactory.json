@@ -3743,8 +3743,8 @@
 									}
 								},
 								{
-									"name": "IsFirstRun",
-									"type": "IfCondition",
+									"name": "CheckIfNewRows",
+									"type": "Lookup",
 									"dependsOn": [
 										{
 											"activity": "SetPreviousWatermark",
@@ -3753,10 +3753,55 @@
 											]
 										}
 									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@concat(\n'SELECT MAX(ModifiedDate) AS MAX_MODIFIED_DATE FROM ',\nitem().SRC_SCHEMA_NAME,'.',item().SRC_TBL_NAME\n)",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "DS_Azure_SRC_SqlDBSalesLT_1203",
+											"type": "DatasetReference",
+											"parameters": {
+												"SRC_SCHEMA_NAME": {
+													"value": "@item().SRC_SCHEMA_NAME",
+													"type": "Expression"
+												},
+												"SRC_TABLE_NAME": {
+													"value": "@item().SRC_TBL_NAME",
+													"type": "Expression"
+												}
+											}
+										}
+									}
+								},
+								{
+									"name": "IsFirstRun",
+									"type": "IfCondition",
+									"dependsOn": [
+										{
+											"activity": "CheckIfNewRows",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
 									"userProperties": [],
 									"typeProperties": {
 										"expression": {
-											"value": "@empty(variables('PreviousWatermark'))",
+											"value": "@or(\r\n    empty(variables('PreviousWatermark')),\r\n    greater(\r\n        activity('CheckIfNewRows').output.firstRow.MAX_MODIFIED_DATE,\r\n        variables('PreviousWatermark')\r\n    )\r\n)",
 											"type": "Expression"
 										},
 										"ifFalseActivities": [
@@ -3839,7 +3884,7 @@
 												{
 													"name": "SRC_TBL_NAME",
 													"value": {
-														"value": "@item().SRC_TABLE_NAME",
+														"value": "@item().SRC_TBL_NAME",
 														"type": "Expression"
 													}
 												},
@@ -3898,7 +3943,7 @@
 													"type": "Expression"
 												},
 												"SRC_TABLE_NAME": {
-													"value": "@item().SRC_TABLE_NAME",
+													"value": "@item().SRC_TBL_NAME",
 													"type": "Expression"
 												}
 											}
@@ -3914,7 +3959,7 @@
 													"type": "Expression"
 												},
 												"TGT_TABLE_NAME": {
-													"value": "@item().TGT_TABLE_NAME",
+													"value": "@item().TGT_TBL_NAME",
 													"type": "Expression"
 												}
 											}
@@ -3998,7 +4043,7 @@
 											},
 											"src_table_name": {
 												"value": {
-													"value": "@item().SRC_TABLE_NAME",
+													"value": "@item().SRC_TBL_NAME",
 													"type": "Expression"
 												},
 												"type": "String"
@@ -4023,7 +4068,7 @@
 											},
 											"tgt_table_name": {
 												"value": {
-													"value": "@item().TGT_TABLE_NAME",
+													"value": "@item().TGT_TBL_NAME",
 													"type": "Expression"
 												},
 												"type": "String"
@@ -4084,7 +4129,7 @@
 											},
 											"error_msg": {
 												"value": {
-													"value": "@activity('Copy_SalesLT_To_SalesLT_M').error.messsage",
+													"value": "@activity('Copy_SalesLT_To_SalesLT_M').error.message",
 													"type": "Expression"
 												},
 												"type": "String"
@@ -4116,7 +4161,7 @@
 											},
 											"src_table_name": {
 												"value": {
-													"value": "@item().SRC_TABLE_NAME",
+													"value": "@item().SRC_TBL_NAME",
 													"type": "Expression"
 												},
 												"type": "String"
@@ -4141,7 +4186,7 @@
 											},
 											"tgt_table_name": {
 												"value": {
-													"value": "@item().TGT_TABLE_NAME",
+													"value": "@item().TGT_TBL_NAME",
 													"type": "Expression"
 												},
 												"type": "String"
@@ -4183,7 +4228,7 @@
 										"source": {
 											"type": "AzureSqlSource",
 											"sqlReaderQuery": {
-												"value": "@concat(\n  'SELECT MAX(ModifiedDate) AS MAX_MODIFIED_DATE FROM ',\n  item().SRC_SCHEMA_NAME, '.', item().SRC_TABLE_NAME,\n  ' WHERE ModifiedDate > ''', variables('PreviousWatermark'), ''''\n)",
+												"value": "@concat(\n  'SELECT MAX(ModifiedDate) AS MAX_MODIFIED_DATE FROM ',\n  item().SRC_SCHEMA_NAME, '.', item().SRC_TBL_NAME,\n  ' WHERE ModifiedDate > ''', variables('PreviousWatermark'), ''''\n)",
 												"type": "Expression"
 											},
 											"queryTimeout": "02:00:00",
@@ -4202,6 +4247,30 @@
 													"type": "Expression"
 												}
 											}
+										}
+									}
+								},
+								{
+									"name": "SetMaxWatermark",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "GetMaxModifiedDate",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "MaxWatermark",
+										"value": {
+											"value": "@if(\n  empty(activity('GetMaxModifiedDate').output.firstRow.MAX_MODIFIED_DATE),\n  variables('PreviousWatermark'),\n  activity('GetMaxModifiedDate').output.firstRow.MAX_MODIFIED_DATE\n)",
+											"type": "Expression"
 										}
 									}
 								},
@@ -4234,9 +4303,16 @@
 												},
 												"type": "Int32"
 											},
+											"SOURCE_SCHEMA": {
+												"value": {
+													"value": "@item().SRC_SCHEMA_NAME",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
 											"SOURCE_TABLE_NAME": {
 												"value": {
-													"value": "@item().SRC_TABLE_NAME",
+													"value": "@item().SRC_TBL_NAME",
 													"type": "Expression"
 												},
 												"type": "String"
@@ -4267,30 +4343,6 @@
 									"linkedServiceName": {
 										"referenceName": "LS_LOG_MIGRATION_EVENT",
 										"type": "LinkedServiceReference"
-									}
-								},
-								{
-									"name": "SetMaxWatermark",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "GetMaxModifiedDate",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "MaxWatermark",
-										"value": {
-											"value": "@if(\n  empty(activity('GetMaxModifiedDate').output.firstRow.MAX_MODIFIED_DATE),\n  variables('PreviousWatermark'),\n  activity('GetMaxModifiedDate').output.firstRow.MAX_MODIFIED_DATE\n)",
-											"type": "Expression"
-										}
 									}
 								}
 							]
@@ -9961,27 +10013,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DS_Azure_Sandbox_LKP_2507')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_Azure_SB_Lkp",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "FILE_TABLE_MAPPING"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS_Azure_SB_Lkp')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/DS_Azure_SRC_SqlDBSalesLT_1203')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -10008,6 +10039,62 @@
 					},
 					"table": {
 						"value": "@dataset().SRC_TABLE_NAME",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_Files_SB_Tables_Lkp_2502')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Azure_Sandbox_LKP_2507')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "FILE_TABLE_MAPPING"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_Azure_SB_Lkp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Azure_TGT_SqlDBSalesLT_M_1203')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Files_SB_Tables_Lkp_2502",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"TGT_SCHEMA_NAME": {
+						"type": "String"
+					},
+					"TGT_TABLE_NAME": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().TGT_SCHEMA_NAME",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().TGT_TABLE_NAME",
 						"type": "Expression"
 					}
 				}
@@ -13843,41 +13930,6 @@
 			"apiVersion": "2018-06-01",
 			"properties": {},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_Azure_TGT_SqlDBSalesLT_M_1203')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_Files_SB_Tables_Lkp_2502",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"TGT_SCHEMA_NAME": {
-						"type": "String"
-					},
-					"TGT_TABLE_NAME": {
-						"type": "String"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().TGT_SCHEMA_NAME",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().TGT_TABLE_NAME",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS_Files_SB_Tables_Lkp_2502')]"
-			]
 		}
 	]
 }
