@@ -639,7 +639,7 @@
 							"type": "SetVariable",
 							"dependsOn": [
 								{
-									"activity": "SP_Success_Log",
+									"activity": "GetMaxModifiedDate",
 									"dependencyConditions": [
 										"Succeeded"
 									]
