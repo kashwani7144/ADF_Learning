@@ -766,9 +766,16 @@
 													},
 													"type": "Int32"
 												},
+												"SOURCE_SCHEMA": {
+													"value": {
+														"value": "@item().SRC_SCHEMA_NAME",
+														"type": "Expression"
+													},
+													"type": "String"
+												},
 												"SOURCE_TABLE_NAME": {
 													"value": {
-														"value": "@item().SRC_TABLE_NAME",
+														"value": "@item().SRC_TBL_NAME",
 														"type": "Expression"
 													},
 													"type": "String"
