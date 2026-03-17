@@ -131,7 +131,7 @@
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "SetPreviousWatermark",
+									"activity": "If_Watermark_Exists",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -727,6 +727,25 @@
 							"linkedServiceName": {
 								"referenceName": "LS_LOG_MIGRATION_EVENT",
 								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "If_Watermark_Exists",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "SetPreviousWatermark",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@not(empty(variables('PreviousWatermark')))",
+									"type": "Expression"
+								}
 							}
 						}
 					]
