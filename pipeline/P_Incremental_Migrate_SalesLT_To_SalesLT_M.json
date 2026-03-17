@@ -121,7 +121,7 @@
 							"typeProperties": {
 								"variableName": "PreviousWatermark",
 								"value": {
-									"value": "@if(\n    empty(activity('GetWatermarkValue').output.firstRow),\n    null,\n    activity('GetWatermarkValue').output.firstRow.WATERMARK_VALUE\n)",
+									"value": "@if(\n    or(\n        empty(activity('GetWatermarkValue').output.firstRow),\n        empty(activity('GetWatermarkValue').output.firstRow.WATERMARK_VALUE)\n    ),\n    null,\n    activity('GetWatermarkValue').output.firstRow.WATERMARK_VALUE\n)",
 									"type": "Expression"
 								}
 							}
