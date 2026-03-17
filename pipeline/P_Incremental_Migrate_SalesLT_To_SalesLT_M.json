@@ -221,7 +221,7 @@
 													"type": "DateTime"
 												},
 												"status": {
-													"value": "Missing Watermark or mapping.",
+													"value": "Missing WTMK / Mapping.",
 													"type": "String"
 												},
 												"tgt_schema_name": {
