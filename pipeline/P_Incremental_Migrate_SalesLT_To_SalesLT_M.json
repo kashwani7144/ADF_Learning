@@ -293,68 +293,11 @@
 										}
 									},
 									{
-										"name": "IsFirstRun",
-										"type": "IfCondition",
-										"dependsOn": [
-											{
-												"activity": "CheckIfNewRows",
-												"dependencyConditions": [
-													"Succeeded"
-												]
-											}
-										],
-										"userProperties": [],
-										"typeProperties": {
-											"expression": {
-												"value": "@or(\r\n    empty(variables('PreviousWatermark')),\r\n    greater(\r\n        activity('CheckIfNewRows').output.firstRow.MAX_MODIFIED_DATE,\r\n        variables('PreviousWatermark')\r\n    )\r\n)",
-												"type": "Expression"
-											},
-											"ifFalseActivities": [
-												{
-													"name": "SqlQuery_After_1st_Run",
-													"type": "SetVariable",
-													"dependsOn": [],
-													"policy": {
-														"secureOutput": false,
-														"secureInput": false
-													},
-													"userProperties": [],
-													"typeProperties": {
-														"variableName": "SqlQuery",
-														"value": {
-															"value": "@concat(\n  'SELECT * FROM ', item().SRC_SCHEMA_NAME, '.', item().SRC_TBL_NAME,\n  ' WHERE ModifiedDate > CAST(''', \n  formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss'), \n  ''' AS DATETIME2)'\n)",
-															"type": "Expression"
-														}
-													}
-												}
-											],
-											"ifTrueActivities": [
-												{
-													"name": "SqlQuery_1st_run",
-													"type": "SetVariable",
-													"dependsOn": [],
-													"policy": {
-														"secureOutput": false,
-														"secureInput": false
-													},
-													"userProperties": [],
-													"typeProperties": {
-														"variableName": "SqlQuery",
-														"value": {
-															"value": "@concat(\n  'SELECT * FROM ',\n  item().SRC_SCHEMA_NAME, '.', item().SRC_TBL_NAME\n)",
-															"type": "Expression"
-														}
-													}
-												}
-											]
-										}
-									},
-									{
 										"name": "Copy_SalesLT_To_SalesLT_M",
 										"type": "Copy",
 										"dependsOn": [
 											{
-												"activity": "IsFirstRun",
+												"activity": "SetSqlQuery",
 												"dependencyConditions": [
 													"Succeeded"
 												]
@@ -848,6 +791,30 @@
 										"linkedServiceName": {
 											"referenceName": "LS_LOG_MIGRATION_EVENT",
 											"type": "LinkedServiceReference"
+										}
+									},
+									{
+										"name": "SetSqlQuery",
+										"type": "SetVariable",
+										"dependsOn": [
+											{
+												"activity": "CheckIfNewRows",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"policy": {
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"variableName": "SqlQuery",
+											"value": {
+												"value": "@concat(\r\n  'SELECT * FROM ',\r\n  item().SRC_SCHEMA_NAME, '.', item().SRC_TBL_NAME,\r\n  ' WHERE ModifiedDate > ''',\r\n  if(\r\n      empty(variables('PreviousWatermark')),\r\n      '1900-01-01 00:00:00',\r\n      formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss')\r\n  ),\r\n  ''''\r\n)",
+												"type": "Expression"
+											}
 										}
 									}
 								]
