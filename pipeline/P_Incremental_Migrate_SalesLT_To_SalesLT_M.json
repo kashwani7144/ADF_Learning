@@ -137,7 +137,12 @@
 									]
 								}
 							],
-							"userProperties": [],
+							"userProperties": [
+								{
+									"name": "continueOnError",
+									"value": "true"
+								}
+							],
 							"typeProperties": {
 								"expression": {
 									"value": "@not(empty(variables('PreviousWatermark')))",
