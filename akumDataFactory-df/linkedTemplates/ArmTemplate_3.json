@@ -3825,7 +3825,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"expression": {
-											"value": "@not(empty(variables('PreviousWatermark')))",
+											"value": "@if(\n    empty(activity('GetWatermarkValue').output.firstRow),\n    false,\n    true\n)",
 											"type": "Expression"
 										},
 										"ifFalseActivities": [
@@ -3863,7 +3863,7 @@
 															"type": "DateTime"
 														},
 														"error_msg": {
-															"value": "Watermark not found / Mapping missing.",
+															"value": "Watermark row missing in tracker table.",
 															"type": "String"
 														},
 														"file_table_id": {
@@ -3906,7 +3906,7 @@
 															"type": "DateTime"
 														},
 														"status": {
-															"value": "Missing WTMK / Mapping.",
+															"value": "WTMK / Mapping Issue.",
 															"type": "String"
 														},
 														"tgt_schema_name": {
