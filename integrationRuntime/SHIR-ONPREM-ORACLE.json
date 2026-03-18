@@ -1,0 +1,6 @@
+{
+	"name": "SHIR-ONPREM-ORACLE",
+	"properties": {
+		"type": "SelfHosted"
+	}
+}
