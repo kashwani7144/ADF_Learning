@@ -140,7 +140,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"expression": {
-									"value": "@not(empty(variables('PreviousWatermark')))",
+									"value": "@if(\n    empty(activity('GetWatermarkValue').output.firstRow),\n    false,\n    true\n)",
 									"type": "Expression"
 								},
 								"ifFalseActivities": [
