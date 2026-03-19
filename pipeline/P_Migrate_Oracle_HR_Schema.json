@@ -105,7 +105,37 @@
 						"value": "@activity('GetSrcTgtTableMapping').output.value",
 						"type": "Expression"
 					},
-					"isSequential": true
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "GetWatermarkValue",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "@concat(\r\n  'SELECT WATERMARK_VALUE,WATERMARK_ID FROM dbo.WATERMARK_TRACKER ',\r\n  'WHERE SOURCE_SCHEMA = ''', item().SRC_SCHEMA_NAME, ''' ',\r\n  'AND SOURCE_TABLE_NAME = ''', item().SRC_TBL_NAME, ''' ', \r\n  'AND PIPELINE_NAME = ''', pipeline().Pipeline, ''' ',\r\n  'AND ROW_STS_CD = ''A'''\r\n)\r\n",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "DS_Watermark_Tracker",
+									"type": "DatasetReference"
+								}
+							}
+						}
+					]
 				}
 			}
 		],
