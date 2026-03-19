@@ -1,0 +1,12 @@
+{
+	"name": "DS_Oracle_HR_1903",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_Oracle_ADF_USER_1903",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "OracleTable",
+		"schema": []
+	}
+}
