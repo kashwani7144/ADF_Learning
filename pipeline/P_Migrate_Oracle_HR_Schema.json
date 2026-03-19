@@ -34,8 +34,30 @@
 						}
 					}
 				]
+			},
+			{
+				"name": "SetStartTimestamp",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "StartTimestamp",
+					"value": {
+						"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
+						"type": "Expression"
+					}
+				}
 			}
 		],
+		"variables": {
+			"StartTimestamp": {
+				"type": "String"
+			}
+		},
 		"folder": {
 			"name": "Oracle"
 		},
