@@ -87,6 +87,26 @@
 					},
 					"firstRowOnly": false
 				}
+			},
+			{
+				"name": "ForEachTableInMapping",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GetSrcTgtTableMapping",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GetSrcTgtTableMapping').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true
+				}
 			}
 		],
 		"variables": {
