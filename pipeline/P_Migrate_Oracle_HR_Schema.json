@@ -170,7 +170,13 @@
 									]
 								}
 							],
-							"userProperties": []
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@if(\n    empty(activity('GetWatermarkValue').output.firstRow),\n    false,\n    true\n)",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
