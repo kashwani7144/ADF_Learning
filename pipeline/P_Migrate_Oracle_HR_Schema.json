@@ -276,7 +276,35 @@
 												"numberScale": 18,
 												"queryTimeout": "02:00:00"
 											},
-											"enableStaging": false
+											"sink": {
+												"type": "AzureSqlSink",
+												"writeBehavior": "insert",
+												"sqlWriterUseTableLock": false
+											},
+											"enableStaging": false,
+											"enableSkipIncompatibleRow": false,
+											"logSettings": {
+												"enableCopyActivityLog": true,
+												"copyActivityLogSettings": {
+													"logLevel": "Warning",
+													"enableReliableLogging": false
+												},
+												"logLocationSettings": {
+													"linkedServiceName": {
+														"referenceName": "LS_STG_ADLS_1209",
+														"type": "LinkedServiceReference"
+													},
+													"path": "logs"
+												}
+											},
+											"translator": {
+												"type": "TabularTranslator",
+												"typeConversion": true,
+												"typeConversionSettings": {
+													"allowDataTruncation": true,
+													"treatBooleanAsNumber": false
+												}
+											}
 										},
 										"inputs": [
 											{
@@ -289,6 +317,22 @@
 													},
 													"SRC_TBL_NAME": {
 														"value": "@item().SRC_TBL_NAME",
+														"type": "Expression"
+													}
+												}
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "DS_Azure_TGT_SqlDBSalesLT_M_1203",
+												"type": "DatasetReference",
+												"parameters": {
+													"TGT_SCHEMA_NAME": {
+														"value": "@item().TGT_SCHEMA_NAME",
+														"type": "Expression"
+													},
+													"TGT_TABLE_NAME": {
+														"value": "@item().TGT_TBL_NAME",
 														"type": "Expression"
 													}
 												}
