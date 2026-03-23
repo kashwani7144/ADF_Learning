@@ -143,6 +143,116 @@
 									"value": "@if(\n    empty(activity('GetWatermarkValue').output.firstRow),\n    false,\n    true\n)",
 									"type": "Expression"
 								},
+								"ifFalseActivities": [
+									{
+										"name": "SP_Watermark_Lookup_Missing_Log",
+										"type": "SqlServerStoredProcedure",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"storedProcedureName": "[dbo].[LOG_MIGRATION_EVENT]",
+											"storedProcedureParameters": {
+												"audit_key": {
+													"value": {
+														"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMddHHmmssfffffff')",
+														"type": "Expression"
+													},
+													"type": "String"
+												},
+												"batch_id": {
+													"value": {
+														"value": "@int(formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMdd'))",
+														"type": "Expression"
+													},
+													"type": "Int32"
+												},
+												"end_time": {
+													"value": null,
+													"type": "DateTime"
+												},
+												"error_msg": {
+													"value": "Watermark row missing in tracker table.",
+													"type": "String"
+												},
+												"file_table_id": {
+													"value": {
+														"value": "@item().FILE_TABLE_ID",
+														"type": "Expression"
+													},
+													"type": "Int32"
+												},
+												"pipeline_name": {
+													"value": {
+														"value": "@pipeline().Pipeline",
+														"type": "Expression"
+													},
+													"type": "String"
+												},
+												"row_count": {
+													"value": null,
+													"type": "Int32"
+												},
+												"src_schema_name": {
+													"value": {
+														"value": "@item().SRC_SCHEMA_NAME",
+														"type": "Expression"
+													},
+													"type": "String"
+												},
+												"src_table_name": {
+													"value": {
+														"value": "@item().SRC_TBL_NAME",
+														"type": "Expression"
+													},
+													"type": "String"
+												},
+												"start_time": {
+													"value": {
+														"value": "@variables('StartTimestamp')",
+														"type": "Expression"
+													},
+													"type": "DateTime"
+												},
+												"status": {
+													"value": "WTMK / Mapping Issue.",
+													"type": "String"
+												},
+												"tgt_schema_name": {
+													"value": {
+														"value": "@item().TGT_SCHEMA_NAME",
+														"type": "Expression"
+													},
+													"type": "String"
+												},
+												"tgt_table_name": {
+													"value": {
+														"value": "@item().TGT_TBL_NAME",
+														"type": "Expression"
+													},
+													"type": "String"
+												},
+												"triggered_by": {
+													"value": {
+														"value": "@pipeline().TriggerName",
+														"type": "Expression"
+													},
+													"type": "String"
+												}
+											}
+										},
+										"linkedServiceName": {
+											"referenceName": "LS_LOG_MIGRATION_EVENT",
+											"type": "LinkedServiceReference"
+										}
+									}
+								],
 								"ifTrueActivities": [
 									{
 										"name": "CheckIfNewRows",
