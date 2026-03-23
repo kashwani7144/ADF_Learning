@@ -230,6 +230,44 @@
 										"typeProperties": {
 											"source": {
 												"type": "OracleSource",
+												"additionalColumns": [
+													{
+														"name": "WATERMARK_ID",
+														"value": "$$COLUMN:"
+													},
+													{
+														"name": "FILE_TABLE_ID",
+														"value": {
+															"value": "@item().FILE_TABLE_ID",
+															"type": "Expression"
+														}
+													},
+													{
+														"name": "BATCH_ID",
+														"value": {
+															"value": "@string(formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMdd'))",
+															"type": "Expression"
+														}
+													},
+													{
+														"name": "SRC_TBL_NM",
+														"value": {
+															"value": "@item().SRC_TBL_NAME",
+															"type": "Expression"
+														}
+													},
+													{
+														"name": "PIPLN_NM",
+														"value": {
+															"value": "@pipeline().Pipeline",
+															"type": "Expression"
+														}
+													}
+												],
+												"oracleReaderQuery": {
+													"value": "@variables('SqlQuery')",
+													"type": "Expression"
+												},
 												"partitionOption": "None",
 												"numberPrecision": 38,
 												"numberScale": 18,
