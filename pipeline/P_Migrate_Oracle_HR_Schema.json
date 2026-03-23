@@ -3,39 +3,6 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "HR_Schema_Copy",
-				"type": "Copy",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "OracleSource",
-						"partitionOption": "None",
-						"numberPrecision": 38,
-						"numberScale": 18,
-						"queryTimeout": "02:00:00"
-					},
-					"enableStaging": false
-				},
-				"inputs": [
-					{
-						"referenceName": "DS_Oracle_HR_1903",
-						"type": "DatasetReference",
-						"parameters": {
-							"SRC_SCHEMA_NAME": "HR",
-							"SRC_TBL_NAME": "EMPLOYEES"
-						}
-					}
-				]
-			},
-			{
 				"name": "SetStartTimestamp",
 				"type": "SetVariable",
 				"dependsOn": [],
@@ -205,8 +172,14 @@
 												"referenceName": "DS_Oracle_HR_1903",
 												"type": "DatasetReference",
 												"parameters": {
-													"SRC_SCHEMA_NAME": "HR",
-													"SRC_TBL_NAME": "EMPLOYEES"
+													"SRC_SCHEMA_NAME": {
+														"value": "@item().SRC_SCHEMA_NAME",
+														"type": "Expression"
+													},
+													"SRC_TBL_NAME": {
+														"value": "@item().SRC_TBL_NAME",
+														"type": "Expression"
+													}
 												}
 											}
 										}
@@ -234,6 +207,46 @@
 												"type": "Expression"
 											}
 										}
+									},
+									{
+										"name": "HR_Schema_Copy",
+										"type": "Copy",
+										"dependsOn": [
+											{
+												"activity": "SetSqlQuery",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "OracleSource",
+												"partitionOption": "None",
+												"numberPrecision": 38,
+												"numberScale": 18,
+												"queryTimeout": "02:00:00"
+											},
+											"enableStaging": false
+										},
+										"inputs": [
+											{
+												"referenceName": "DS_Oracle_HR_1903",
+												"type": "DatasetReference",
+												"parameters": {
+													"SRC_SCHEMA_NAME": "HR",
+													"SRC_TBL_NAME": "EMPLOYEES"
+												}
+											}
+										]
 									}
 								]
 							}
