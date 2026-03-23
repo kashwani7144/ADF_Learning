@@ -624,6 +624,30 @@
 												}
 											}
 										}
+									},
+									{
+										"name": "SetMaxWatermark",
+										"type": "SetVariable",
+										"dependsOn": [
+											{
+												"activity": "GetMaxModifiedDate",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"policy": {
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"variableName": "MaxWatermark",
+											"value": {
+												"value": "@if(\n  empty(activity('GetMaxModifiedDate').output.firstRow.MAX_MODIFIED_DATE),\n  variables('PreviousWatermark'),\n  activity('GetMaxModifiedDate').output.firstRow.MAX_MODIFIED_DATE\n)",
+												"type": "Expression"
+											}
+										}
 									}
 								]
 							}
@@ -640,6 +664,9 @@
 				"type": "String"
 			},
 			"SqlQuery": {
+				"type": "String"
+			},
+			"MaxWatermark": {
 				"type": "String"
 			}
 		},
