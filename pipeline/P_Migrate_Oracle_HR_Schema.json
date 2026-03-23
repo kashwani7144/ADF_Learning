@@ -402,7 +402,7 @@
 												},
 												"row_count": {
 													"value": {
-														"value": "@activity('Copy_SalesLT_To_SalesLT_M').output.rowsCopied",
+														"value": "@activity('HR_Schema_Copy').output.rowsCopied",
 														"type": "Expression"
 													},
 													"type": "Int32"
@@ -502,7 +502,7 @@
 												},
 												"error_msg": {
 													"value": {
-														"value": "@activity('Copy_SalesLT_To_SalesLT_M').error.message",
+														"value": "@activity('HR_Schema_Copy').error.message",
 														"type": "Expression"
 													},
 													"type": "String"
