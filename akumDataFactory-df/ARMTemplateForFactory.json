@@ -5564,7 +5564,7 @@
 												"typeProperties": {
 													"variableName": "SqlQuery",
 													"value": {
-														"value": "@concat(\n  'SELECT * FROM ',\n  item().SRC_SCHEMA_NAME, '.', item().SRC_TBL_NAME,\n  ' WHERE SRC_ROW_INSERT_TSTMP > ''',\n  if(\n      empty(variables('PreviousWatermark')),\n      '1900-01-01 00:00:00',\n      formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss')\n  ),\n  ''''\n)",
+														"value": "@concat(\r\n  'SELECT * FROM ',\r\n  item().SRC_SCHEMA_NAME, '.', item().SRC_TBL_NAME,\r\n  ' WHERE SRC_ROW_INSERT_TSTMP > TO_TIMESTAMP(''',\r\n  if(\r\n      empty(variables('PreviousWatermark')),\r\n      '1900-01-01 00:00:00',\r\n      formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss')\r\n  ),\r\n  ''', ''YYYY-MM-DD HH24:MI:SS'')'\r\n)\r\n",
 														"type": "Expression"
 													}
 												}
@@ -5962,7 +5962,7 @@
 													"source": {
 														"type": "OracleSource",
 														"oracleReaderQuery": {
-															"value": "@concat(\n  'SELECT MAX(SRC_ROW_INSERT_TSTMP) AS MAX_MODIFIED_DATE FROM ',\n  item().SRC_SCHEMA_NAME, '.', item().SRC_TBL_NAME,\n  ' WHERE SRC_ROW_INSERT_TSTMP > ''', variables('PreviousWatermark'), ''''\n)",
+															"value": "@concat(\n  'SELECT MAX(SRC_ROW_INSERT_TSTMP) AS MAX_MODIFIED_DATE FROM ',\n  item().SRC_SCHEMA_NAME, '.', item().SRC_TBL_NAME,\n  ' WHERE SRC_ROW_INSERT_TSTMP > TO_TIMESTAMP(''',\n  variables('PreviousWatermark'),\n  ''', ''YYYY-MM-DD HH24:MI:SS'')'\n)",
 															"type": "Expression"
 														},
 														"partitionOption": "None",
