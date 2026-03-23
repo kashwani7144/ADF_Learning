@@ -43,6 +43,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_LOG_MIGRATION_EVENT'"
 		},
+		"LS_Oracle_ADF_USER_1903_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_Oracle_ADF_USER_1903'"
+		},
 		"LS_RawFiles_Generic_2702_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'LS_RawFiles_Generic_2702'"
@@ -138,6 +142,14 @@
 		"LS_LOG_MIGRATION_EVENT_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "akum"
+		},
+		"LS_Oracle_ADF_USER_1903_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "localhost:1521/orcl"
+		},
+		"LS_Oracle_ADF_USER_1903_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "adf_user"
 		},
 		"LS_Run_DDLs_Azure_2507_properties_typeProperties_server": {
 			"type": "string",
@@ -927,776 +939,6 @@
 				"[concat(variables('factoryId'), '/datasets/DS_ADVW_Src_2807')]",
 				"[concat(variables('factoryId'), '/datasets/DS_SB_Tgt_SalesLT_M')]",
 				"[concat(variables('factoryId'), '/linkedServices/LS_LOG_MIGRATION_EVENT')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/BKP_P_Incremental_Migrate_SalesLT_To_SalesLT_M')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "SetStartTimestamp",
-						"type": "SetVariable",
-						"dependsOn": [],
-						"policy": {
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "StartTimestamp",
-							"value": {
-								"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "GetSrcTgtTableMapping",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "SetStartTimestamp",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "@concat(\n  'SELECT FILE_TABLE_ID, ',\n  'RIGHT(SRC_SCHEMA_NAME, 7) AS SRC_SCHEMA_NAME, ',\n  'RIGHT(TGT_SCHEMA_NAME, 9) AS TGT_SCHEMA_NAME, ',\n  'SRC_NAME AS SRC_TBL_NAME, ',\n  'TGT_NAME AS TGT_TBL_NAME ',\n  'FROM FILE_TABLE_MAPPING ',\n  'WHERE PIPLN_NM = ''', pipeline().Pipeline, ''' ',\n  'AND ROW_STS_CD = ''A'''\n)",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "DS_Files_To_Tables_2502",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "ForEachTableInMapping",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "GetSrcTgtTableMapping",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('GetSrcTgtTableMapping').output.value",
-								"type": "Expression"
-							},
-							"isSequential": true,
-							"activities": [
-								{
-									"name": "GetWatermarkValue",
-									"type": "Lookup",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "AzureSqlSource",
-											"sqlReaderQuery": {
-												"value": "@concat(\n  'SELECT WATERMARK_VALUE FROM dbo.WATERMARK_TRACKER ',\n  'WHERE SOURCE_TABLE_NAME = ''', item().SRC_TBL_NAME, ''' ',\n  'AND PIPELINE_NAME = ''', pipeline().Pipeline, ''' ',\n  'AND ROW_STS_CD = ''A'''\n)",
-												"type": "Expression"
-											},
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"dataset": {
-											"referenceName": "DS_Watermark_Tracker",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									}
-								},
-								{
-									"name": "SetPreviousWatermark",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "GetWatermarkValue",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "PreviousWatermark",
-										"value": {
-											"value": "@if(\n    empty(activity('GetWatermarkValue').output.firstRow),\n    null,\n    activity('GetWatermarkValue').output.firstRow.WATERMARK_VALUE\n)",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "CheckIfNewRows",
-									"type": "Lookup",
-									"dependsOn": [
-										{
-											"activity": "SetPreviousWatermark",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "AzureSqlSource",
-											"sqlReaderQuery": {
-												"value": "@concat(\n'SELECT MAX(ModifiedDate) AS MAX_MODIFIED_DATE FROM ',\nitem().SRC_SCHEMA_NAME,'.',item().SRC_TBL_NAME\n)",
-												"type": "Expression"
-											},
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"dataset": {
-											"referenceName": "DS_Azure_SRC_SqlDBSalesLT_1203",
-											"type": "DatasetReference",
-											"parameters": {
-												"SRC_SCHEMA_NAME": {
-													"value": "@item().SRC_SCHEMA_NAME",
-													"type": "Expression"
-												},
-												"SRC_TABLE_NAME": {
-													"value": "@item().SRC_TBL_NAME",
-													"type": "Expression"
-												}
-											}
-										}
-									}
-								},
-								{
-									"name": "IsFirstRun",
-									"type": "IfCondition",
-									"dependsOn": [
-										{
-											"activity": "CheckIfNewRows",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"userProperties": [],
-									"typeProperties": {
-										"expression": {
-											"value": "@or(\r\n    empty(variables('PreviousWatermark')),\r\n    greater(\r\n        activity('CheckIfNewRows').output.firstRow.MAX_MODIFIED_DATE,\r\n        variables('PreviousWatermark')\r\n    )\r\n)",
-											"type": "Expression"
-										},
-										"ifFalseActivities": [
-											{
-												"name": "SqlQuery_After_1st_Run",
-												"type": "SetVariable",
-												"dependsOn": [],
-												"policy": {
-													"secureOutput": false,
-													"secureInput": false
-												},
-												"userProperties": [],
-												"typeProperties": {
-													"variableName": "SqlQuery",
-													"value": {
-														"value": "@concat(\n  'SELECT * FROM ', item().SRC_SCHEMA_NAME, '.', item().SRC_TBL_NAME,\n  ' WHERE ModifiedDate > CAST(''', \n  formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss'), \n  ''' AS DATETIME2)'\n)",
-														"type": "Expression"
-													}
-												}
-											}
-										],
-										"ifTrueActivities": [
-											{
-												"name": "SqlQuery_1st_run",
-												"type": "SetVariable",
-												"dependsOn": [],
-												"policy": {
-													"secureOutput": false,
-													"secureInput": false
-												},
-												"userProperties": [],
-												"typeProperties": {
-													"variableName": "SqlQuery",
-													"value": {
-														"value": "@concat(\n  'SELECT * FROM ',\n  item().SRC_SCHEMA_NAME, '.', item().SRC_TBL_NAME\n)",
-														"type": "Expression"
-													}
-												}
-											}
-										]
-									}
-								},
-								{
-									"name": "Copy_SalesLT_To_SalesLT_M",
-									"type": "Copy",
-									"dependsOn": [
-										{
-											"activity": "IsFirstRun",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "AzureSqlSource",
-											"additionalColumns": [
-												{
-													"name": "FILE_TABLE_ID",
-													"value": {
-														"value": "@item().FILE_TABLE_ID",
-														"type": "Expression"
-													}
-												},
-												{
-													"name": "BATCH_ID",
-													"value": {
-														"value": "@string(formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMdd'))",
-														"type": "Expression"
-													}
-												},
-												{
-													"name": "SRC_TBL_NAME",
-													"value": {
-														"value": "@item().SRC_TBL_NAME",
-														"type": "Expression"
-													}
-												},
-												{
-													"name": "PIPLN_NM",
-													"value": {
-														"value": "@pipeline().Pipeline",
-														"type": "Expression"
-													}
-												}
-											],
-											"sqlReaderQuery": {
-												"value": "@variables('SqlQuery')",
-												"type": "Expression"
-											},
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"sink": {
-											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
-											"sqlWriterUseTableLock": false,
-											"disableMetricsCollection": false
-										},
-										"enableStaging": false,
-										"logSettings": {
-											"enableCopyActivityLog": true,
-											"copyActivityLogSettings": {
-												"logLevel": "Warning",
-												"enableReliableLogging": false
-											},
-											"logLocationSettings": {
-												"linkedServiceName": {
-													"referenceName": "LS_STG_ADLS_1209",
-													"type": "LinkedServiceReference"
-												},
-												"path": "logs"
-											}
-										},
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "DS_Azure_SRC_SqlDBSalesLT_1203",
-											"type": "DatasetReference",
-											"parameters": {
-												"SRC_SCHEMA_NAME": {
-													"value": "@item().SRC_SCHEMA_NAME",
-													"type": "Expression"
-												},
-												"SRC_TABLE_NAME": {
-													"value": "@item().SRC_TBL_NAME",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "DS_Azure_TGT_SqlDBSalesLT_M_1203",
-											"type": "DatasetReference",
-											"parameters": {
-												"TGT_SCHEMA_NAME": {
-													"value": "@item().TGT_SCHEMA_NAME",
-													"type": "Expression"
-												},
-												"TGT_TABLE_NAME": {
-													"value": "@item().TGT_TBL_NAME",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								},
-								{
-									"name": "SP_Success_Log",
-									"type": "SqlServerStoredProcedure",
-									"dependsOn": [
-										{
-											"activity": "Copy_SalesLT_To_SalesLT_M",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"storedProcedureName": "[[dbo].[LOG_MIGRATION_EVENT]",
-										"storedProcedureParameters": {
-											"audit_key": {
-												"value": {
-													"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMddHHmmssfffffff')",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"batch_id": {
-												"value": {
-													"value": "@int(formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMdd'))",
-													"type": "Expression"
-												},
-												"type": "Int32"
-											},
-											"end_time": {
-												"value": {
-													"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
-													"type": "Expression"
-												},
-												"type": "DateTime"
-											},
-											"error_msg": {
-												"value": null,
-												"type": "String"
-											},
-											"file_table_id": {
-												"value": {
-													"value": "@item().FILE_TABLE_ID",
-													"type": "Expression"
-												},
-												"type": "Int32"
-											},
-											"pipeline_name": {
-												"value": {
-													"value": "@pipeline().Pipeline",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"row_count": {
-												"value": {
-													"value": "@activity('Copy_SalesLT_To_SalesLT_M').output.rowsCopied",
-													"type": "Expression"
-												},
-												"type": "Int32"
-											},
-											"src_schema_name": {
-												"value": {
-													"value": "@item().SRC_SCHEMA_NAME",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"src_table_name": {
-												"value": {
-													"value": "@item().SRC_TBL_NAME",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"start_time": {
-												"value": {
-													"value": "@variables('StartTimestamp')",
-													"type": "Expression"
-												},
-												"type": "DateTime"
-											},
-											"status": {
-												"value": "Success",
-												"type": "String"
-											},
-											"tgt_schema_name": {
-												"value": {
-													"value": "@item().TGT_SCHEMA_NAME",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"tgt_table_name": {
-												"value": {
-													"value": "@item().TGT_TBL_NAME",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"triggered_by": {
-												"value": {
-													"value": "@pipeline().TriggerName",
-													"type": "Expression"
-												},
-												"type": "String"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "LS_LOG_MIGRATION_EVENT",
-										"type": "LinkedServiceReference"
-									}
-								},
-								{
-									"name": "SP_Failure_Log",
-									"type": "SqlServerStoredProcedure",
-									"dependsOn": [
-										{
-											"activity": "Copy_SalesLT_To_SalesLT_M",
-											"dependencyConditions": [
-												"Failed"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"storedProcedureName": "[[dbo].[LOG_MIGRATION_EVENT]",
-										"storedProcedureParameters": {
-											"audit_key": {
-												"value": {
-													"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMddHHmmssfffffff')",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"batch_id": {
-												"value": {
-													"value": "@int(formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMdd'))",
-													"type": "Expression"
-												},
-												"type": "Int32"
-											},
-											"end_time": {
-												"value": null,
-												"type": "DateTime"
-											},
-											"error_msg": {
-												"value": {
-													"value": "@activity('Copy_SalesLT_To_SalesLT_M').error.message",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"file_table_id": {
-												"value": {
-													"value": "@item().FILE_TABLE_ID",
-													"type": "Expression"
-												},
-												"type": "Int32"
-											},
-											"pipeline_name": {
-												"value": {
-													"value": "@pipeline().Pipeline",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"row_count": {
-												"value": null,
-												"type": "Int32"
-											},
-											"src_schema_name": {
-												"value": {
-													"value": "@item().SRC_SCHEMA_NAME",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"src_table_name": {
-												"value": {
-													"value": "@item().SRC_TBL_NAME",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"start_time": {
-												"value": {
-													"value": "@variables('StartTimestamp')",
-													"type": "Expression"
-												},
-												"type": "DateTime"
-											},
-											"status": {
-												"value": "Fail",
-												"type": "String"
-											},
-											"tgt_schema_name": {
-												"value": {
-													"value": "@item().TGT_SCHEMA_NAME",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"tgt_table_name": {
-												"value": {
-													"value": "@item().TGT_TBL_NAME",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"triggered_by": {
-												"value": {
-													"value": "@pipeline().TriggerName",
-													"type": "Expression"
-												},
-												"type": "String"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "LS_LOG_MIGRATION_EVENT",
-										"type": "LinkedServiceReference"
-									}
-								},
-								{
-									"name": "GetMaxModifiedDate",
-									"type": "Lookup",
-									"dependsOn": [
-										{
-											"activity": "Copy_SalesLT_To_SalesLT_M",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "AzureSqlSource",
-											"sqlReaderQuery": {
-												"value": "@concat(\n  'SELECT MAX(ModifiedDate) AS MAX_MODIFIED_DATE FROM ',\n  item().SRC_SCHEMA_NAME, '.', item().SRC_TBL_NAME,\n  ' WHERE ModifiedDate > ''', variables('PreviousWatermark'), ''''\n)",
-												"type": "Expression"
-											},
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"dataset": {
-											"referenceName": "DS_Azure_SRC_SqlDBSalesLT_1203",
-											"type": "DatasetReference",
-											"parameters": {
-												"SRC_SCHEMA_NAME": {
-													"value": "@item().SRC_SCHEMA_NAME",
-													"type": "Expression"
-												},
-												"SRC_TABLE_NAME": {
-													"value": "@item().SRC_TBL_NAME",
-													"type": "Expression"
-												}
-											}
-										}
-									}
-								},
-								{
-									"name": "SetMaxWatermark",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "GetMaxModifiedDate",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "MaxWatermark",
-										"value": {
-											"value": "@if(\n  empty(activity('GetMaxModifiedDate').output.firstRow.MAX_MODIFIED_DATE),\n  variables('PreviousWatermark'),\n  activity('GetMaxModifiedDate').output.firstRow.MAX_MODIFIED_DATE\n)",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "SP_UpdateWatermark",
-									"type": "SqlServerStoredProcedure",
-									"dependsOn": [
-										{
-											"activity": "SetMaxWatermark",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"storedProcedureName": "[[dbo].[UpdateWatermark]",
-										"storedProcedureParameters": {
-											"FILE_TABLE_ID": {
-												"value": {
-													"value": "@item().FILE_TABLE_ID",
-													"type": "Expression"
-												},
-												"type": "Int32"
-											},
-											"SOURCE_SCHEMA": {
-												"value": {
-													"value": "@item().SRC_SCHEMA_NAME",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"SOURCE_TABLE_NAME": {
-												"value": {
-													"value": "@item().SRC_TBL_NAME",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"UPDATED_AT_TSTMP": {
-												"value": {
-													"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
-													"type": "Expression"
-												},
-												"type": "DateTime"
-											},
-											"UPDATED_BY": {
-												"value": {
-													"value": "@pipeline().TriggerName",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"WATERMARK_VALUE": {
-												"value": {
-													"value": "@variables('MaxWatermark')",
-													"type": "Expression"
-												},
-												"type": "DateTime"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "LS_LOG_MIGRATION_EVENT",
-										"type": "LinkedServiceReference"
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"variables": {
-					"StartTimestamp": {
-						"type": "String"
-					},
-					"PreviousWatermark": {
-						"type": "String"
-					},
-					"SqlQuery": {
-						"type": "String"
-					},
-					"MaxWatermark": {
-						"type": "String"
-					}
-				},
-				"folder": {
-					"name": "Table_To_Table_Migrations"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DS_Files_To_Tables_2502')]",
-				"[concat(variables('factoryId'), '/datasets/DS_Watermark_Tracker')]",
-				"[concat(variables('factoryId'), '/datasets/DS_Azure_SRC_SqlDBSalesLT_1203')]",
-				"[concat(variables('factoryId'), '/datasets/DS_Azure_TGT_SqlDBSalesLT_M_1203')]",
-				"[concat(variables('factoryId'), '/linkedServices/LS_LOG_MIGRATION_EVENT')]",
-				"[concat(variables('factoryId'), '/linkedServices/LS_STG_ADLS_1209')]"
 			]
 		},
 		{
@@ -6001,6 +5243,880 @@
 				"[concat(variables('factoryId'), '/datasets/DS_SB_VIVID_Insert_2502')]",
 				"[concat(variables('factoryId'), '/linkedServices/LS_Error_Log_Generic_2702')]",
 				"[concat(variables('factoryId'), '/linkedServices/LS_Delete_Blob_From_Landing_0803')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/P_Migrate_Oracle_HR_Schema')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "SetStartTimestamp",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "StartTimestamp",
+							"value": {
+								"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "GetSrcTgtTableMapping",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "SetStartTimestamp",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat(\n  'SELECT FILE_TABLE_ID, ',\n  'RIGHT(SRC_SCHEMA_NAME, 2) AS SRC_SCHEMA_NAME, ',\n  'RIGHT(TGT_SCHEMA_NAME, 2) AS TGT_SCHEMA_NAME, ',\n  'SRC_NAME AS SRC_TBL_NAME, ',\n  'TGT_NAME AS TGT_TBL_NAME ',\n  'FROM FILE_TABLE_MAPPING ',\n  'WHERE PIPLN_NM = ''', pipeline().Pipeline, ''' ',\n  'AND ROW_STS_CD = ''A'''\n)",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DS_Files_To_Tables_2502",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEachTableInMapping",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GetSrcTgtTableMapping",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetSrcTgtTableMapping').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "GetWatermarkValue",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@concat(\r\n  'SELECT WATERMARK_VALUE,WATERMARK_ID FROM dbo.WATERMARK_TRACKER ',\r\n  'WHERE SOURCE_SCHEMA = ''', item().SRC_SCHEMA_NAME, ''' ',\r\n  'AND SOURCE_TABLE_NAME = ''', item().SRC_TBL_NAME, ''' ', \r\n  'AND PIPELINE_NAME = ''', pipeline().Pipeline, ''' ',\r\n  'AND ROW_STS_CD = ''A'''\r\n)\r\n",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "DS_Watermark_Tracker",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									}
+								},
+								{
+									"name": "SetPreviousWatermark",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "GetWatermarkValue",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "PreviousWatermark",
+										"value": {
+											"value": "@if(\n    or(\n        empty(activity('GetWatermarkValue').output.firstRow),\n        empty(activity('GetWatermarkValue').output.firstRow.WATERMARK_VALUE)\n    ),\n    null,\n    activity('GetWatermarkValue').output.firstRow.WATERMARK_VALUE\n)",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "If_Watermark_Exists",
+									"type": "IfCondition",
+									"dependsOn": [
+										{
+											"activity": "SetPreviousWatermark",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@if(\n    empty(activity('GetWatermarkValue').output.firstRow),\n    false,\n    true\n)",
+											"type": "Expression"
+										},
+										"ifFalseActivities": [
+											{
+												"name": "SP_Watermark_Lookup_Missing_Log",
+												"type": "SqlServerStoredProcedure",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"storedProcedureName": "[[dbo].[LOG_MIGRATION_EVENT]",
+													"storedProcedureParameters": {
+														"audit_key": {
+															"value": {
+																"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMddHHmmssfffffff')",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"batch_id": {
+															"value": {
+																"value": "@int(formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMdd'))",
+																"type": "Expression"
+															},
+															"type": "Int32"
+														},
+														"end_time": {
+															"value": null,
+															"type": "DateTime"
+														},
+														"error_msg": {
+															"value": "Watermark row missing in tracker table.",
+															"type": "String"
+														},
+														"file_table_id": {
+															"value": {
+																"value": "@item().FILE_TABLE_ID",
+																"type": "Expression"
+															},
+															"type": "Int32"
+														},
+														"pipeline_name": {
+															"value": {
+																"value": "@pipeline().Pipeline",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"row_count": {
+															"value": null,
+															"type": "Int32"
+														},
+														"src_schema_name": {
+															"value": {
+																"value": "@item().SRC_SCHEMA_NAME",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"src_table_name": {
+															"value": {
+																"value": "@item().SRC_TBL_NAME",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"start_time": {
+															"value": {
+																"value": "@variables('StartTimestamp')",
+																"type": "Expression"
+															},
+															"type": "DateTime"
+														},
+														"status": {
+															"value": "WTMK / Mapping Issue.",
+															"type": "String"
+														},
+														"tgt_schema_name": {
+															"value": {
+																"value": "@item().TGT_SCHEMA_NAME",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"tgt_table_name": {
+															"value": {
+																"value": "@item().TGT_TBL_NAME",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"triggered_by": {
+															"value": {
+																"value": "@pipeline().TriggerName",
+																"type": "Expression"
+															},
+															"type": "String"
+														}
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "LS_LOG_MIGRATION_EVENT",
+													"type": "LinkedServiceReference"
+												}
+											}
+										],
+										"ifTrueActivities": [
+											{
+												"name": "CheckIfNewRows",
+												"type": "Lookup",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "OracleSource",
+														"oracleReaderQuery": {
+															"value": "@concat(\n'SELECT MAX(SRC_ROW_INSERT_TSTMP) AS MAX_MODIFIED_DATE FROM ',\nitem().SRC_SCHEMA_NAME,'.',item().SRC_TBL_NAME\n)",
+															"type": "Expression"
+														},
+														"partitionOption": "None",
+														"numberPrecision": 38,
+														"numberScale": 18,
+														"queryTimeout": "02:00:00"
+													},
+													"dataset": {
+														"referenceName": "DS_Oracle_HR_1903",
+														"type": "DatasetReference",
+														"parameters": {
+															"SRC_SCHEMA_NAME": {
+																"value": "@item().SRC_SCHEMA_NAME",
+																"type": "Expression"
+															},
+															"SRC_TBL_NAME": {
+																"value": "@item().SRC_TBL_NAME",
+																"type": "Expression"
+															}
+														}
+													}
+												}
+											},
+											{
+												"name": "SetSqlQuery",
+												"type": "SetVariable",
+												"dependsOn": [
+													{
+														"activity": "CheckIfNewRows",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"variableName": "SqlQuery",
+													"value": {
+														"value": "@concat(\n  'SELECT * FROM ',\n  item().SRC_SCHEMA_NAME, '.', item().SRC_TBL_NAME,\n  ' WHERE SRC_ROW_INSERT_TSTMP > ''',\n  if(\n      empty(variables('PreviousWatermark')),\n      '1900-01-01 00:00:00',\n      formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss')\n  ),\n  ''''\n)",
+														"type": "Expression"
+													}
+												}
+											},
+											{
+												"name": "HR_Schema_Copy",
+												"type": "Copy",
+												"dependsOn": [
+													{
+														"activity": "SetSqlQuery",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "OracleSource",
+														"additionalColumns": [
+															{
+																"name": "WATERMARK_ID",
+																"value": {
+																	"value": "@activity('GetWatermarkValue').output.firstRow.WATERMARK_ID",
+																	"type": "Expression"
+																}
+															},
+															{
+																"name": "FILE_TABLE_ID",
+																"value": {
+																	"value": "@item().FILE_TABLE_ID",
+																	"type": "Expression"
+																}
+															},
+															{
+																"name": "BATCH_ID",
+																"value": {
+																	"value": "@string(formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMdd'))",
+																	"type": "Expression"
+																}
+															},
+															{
+																"name": "SRC_TBL_NM",
+																"value": {
+																	"value": "@item().SRC_TBL_NAME",
+																	"type": "Expression"
+																}
+															},
+															{
+																"name": "PIPLN_NM",
+																"value": {
+																	"value": "@pipeline().Pipeline",
+																	"type": "Expression"
+																}
+															}
+														],
+														"oracleReaderQuery": {
+															"value": "@variables('SqlQuery')",
+															"type": "Expression"
+														},
+														"partitionOption": "None",
+														"numberPrecision": 38,
+														"numberScale": 18,
+														"queryTimeout": "02:00:00"
+													},
+													"sink": {
+														"type": "AzureSqlSink",
+														"writeBehavior": "insert",
+														"sqlWriterUseTableLock": false
+													},
+													"enableStaging": false,
+													"enableSkipIncompatibleRow": false,
+													"logSettings": {
+														"enableCopyActivityLog": true,
+														"copyActivityLogSettings": {
+															"logLevel": "Warning",
+															"enableReliableLogging": false
+														},
+														"logLocationSettings": {
+															"linkedServiceName": {
+																"referenceName": "LS_STG_ADLS_1209",
+																"type": "LinkedServiceReference"
+															},
+															"path": "logs"
+														}
+													},
+													"translator": {
+														"type": "TabularTranslator",
+														"typeConversion": true,
+														"typeConversionSettings": {
+															"allowDataTruncation": true,
+															"treatBooleanAsNumber": false
+														}
+													}
+												},
+												"inputs": [
+													{
+														"referenceName": "DS_Oracle_HR_1903",
+														"type": "DatasetReference",
+														"parameters": {
+															"SRC_SCHEMA_NAME": {
+																"value": "@item().SRC_SCHEMA_NAME",
+																"type": "Expression"
+															},
+															"SRC_TBL_NAME": {
+																"value": "@item().SRC_TBL_NAME",
+																"type": "Expression"
+															}
+														}
+													}
+												],
+												"outputs": [
+													{
+														"referenceName": "DS_Azure_TGT_SqlDBSalesLT_M_1203",
+														"type": "DatasetReference",
+														"parameters": {
+															"TGT_SCHEMA_NAME": {
+																"value": "@item().TGT_SCHEMA_NAME",
+																"type": "Expression"
+															},
+															"TGT_TABLE_NAME": {
+																"value": "@item().TGT_TBL_NAME",
+																"type": "Expression"
+															}
+														}
+													}
+												]
+											},
+											{
+												"name": "SP_Success_Log",
+												"type": "SqlServerStoredProcedure",
+												"dependsOn": [
+													{
+														"activity": "HR_Schema_Copy",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"storedProcedureName": "[[dbo].[LOG_MIGRATION_EVENT]",
+													"storedProcedureParameters": {
+														"audit_key": {
+															"value": {
+																"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMddHHmmssfffffff')",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"batch_id": {
+															"value": {
+																"value": "@int(formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMdd'))",
+																"type": "Expression"
+															},
+															"type": "Int32"
+														},
+														"end_time": {
+															"value": {
+																"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
+																"type": "Expression"
+															},
+															"type": "DateTime"
+														},
+														"error_msg": {
+															"value": null,
+															"type": "String"
+														},
+														"file_table_id": {
+															"value": {
+																"value": "@item().FILE_TABLE_ID",
+																"type": "Expression"
+															},
+															"type": "Int32"
+														},
+														"pipeline_name": {
+															"value": {
+																"value": "@pipeline().Pipeline",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"row_count": {
+															"value": {
+																"value": "@activity('HR_Schema_Copy').output.rowsCopied",
+																"type": "Expression"
+															},
+															"type": "Int32"
+														},
+														"src_schema_name": {
+															"value": {
+																"value": "@item().SRC_SCHEMA_NAME",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"src_table_name": {
+															"value": {
+																"value": "@item().SRC_TBL_NAME",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"start_time": {
+															"value": {
+																"value": "@variables('StartTimestamp')",
+																"type": "Expression"
+															},
+															"type": "DateTime"
+														},
+														"status": {
+															"value": "Success",
+															"type": "String"
+														},
+														"tgt_schema_name": {
+															"value": {
+																"value": "@item().TGT_SCHEMA_NAME",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"tgt_table_name": {
+															"value": {
+																"value": "@item().TGT_TBL_NAME",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"triggered_by": {
+															"value": {
+																"value": "@pipeline().TriggerName",
+																"type": "Expression"
+															},
+															"type": "String"
+														}
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "LS_LOG_MIGRATION_EVENT",
+													"type": "LinkedServiceReference"
+												}
+											},
+											{
+												"name": "SP_Failure_Log",
+												"type": "SqlServerStoredProcedure",
+												"dependsOn": [
+													{
+														"activity": "HR_Schema_Copy",
+														"dependencyConditions": [
+															"Failed"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"storedProcedureName": "[[dbo].[LOG_MIGRATION_EVENT]",
+													"storedProcedureParameters": {
+														"audit_key": {
+															"value": {
+																"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMddHHmmssfffffff')",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"batch_id": {
+															"value": {
+																"value": "@int(formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMdd'))",
+																"type": "Expression"
+															},
+															"type": "Int32"
+														},
+														"end_time": {
+															"value": null,
+															"type": "DateTime"
+														},
+														"error_msg": {
+															"value": {
+																"value": "@activity('HR_Schema_Copy').error.message",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"file_table_id": {
+															"value": {
+																"value": "@item().FILE_TABLE_ID",
+																"type": "Expression"
+															},
+															"type": "Int32"
+														},
+														"pipeline_name": {
+															"value": {
+																"value": "@pipeline().Pipeline",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"row_count": {
+															"value": null,
+															"type": "Int32"
+														},
+														"src_schema_name": {
+															"value": {
+																"value": "@item().SRC_SCHEMA_NAME",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"src_table_name": {
+															"value": {
+																"value": "@item().SRC_TBL_NAME",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"start_time": {
+															"value": {
+																"value": "@variables('StartTimestamp')",
+																"type": "Expression"
+															},
+															"type": "DateTime"
+														},
+														"status": {
+															"value": "Fail",
+															"type": "String"
+														},
+														"tgt_schema_name": {
+															"value": {
+																"value": "@item().TGT_SCHEMA_NAME",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"tgt_table_name": {
+															"value": {
+																"value": "@item().TGT_TBL_NAME",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"triggered_by": {
+															"value": {
+																"value": "@pipeline().TriggerName",
+																"type": "Expression"
+															},
+															"type": "String"
+														}
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "LS_LOG_MIGRATION_EVENT",
+													"type": "LinkedServiceReference"
+												}
+											},
+											{
+												"name": "GetMaxModifiedDate",
+												"type": "Lookup",
+												"dependsOn": [
+													{
+														"activity": "HR_Schema_Copy",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "OracleSource",
+														"oracleReaderQuery": {
+															"value": "@concat(\n  'SELECT MAX(SRC_ROW_INSERT_TSTMP) AS MAX_MODIFIED_DATE FROM ',\n  item().SRC_SCHEMA_NAME, '.', item().SRC_TBL_NAME,\n  ' WHERE SRC_ROW_INSERT_TSTMP > ''', variables('PreviousWatermark'), ''''\n)",
+															"type": "Expression"
+														},
+														"partitionOption": "None",
+														"numberPrecision": 38,
+														"numberScale": 18,
+														"queryTimeout": "02:00:00"
+													},
+													"dataset": {
+														"referenceName": "DS_Oracle_HR_1903",
+														"type": "DatasetReference",
+														"parameters": {
+															"SRC_SCHEMA_NAME": {
+																"value": "@item().SRC_SCHEMA_NAME",
+																"type": "Expression"
+															},
+															"SRC_TBL_NAME": {
+																"value": "@item().SRC_TBL_NAME",
+																"type": "Expression"
+															}
+														}
+													}
+												}
+											},
+											{
+												"name": "SetMaxWatermark",
+												"type": "SetVariable",
+												"dependsOn": [
+													{
+														"activity": "GetMaxModifiedDate",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"variableName": "MaxWatermark",
+													"value": {
+														"value": "@if(\n  empty(activity('GetMaxModifiedDate').output.firstRow.MAX_MODIFIED_DATE),\n  variables('PreviousWatermark'),\n  activity('GetMaxModifiedDate').output.firstRow.MAX_MODIFIED_DATE\n)",
+														"type": "Expression"
+													}
+												}
+											},
+											{
+												"name": "SP_UpdateWatermark",
+												"type": "SqlServerStoredProcedure",
+												"dependsOn": [
+													{
+														"activity": "SetMaxWatermark",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"storedProcedureName": "[[dbo].[UpdateWatermark]",
+													"storedProcedureParameters": {
+														"FILE_TABLE_ID": {
+															"value": {
+																"value": "@item().FILE_TABLE_ID",
+																"type": "Expression"
+															},
+															"type": "Int32"
+														},
+														"SOURCE_SCHEMA": {
+															"value": {
+																"value": "@item().SRC_SCHEMA_NAME",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"SOURCE_TABLE_NAME": {
+															"value": {
+																"value": "@item().SRC_TBL_NAME",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"UPDATED_AT_TSTMP": {
+															"value": {
+																"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
+																"type": "Expression"
+															},
+															"type": "DateTime"
+														},
+														"UPDATED_BY": {
+															"value": {
+																"value": "@pipeline().TriggerName",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"WATERMARK_VALUE": {
+															"value": {
+																"value": "@variables('MaxWatermark')",
+																"type": "Expression"
+															},
+															"type": "DateTime"
+														}
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "LS_LOG_MIGRATION_EVENT",
+													"type": "LinkedServiceReference"
+												}
+											}
+										]
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"StartTimestamp": {
+						"type": "String"
+					},
+					"PreviousWatermark": {
+						"type": "String"
+					},
+					"SqlQuery": {
+						"type": "String"
+					},
+					"MaxWatermark": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "Oracle"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_Files_To_Tables_2502')]",
+				"[concat(variables('factoryId'), '/datasets/DS_Watermark_Tracker')]",
+				"[concat(variables('factoryId'), '/linkedServices/LS_LOG_MIGRATION_EVENT')]",
+				"[concat(variables('factoryId'), '/datasets/DS_Oracle_HR_1903')]",
+				"[concat(variables('factoryId'), '/datasets/DS_Azure_TGT_SqlDBSalesLT_M_1203')]",
+				"[concat(variables('factoryId'), '/linkedServices/LS_STG_ADLS_1209')]"
 			]
 		},
 		{
@@ -11750,6 +11866,41 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_Oracle_HR_1903')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Oracle_ADF_USER_1903",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"SRC_SCHEMA_NAME": {
+						"type": "String"
+					},
+					"SRC_TBL_NAME": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "OracleTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().SRC_SCHEMA_NAME",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().SRC_TBL_NAME",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_Oracle_ADF_USER_1903')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_Org_0805')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -13150,6 +13301,36 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/LS_Oracle_ADF_USER_1903')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "Oracle",
+				"version": "2.0",
+				"typeProperties": {
+					"server": "[parameters('LS_Oracle_ADF_USER_1903_properties_typeProperties_server')]",
+					"authenticationType": "Basic",
+					"username": "[parameters('LS_Oracle_ADF_USER_1903_properties_typeProperties_username')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_Oracle_ADF_USER_1903_password')]"
+					},
+					"encryptionClient": "accepted",
+					"encryptionTypesClient": "(AES128, AES192, AES256, 3DES112, 3DES168)",
+					"cryptoChecksumClient": "accepted",
+					"cryptoChecksumTypesClient": "(SHA1, SHA256, SHA384, SHA512)"
+				},
+				"connectVia": {
+					"referenceName": "SHIR-ONPREM-ORACLE",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/SHIR-ONPREM-ORACLE')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/LS_RawFiles_Generic_2702')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -13406,12 +13587,14 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/SHIR-OnPremise')]",
+			"name": "[concat(parameters('factoryName'), '/SHIR-ONPREM-ORACLE')]",
 			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"type": "SelfHosted",
-				"typeProperties": {}
+				"typeProperties": {
+					"selfContainedInteractiveAuthoringEnabled": true
+				}
 			},
 			"dependsOn": []
 		},

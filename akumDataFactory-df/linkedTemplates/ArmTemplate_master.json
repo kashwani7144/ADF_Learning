@@ -43,6 +43,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_LOG_MIGRATION_EVENT'"
 		},
+		"LS_Oracle_ADF_USER_1903_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_Oracle_ADF_USER_1903'"
+		},
 		"LS_RawFiles_Generic_2702_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'LS_RawFiles_Generic_2702'"
@@ -138,6 +142,14 @@
 		"LS_LOG_MIGRATION_EVENT_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "akum"
+		},
+		"LS_Oracle_ADF_USER_1903_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "localhost:1521/orcl"
+		},
+		"LS_Oracle_ADF_USER_1903_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "adf_user"
 		},
 		"LS_Run_DDLs_Azure_2507_properties_typeProperties_server": {
 			"type": "string",
@@ -242,6 +254,9 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"LS_Oracle_ADF_USER_1903_password": {
+						"value": "[parameters('LS_Oracle_ADF_USER_1903_password')]"
+					},
 					"LS_AZURE_ORACLE_2507_password": {
 						"value": "[parameters('LS_AZURE_ORACLE_2507_password')]"
 					},
@@ -284,11 +299,11 @@
 					"LS_SB_VIVID_Insert_2502_password": {
 						"value": "[parameters('LS_SB_VIVID_Insert_2502_password')]"
 					},
-					"LS_SNFLK_ETLSB_VIVID_password": {
-						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_password')]"
+					"LS_Oracle_ADF_USER_1903_properties_typeProperties_server": {
+						"value": "[parameters('LS_Oracle_ADF_USER_1903_properties_typeProperties_server')]"
 					},
-					"LS_STG_ADLS_1209_connectionString": {
-						"value": "[parameters('LS_STG_ADLS_1209_connectionString')]"
+					"LS_Oracle_ADF_USER_1903_properties_typeProperties_username": {
+						"value": "[parameters('LS_Oracle_ADF_USER_1903_properties_typeProperties_username')]"
 					},
 					"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
 						"value": "[parameters('LS_AZURE_ORACLE_2507_properties_typeProperties_server')]"
@@ -370,15 +385,6 @@
 					},
 					"LS_SB_VIVID_Insert_2502_properties_typeProperties_userName": {
 						"value": "[parameters('LS_SB_VIVID_Insert_2502_properties_typeProperties_userName')]"
-					},
-					"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database": {
-						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database')]"
-					},
-					"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role": {
-						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role')]"
-					},
-					"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host": {
-						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host')]"
 					}
 				}
 			},
@@ -398,11 +404,26 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"LS_SNFLK_ETLSB_VIVID_password": {
+						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_password')]"
+					},
+					"LS_STG_ADLS_1209_connectionString": {
+						"value": "[parameters('LS_STG_ADLS_1209_connectionString')]"
+					},
 					"LS__SB_ADVW_password": {
 						"value": "[parameters('LS__SB_ADVW_password')]"
 					},
 					"Par_ETLSANDBOX_accountKey": {
 						"value": "[parameters('Par_ETLSANDBOX_accountKey')]"
+					},
+					"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database": {
+						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database')]"
+					},
+					"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role": {
+						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role')]"
+					},
+					"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host": {
+						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host')]"
 					},
 					"LS__SB_ADVW_properties_typeProperties_server": {
 						"value": "[parameters('LS__SB_ADVW_properties_typeProperties_server')]"

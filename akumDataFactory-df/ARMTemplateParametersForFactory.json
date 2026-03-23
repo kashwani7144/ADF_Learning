@@ -32,6 +32,9 @@
 		"LS_LOG_MIGRATION_EVENT_password": {
 			"value": ""
 		},
+		"LS_Oracle_ADF_USER_1903_password": {
+			"value": ""
+		},
 		"LS_RawFiles_Generic_2702_connectionString": {
 			"value": ""
 		},
@@ -103,6 +106,12 @@
 		},
 		"LS_LOG_MIGRATION_EVENT_properties_typeProperties_userName": {
 			"value": "akum"
+		},
+		"LS_Oracle_ADF_USER_1903_properties_typeProperties_server": {
+			"value": "localhost:1521/orcl"
+		},
+		"LS_Oracle_ADF_USER_1903_properties_typeProperties_username": {
+			"value": "adf_user"
 		},
 		"LS_Run_DDLs_Azure_2507_properties_typeProperties_server": {
 			"value": "svetlsandbox.database.windows.net"

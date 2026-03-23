@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "akumDataFactory-df"
 		},
+		"LS_Oracle_ADF_USER_1903_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_Oracle_ADF_USER_1903'"
+		},
 		"LS_AZURE_ORACLE_2507_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_AZURE_ORACLE_2507'"
@@ -63,13 +67,13 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_SB_VIVID_Insert_2502'"
 		},
-		"LS_SNFLK_ETLSB_VIVID_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'LS_SNFLK_ETLSB_VIVID'"
+		"LS_Oracle_ADF_USER_1903_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "localhost:1521/orcl"
 		},
-		"LS_STG_ADLS_1209_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'LS_STG_ADLS_1209'"
+		"LS_Oracle_ADF_USER_1903_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "adf_user"
 		},
 		"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
 			"type": "string",
@@ -178,18 +182,6 @@
 		"LS_SB_VIVID_Insert_2502_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "akum"
-		},
-		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "ETLSANDBOX"
-		},
-		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role": {
-			"type": "string",
-			"defaultValue": "ACCOUNTADMIN"
-		},
-		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host": {
-			"type": "string",
-			"defaultValue": "LPOYIGM-IN47228.snowflakecomputing.com"
 		}
 	},
 	"variables": {
@@ -197,12 +189,14 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/SHIR-OnPremise')]",
+			"name": "[concat(parameters('factoryName'), '/SHIR-ONPREM-ORACLE')]",
 			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"type": "SelfHosted",
-				"typeProperties": {}
+				"typeProperties": {
+					"selfContainedInteractiveAuthoringEnabled": true
+				}
 			},
 			"dependsOn": []
 		},
@@ -771,6 +765,36 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/LS_Oracle_ADF_USER_1903')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "Oracle",
+				"version": "2.0",
+				"typeProperties": {
+					"server": "[parameters('LS_Oracle_ADF_USER_1903_properties_typeProperties_server')]",
+					"authenticationType": "Basic",
+					"username": "[parameters('LS_Oracle_ADF_USER_1903_properties_typeProperties_username')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_Oracle_ADF_USER_1903_password')]"
+					},
+					"encryptionClient": "accepted",
+					"encryptionTypesClient": "(AES128, AES192, AES256, 3DES112, 3DES168)",
+					"cryptoChecksumClient": "accepted",
+					"cryptoChecksumTypesClient": "(SHA1, SHA256, SHA384, SHA512)"
+				},
+				"connectVia": {
+					"referenceName": "SHIR-ONPREM-ORACLE",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/SHIR-ONPREM-ORACLE')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/AutoResolveIntegrationRuntime')]",
 			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
 			"apiVersion": "2018-06-01",
@@ -793,6 +817,41 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Oracle_HR_1903')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Oracle_ADF_USER_1903",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"SRC_SCHEMA_NAME": {
+						"type": "String"
+					},
+					"SRC_TBL_NAME": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "OracleTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().SRC_SCHEMA_NAME",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().SRC_TBL_NAME",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_Oracle_ADF_USER_1903')]"
 			]
 		},
 		{
@@ -1132,55 +1191,6 @@
 						"type": "SecureString",
 						"value": "[parameters('LS_SB_VIVID_Insert_2502_password')]"
 					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_SNFLK_ETLSB_VIVID')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "SnowflakeV2",
-				"typeProperties": {
-					"authenticationType": "Basic",
-					"accountIdentifier": "LPOYIGM-IN47228",
-					"user": "KMRASHWANI12",
-					"database": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database')]",
-					"warehouse": "COMPUTE_WH",
-					"role": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role')]",
-					"host": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_password')]"
-					}
-				},
-				"version": "1.1",
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_STG_ADLS_1209')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('LS_STG_ADLS_1209_connectionString')]"
 				},
 				"connectVia": {
 					"referenceName": "AutoResolveIntegrationRuntime",
