@@ -175,7 +175,67 @@
 								"expression": {
 									"value": "@if(\n    empty(activity('GetWatermarkValue').output.firstRow),\n    false,\n    true\n)",
 									"type": "Expression"
-								}
+								},
+								"ifTrueActivities": [
+									{
+										"name": "CheckIfNewRows",
+										"type": "Lookup",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "OracleSource",
+												"oracleReaderQuery": {
+													"value": "@concat(\n'SELECT MAX(SRC_ROW_INSERT_TSTMP) AS MAX_MODIFIED_DATE FROM ',\nitem().SRC_SCHEMA_NAME,'.',item().SRC_TBL_NAME\n)",
+													"type": "Expression"
+												},
+												"partitionOption": "None",
+												"numberPrecision": 38,
+												"numberScale": 18,
+												"queryTimeout": "02:00:00"
+											},
+											"dataset": {
+												"referenceName": "DS_Oracle_HR_1903",
+												"type": "DatasetReference",
+												"parameters": {
+													"SRC_SCHEMA_NAME": "HR",
+													"SRC_TBL_NAME": "EMPLOYEES"
+												}
+											}
+										}
+									},
+									{
+										"name": "SetSqlQuery",
+										"type": "SetVariable",
+										"dependsOn": [
+											{
+												"activity": "CheckIfNewRows",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"policy": {
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"variableName": "SqlQuery",
+											"value": {
+												"value": "@concat(\n  'SELECT * FROM ',\n  item().SRC_SCHEMA_NAME, '.', item().SRC_TBL_NAME,\n  ' WHERE SRC_ROW_INSERT_TSTMP > ''',\n  if(\n      empty(variables('PreviousWatermark')),\n      '1900-01-01 00:00:00',\n      formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss')\n  ),\n  ''''\n)",
+												"type": "Expression"
+											}
+										}
+									}
+								]
 							}
 						}
 					]
@@ -187,6 +247,9 @@
 				"type": "String"
 			},
 			"PreviousWatermark": {
+				"type": "String"
+			},
+			"SqlQuery": {
 				"type": "String"
 			}
 		},
