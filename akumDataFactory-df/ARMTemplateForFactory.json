@@ -5564,7 +5564,7 @@
 												"typeProperties": {
 													"variableName": "SqlQuery",
 													"value": {
-														"value": "@concat(\r\n  'SELECT * FROM ',\r\n  item().SRC_SCHEMA_NAME, '.', item().SRC_TBL_NAME,\r\n  ' WHERE SRC_ROW_INSERT_TSTMP > TO_TIMESTAMP(''',\r\n  if(\r\n      empty(variables('PreviousWatermark')),\r\n      '1900-01-01 00:00:00',\r\n      formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss')\r\n  ),\r\n  ''', ''YYYY-MM-DD HH24:MI:SS'')'\r\n)\r\n",
+														"value": "@concat(\n  'SELECT * FROM ',\n  item().SRC_SCHEMA_NAME, '.', item().SRC_TBL_NAME,\n  ' WHERE SRC_ROW_INSERT_TSTMP >= TO_TIMESTAMP(''',\n  if(\n      empty(variables('PreviousWatermark')),\n      '1900-01-01 00:00:00',\n      formatDateTime(variables('PreviousWatermark'), 'yyyy-MM-dd HH:mm:ss')\n  ),\n  ''', ''YYYY-MM-DD HH24:MI:SS'')'\n)\n",
 														"type": "Expression"
 													}
 												}
