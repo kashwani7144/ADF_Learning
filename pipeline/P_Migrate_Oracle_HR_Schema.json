@@ -233,7 +233,10 @@
 												"additionalColumns": [
 													{
 														"name": "WATERMARK_ID",
-														"value": "$$COLUMN:"
+														"value": {
+															"value": "@activity('GetWatermarkValue').output.firstRow.WATERMARK_ID",
+															"type": "Expression"
+														}
 													},
 													{
 														"name": "FILE_TABLE_ID",
