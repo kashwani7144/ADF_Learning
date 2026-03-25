@@ -1,0 +1,14 @@
+{
+	"name": "DF_SCD_T2_Oracle_HR_Customer",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				""
+			]
+		}
+	}
+}
