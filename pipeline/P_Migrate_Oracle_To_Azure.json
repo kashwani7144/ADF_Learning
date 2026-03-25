@@ -43,7 +43,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"SRC_SCHEMA_NAME": "HR",
-							"SRC_TBL_NAME": "LOCATIONS"
+							"SRC_TBL_NAME": "DEPARTMENTS"
 						}
 					}
 				],
@@ -53,7 +53,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"SRC_SCHEMA_NAME": "OHR",
-							"SRC_TABLE_NAME": "LOCATIONS"
+							"SRC_TABLE_NAME": "DEPARTMENTS"
 						}
 					}
 				]
