@@ -43,7 +43,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"SRC_SCHEMA_NAME": "HR",
-							"SRC_TBL_NAME": "EMPLOYEES"
+							"SRC_TBL_NAME": "JOB_HISTORY"
 						}
 					}
 				],
@@ -53,7 +53,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"SRC_SCHEMA_NAME": "OHR",
-							"SRC_TABLE_NAME": "EMPLOYEES"
+							"SRC_TABLE_NAME": "JOB_HISTORY"
 						}
 					}
 				]
