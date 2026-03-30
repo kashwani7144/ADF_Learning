@@ -1,0 +1,25 @@
+{
+	"name": "DF_SCD_T2_Inc_OHR_Employees",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_OHR_EMPLOYEES_3003",
+						"type": "DatasetReference"
+					},
+					"name": "OHREmployeesSrc"
+				}
+			],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> OHREmployeesSrc"
+			]
+		}
+	}
+}
