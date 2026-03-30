@@ -10,15 +10,54 @@
 						"type": "DatasetReference"
 					},
 					"name": "OHREmployeesSrc"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_DIM_EMP_DETAILS_3003",
+						"type": "DatasetReference"
+					},
+					"name": "DimEmployeeDetails"
 				}
 			],
 			"sinks": [],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "SourceJoinDimension"
+				}
+			],
 			"scriptLines": [
+				"source(output(",
+				"          EMPLOYEE_ID as string,",
+				"          FIRST_NAME as string,",
+				"          LAST_NAME as string,",
+				"          EMAIL as string,",
+				"          PHONE_NUMBER as string,",
+				"          HIRE_DATE as timestamp,",
+				"          JOB_ID as string,",
+				"          SALARY as decimal(8,2),",
+				"          COMMISSION_PCT as decimal(2,2),",
+				"          MANAGER_ID as integer,",
+				"          DEPARTMENT_ID as integer,",
+				"          SRC_ROW_INSERT_TSTMP as timestamp,",
+				"          INSERT_TSTMP_IST as timestamp",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     enableCdc: true,",
+				"     mode: 'read',",
+				"     skipInitialLoad: true,",
+				"     waterMarkColumn: 'INSERT_TSTMP_IST',",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> OHREmployeesSrc",
 				"source(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> OHREmployeesSrc"
+				"     format: 'table') ~> DimEmployeeDetails",
+				"OHREmployeesSrc, DimEmployeeDetails join(EMPLOYEE_ID == ERROR_FUNCTION(''),",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> SourceJoinDimension"
 			]
 		}
 	}

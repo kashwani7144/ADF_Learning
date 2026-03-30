@@ -1,0 +1,30 @@
+{
+	"name": "DS_DIM_EMP_DETAILS_3003",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_Azure_SB_Lkp",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"DIM_SCHEMA_NAME": {
+				"type": "String"
+			},
+			"DIM_TBL_NAME": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().DIM_SCHEMA_NAME",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().DIM_TBL_NAME",
+				"type": "Expression"
+			}
+		}
+	}
+}
