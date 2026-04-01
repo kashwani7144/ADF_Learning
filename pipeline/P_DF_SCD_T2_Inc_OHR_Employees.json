@@ -17,7 +17,17 @@
 				"typeProperties": {
 					"dataflow": {
 						"referenceName": "DF_SCD_T2_Inc_OHR_Employees",
-						"type": "DataFlowReference"
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"OHREmployeesSrc": {
+								"SRC_SCHEMA_NAME": "OHR",
+								"SRC_TBL_NAME": "EMPLOYEES"
+							},
+							"DimEmployeeDetails": {
+								"DIM_SCHEMA_NAME": "DWH",
+								"DIM_TBL_NAME": "DIM_EMPLOYEE_DETAILS"
+							}
+						}
 					},
 					"compute": {
 						"coreCount": 8,
