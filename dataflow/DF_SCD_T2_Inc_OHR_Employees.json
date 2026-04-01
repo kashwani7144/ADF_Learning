@@ -228,7 +228,6 @@
 				"     skipDuplicateMapOutputs: true,",
 				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
-				"          EMPLOYEE_SID,",
 				"          EMPLOYEE_ID,",
 				"          FIRST_NAME,",
 				"          LAST_NAME,",
