@@ -23,6 +23,12 @@
 			"transformations": [
 				{
 					"name": "SourceJoinDimension"
+				},
+				{
+					"name": "SelectDistinctColumns"
+				},
+				{
+					"name": "DcTrackChanges"
 				}
 			],
 			"scriptLines": [
@@ -84,7 +90,53 @@
 				"     joinType:'left',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> SourceJoinDimension"
+				"     broadcast: 'auto')~> SourceJoinDimension",
+				"SourceJoinDimension select(mapColumn(",
+				"          EMPLOYEE_ID = OHREmployeesSrc@EMPLOYEE_ID,",
+				"          FIRST_NAME = OHREmployeesSrc@FIRST_NAME,",
+				"          LAST_NAME = OHREmployeesSrc@LAST_NAME,",
+				"          EMAIL = OHREmployeesSrc@EMAIL,",
+				"          PHONE_NUMBER = OHREmployeesSrc@PHONE_NUMBER,",
+				"          HIRE_DATE = OHREmployeesSrc@HIRE_DATE,",
+				"          JOB_ID = OHREmployeesSrc@JOB_ID,",
+				"          SALARY = OHREmployeesSrc@SALARY,",
+				"          COMMISSION_PCT = OHREmployeesSrc@COMMISSION_PCT,",
+				"          MANAGER_ID = OHREmployeesSrc@MANAGER_ID,",
+				"          DEPARTMENT_ID = OHREmployeesSrc@DEPARTMENT_ID,",
+				"          SRC_ROW_INSERT_TSTMP = OHREmployeesSrc@SRC_ROW_INSERT_TSTMP,",
+				"          INSERT_TSTMP_IST = OHREmployeesSrc@INSERT_TSTMP_IST,",
+				"          TGT_EMPLOYEE_ID = DimEmployeeDetails@EMPLOYEE_ID,",
+				"          TGT_FIRST_NAME = DimEmployeeDetails@FIRST_NAME,",
+				"          TGT_LAST_NAME = DimEmployeeDetails@LAST_NAME,",
+				"          TGT_EMAIL = DimEmployeeDetails@EMAIL,",
+				"          TGT_PHONE_NUMBER = DimEmployeeDetails@PHONE_NUMBER,",
+				"          TGT_HIRE_DATE = DimEmployeeDetails@HIRE_DATE,",
+				"          TGT_JOB_ID = DimEmployeeDetails@JOB_ID,",
+				"          TGT_SALARY = DimEmployeeDetails@SALARY,",
+				"          TGT_COMMISSION_PCT = DimEmployeeDetails@COMMISSION_PCT,",
+				"          TGT_MANAGER_ID = DimEmployeeDetails@MANAGER_ID,",
+				"          TGT_DEPARTMENT_ID = DimEmployeeDetails@DEPARTMENT_ID,",
+				"          TGT_SRC_ROW_INSERT_TSTMP = DimEmployeeDetails@SRC_ROW_INSERT_TSTMP",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SelectDistinctColumns",
+				"SelectDistinctColumns derive(isChanged = iif(\r",
+				"     md5(EMPLOYEE_ID)  != md5(TGT_EMPLOYEE_ID)  ||\r",
+				"    md5(FIRST_NAME) != md5(TGT_FIRST_NAME) ||\r",
+				"    md5(LAST_NAME)  != md5(TGT_LAST_NAME)  ||\r",
+				"     md5(EMAIL)      != md5(TGT_EMAIL)      ||\r",
+				"    md5(PHONE_NUMBER)    != md5(TGT_PHONE_NUMBER)    ||\r",
+				"    md5(HIRE_DATE)       != md5(TGT_HIRE_DATE)       ||\r",
+				"    md5(JOB_ID)    != md5(TGT_JOB_ID)    ||\r",
+				"    md5(SALARY)    != md5(TGT_SALARY)    ||\r",
+				"    md5(COMMISSION_PCT)    != md5(TGT_COMMISSION_PCT)    ||\r",
+				"    \r",
+				"    md5(MANAGER_ID) != md5(TGT_MANAGER_ID) ||\r",
+				"    md5(DEPARTMENT_ID)    != md5(TGT_DEPARTMENT_ID),\r",
+				"    true(),\r",
+				"    false()\r",
+				")\r",
+				") ~> DcTrackChanges"
 			]
 		}
 	}
