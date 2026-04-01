@@ -26,6 +26,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "DwhDimEmployeeInsert"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_DIM_EMPLOYEE_0104",
+						"type": "DatasetReference"
+					},
+					"name": "DwhDimEmployeeUpdate"
 				}
 			],
 			"transformations": [
@@ -46,6 +53,12 @@
 				},
 				{
 					"name": "DcAddMetadataColumns"
+				},
+				{
+					"name": "DcExpiredRowSetup"
+				},
+				{
+					"name": "UpdateRowCondition"
 				}
 			],
 			"scriptLines": [
@@ -122,6 +135,7 @@
 				"          DEPARTMENT_ID = OHREmployeesSrc@DEPARTMENT_ID,",
 				"          SRC_ROW_INSERT_TSTMP = OHREmployeesSrc@SRC_ROW_INSERT_TSTMP,",
 				"          INSERT_TSTMP_IST = OHREmployeesSrc@INSERT_TSTMP_IST,",
+				"          EMPLOYEE_SID,",
 				"          TGT_EMPLOYEE_ID = DimEmployeeDetails@EMPLOYEE_ID,",
 				"          TGT_FIRST_NAME = DimEmployeeDetails@FIRST_NAME,",
 				"          TGT_LAST_NAME = DimEmployeeDetails@LAST_NAME,",
@@ -173,7 +187,12 @@
 				"          BATCH_ID = toInteger(toString(currentDate(), 'yyyyMMdd')),",
 				"          ROW_EFF_DT = currentDate(),",
 				"          ROW_EXPIR_DT = toDate('9999-12-31'),",
-				"          ROW_STS_CD = 'A') ~> DcAddMetadataColumns",
+				"          ROW_STS_CD = 'A',",
+				"          PIPELINE_NAME = 'P_DF_SCD_T2_Inc_OHR_Employees') ~> DcAddMetadataColumns",
+				"CheckNewOrChangedRow@ChangedRows derive(ROW_STS_CD = 'I',",
+				"          ROW_EXPIR_DT = toDate(fromUTC(currentUTC(), 'India Standard Time')),",
+				"          LST_UPD_TSTMP_IST = fromUTC(currentUTC(), 'India Standard Time')) ~> DcExpiredRowSetup",
+				"DcExpiredRowSetup alterRow(updateIf(true())) ~> UpdateRowCondition",
 				"DcAddMetadataColumns sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -210,7 +229,67 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError') ~> DwhDimEmployeeInsert"
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          EMPLOYEE_SID,",
+				"          EMPLOYEE_ID,",
+				"          FIRST_NAME,",
+				"          LAST_NAME,",
+				"          EMAIL,",
+				"          PHONE_NUMBER,",
+				"          HIRE_DATE,",
+				"          JOB_ID,",
+				"          SALARY,",
+				"          COMMISSION_PCT,",
+				"          MANAGER_ID,",
+				"          DEPARTMENT_ID,",
+				"          SRC_ROW_INSERT_TSTMP,",
+				"          WATERMARK_VALUE = WATERMARK_ID,",
+				"          BATCH_ID,",
+				"          WATERMARK_ID,",
+				"          ROW_EFF_DT,",
+				"          ROW_EXPIR_DT,",
+				"          ROW_STS_CD,",
+				"          INSERT_TSTMP_IST",
+				"     )) ~> DwhDimEmployeeInsert",
+				"UpdateRowCondition sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          EMPLOYEE_SID as integer,",
+				"          EMPLOYEE_ID as string,",
+				"          FIRST_NAME as string,",
+				"          LAST_NAME as string,",
+				"          EMAIL as string,",
+				"          PHONE_NUMBER as string,",
+				"          HIRE_DATE as timestamp,",
+				"          JOB_ID as string,",
+				"          SALARY as decimal(8,2),",
+				"          COMMISSION_PCT as decimal(2,2),",
+				"          MANAGER_ID as integer,",
+				"          DEPARTMENT_ID as integer,",
+				"          SRC_ROW_INSERT_TSTMP as timestamp,",
+				"          WATERMARK_VALUE as string,",
+				"          FILE_TABLE_ID as integer,",
+				"          BATCH_ID as integer,",
+				"          SRC_TBL_NM as string,",
+				"          PIPELINE_NAME as string,",
+				"          ROW_VERSION as binary,",
+				"          WATERMARK_ID as integer,",
+				"          ROW_EFF_DT as date,",
+				"          ROW_EXPIR_DT as date,",
+				"          ROW_STS_CD as string,",
+				"          INSERT_TSTMP_IST as timestamp,",
+				"          LST_UPD_TSTMP_IST as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:true,",
+				"     upsertable:false,",
+				"     keys:['EMPLOYEE_SID'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> DwhDimEmployeeUpdate"
 			]
 		}
 	}
