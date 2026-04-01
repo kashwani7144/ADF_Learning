@@ -19,7 +19,15 @@
 					"name": "DimEmployeeDetails"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_DIM_EMPLOYEE_0104",
+						"type": "DatasetReference"
+					},
+					"name": "DwhDimEmployeeInsert"
+				}
+			],
 			"transformations": [
 				{
 					"name": "SourceJoinDimension"
@@ -29,6 +37,15 @@
 				},
 				{
 					"name": "DcTrackChanges"
+				},
+				{
+					"name": "CheckNewOrChangedRow"
+				},
+				{
+					"name": "NewRowsUnionChangedRows"
+				},
+				{
+					"name": "DcAddMetadataColumns"
 				}
 			],
 			"scriptLines": [
@@ -136,7 +153,64 @@
 				"    true(),\r",
 				"    false()\r",
 				")\r",
-				") ~> DcTrackChanges"
+				") ~> DcTrackChanges",
+				"DcTrackChanges split(isNull(TGT_EMPLOYEE_ID),",
+				"     !isNull(TGT_EMPLOYEE_ID) && (\r",
+				"  coalesce(FIRST_NAME , '') != coalesce(TGT_FIRST_NAME , '') ||\r",
+				"  coalesce(LAST_NAME  , '') != coalesce(TGT_LAST_NAME  , '') ||\r",
+				"  coalesce(EMAIL      , '') != coalesce(TGT_EMAIL      , '') || \r",
+				"  coalesce(PHONE_NUMBER, '') != coalesce(TGT_PHONE_NUMBER, '') ||\r",
+				"  coalesce(HIRE_DATE, toDate('1900-01-01')) != coalesce(TGT_HIRE_DATE, toDate('1900-01-01')) ||\r",
+				"  coalesce(JOB_ID, '') != coalesce(TGT_JOB_ID, '') ||\r",
+				"  coalesce(SALARY, 0) != coalesce(TGT_SALARY, 0) ||\r",
+				"  coalesce(COMMISSION_PCT, 0.0) != coalesce(TGT_COMMISSION_PCT, 0.0) ||\r",
+				"  coalesce(MANAGER_ID, 0) != coalesce(TGT_MANAGER_ID, 0) ||\r",
+				"  coalesce(DEPARTMENT_ID, 0) != coalesce(TGT_DEPARTMENT_ID, 0)\r",
+				"),",
+				"     disjoint: false) ~> CheckNewOrChangedRow@(NewRows, ChangedRows)",
+				"CheckNewOrChangedRow@NewRows, CheckNewOrChangedRow@ChangedRows union(byName: true)~> NewRowsUnionChangedRows",
+				"NewRowsUnionChangedRows derive(WATERMARK_ID = 3,",
+				"          BATCH_ID = toInteger(toString(currentDate(), 'yyyyMMdd')),",
+				"          ROW_EFF_DT = currentDate(),",
+				"          ROW_EXPIR_DT = toDate('9999-12-31'),",
+				"          ROW_STS_CD = 'A') ~> DcAddMetadataColumns",
+				"DcAddMetadataColumns sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          EMPLOYEE_SID as integer,",
+				"          EMPLOYEE_ID as string,",
+				"          FIRST_NAME as string,",
+				"          LAST_NAME as string,",
+				"          EMAIL as string,",
+				"          PHONE_NUMBER as string,",
+				"          HIRE_DATE as timestamp,",
+				"          JOB_ID as string,",
+				"          SALARY as decimal(8,2),",
+				"          COMMISSION_PCT as decimal(2,2),",
+				"          MANAGER_ID as integer,",
+				"          DEPARTMENT_ID as integer,",
+				"          SRC_ROW_INSERT_TSTMP as timestamp,",
+				"          WATERMARK_VALUE as string,",
+				"          FILE_TABLE_ID as integer,",
+				"          BATCH_ID as integer,",
+				"          SRC_TBL_NM as string,",
+				"          PIPELINE_NAME as string,",
+				"          ROW_VERSION as binary,",
+				"          WATERMARK_ID as integer,",
+				"          ROW_EFF_DT as date,",
+				"          ROW_EXPIR_DT as date,",
+				"          ROW_STS_CD as string,",
+				"          INSERT_TSTMP_IST as timestamp,",
+				"          LST_UPD_TSTMP_IST as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> DwhDimEmployeeInsert"
 			]
 		}
 	}
