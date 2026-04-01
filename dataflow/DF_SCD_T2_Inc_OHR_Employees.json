@@ -246,6 +246,7 @@
 				"          SRC_ROW_INSERT_TSTMP,",
 				"          WATERMARK_VALUE = WATERMARK_ID,",
 				"          BATCH_ID,",
+				"          PIPELINE_NAME,",
 				"          WATERMARK_ID,",
 				"          ROW_EFF_DT,",
 				"          ROW_EXPIR_DT,",
