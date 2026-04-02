@@ -114,7 +114,7 @@
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> DimEmployeeDetails",
-				"OHREmployeesSrc, DimEmployeeDetails join(ERROR_FUNCTION('') == ERROR_FUNCTION(''),",
+				"OHREmployeesSrc, DimEmployeeDetails join(OHREmployeesSrc@EMPLOYEE_ID == DimEmployeeDetails@EMPLOYEE_ID,",
 				"     joinType:'left',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
