@@ -59,6 +59,9 @@
 				},
 				{
 					"name": "UpdateRowCondition"
+				},
+				{
+					"name": "FilterActiveRows"
 				}
 			],
 			"scriptLines": [
@@ -114,7 +117,7 @@
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> DimEmployeeDetails",
-				"OHREmployeesSrc, DimEmployeeDetails join(OHREmployeesSrc@EMPLOYEE_ID == DimEmployeeDetails@EMPLOYEE_ID,",
+				"OHREmployeesSrc, FilterActiveRows join(OHREmployeesSrc@EMPLOYEE_ID == DimEmployeeDetails@EMPLOYEE_ID,",
 				"     joinType:'left',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
@@ -190,6 +193,7 @@
 				"          ROW_EXPIR_DT = toDate(fromUTC(currentUTC(), 'India Standard Time')),",
 				"          LST_UPD_TSTMP_IST = fromUTC(currentUTC(), 'India Standard Time')) ~> DcExpiredRowSetup",
 				"DcExpiredRowSetup alterRow(updateIf(true())) ~> UpdateRowCondition",
+				"DimEmployeeDetails filter(ROW_STS_CD == 'A' && ROW_EXPIR_DT == toDate('9999-12-31')) ~> FilterActiveRows",
 				"DcAddMetadataColumns sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
