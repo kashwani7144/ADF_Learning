@@ -15,7 +15,70 @@
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
-		"schema": [],
+		"schema": [
+			{
+				"name": "EMPLOYEE_ID",
+				"type": "nvarchar"
+			},
+			{
+				"name": "FIRST_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "LAST_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "EMAIL",
+				"type": "nvarchar"
+			},
+			{
+				"name": "PHONE_NUMBER",
+				"type": "nvarchar"
+			},
+			{
+				"name": "HIRE_DATE",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "JOB_ID",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SALARY",
+				"type": "decimal",
+				"precision": 8,
+				"scale": 2
+			},
+			{
+				"name": "COMMISSION_PCT",
+				"type": "decimal",
+				"precision": 2,
+				"scale": 2
+			},
+			{
+				"name": "MANAGER_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "DEPARTMENT_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SRC_ROW_INSERT_TSTMP",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "INSERT_TSTMP_IST",
+				"type": "datetime2",
+				"scale": 7
+			}
+		],
 		"typeProperties": {
 			"schema": {
 				"value": "@dataset().SRC_SCHEMA_NAME",
