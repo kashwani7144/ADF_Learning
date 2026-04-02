@@ -192,7 +192,7 @@
 				"CheckNewOrChangedRow@ChangedRows derive(ROW_STS_CD = 'I',",
 				"          ROW_EXPIR_DT = toDate(fromUTC(currentUTC(), 'India Standard Time')),",
 				"          LST_UPD_TSTMP_IST = fromUTC(currentUTC(), 'India Standard Time')) ~> DcExpiredRowSetup",
-				"DcExpiredRowSetup alterRow(updateIf(true())) ~> UpdateRowCondition",
+				"DcExpiredRowSetup alterRow(updateIf(!isNull(EMPLOYEE_SID))) ~> UpdateRowCondition",
 				"DimEmployeeDetails filter(ROW_STS_CD == 'A' && ROW_EXPIR_DT == toDate('9999-12-31')) ~> FilterActiveRows",
 				"DcAddMetadataColumns sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
