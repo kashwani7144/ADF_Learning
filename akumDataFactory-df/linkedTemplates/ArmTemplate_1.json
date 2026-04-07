@@ -176,7 +176,7 @@
 							"scripts": [
 								{
 									"type": "Query",
-									"text": "DROP TABLE IF EXISTS HR_JOB_HISTORY;\r\nDROP TABLE IF EXISTS HR_EMPLOYEES;\r\nDROP TABLE IF EXISTS HR_DEPARTMENTS;\r\nDROP TABLE IF EXISTS HR_LOCATIONS;\r\nDROP TABLE IF EXISTS HR_COUNTRIES;\r\nDROP TABLE IF EXISTS HR_REGIONS;\r\nDROP TABLE IF EXISTS HR_JOBS;"
+									"text": "DROP TABLE IF EXISTS OHR.JOB_HISTORY;\r\nDROP TABLE IF EXISTS OHR.EMPLOYEES;\r\nDROP TABLE IF EXISTS OHR.DEPARTMENTS;\r\nDROP TABLE IF EXISTS OHR.LOCATIONS;\r\nDROP TABLE IF EXISTS OHR.COUNTRIES;\r\nDROP TABLE IF EXISTS OHR.REGIONS;\r\nDROP TABLE IF EXISTS OHR.JOBS;"
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -210,7 +210,7 @@
 							"scripts": [
 								{
 									"type": "Query",
-									"text": "CREATE TABLE HR_JOBS (\r\n  JOB_ID NVARCHAR(100),\r\n  JOB_TITLE NVARCHAR(35) NOT NULL,\r\n  MIN_SALARY FLOAT,\r\n  MAX_SALARY FLOAT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (JOB_ID)\r\n);\r\n\r\nCREATE TABLE HR_REGIONS (\r\n  REGION_ID NVARCHAR(100) NOT NULL,\r\n  REGION_NAME NVARCHAR(25),\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (REGION_ID)\r\n);\r\n\r\nCREATE TABLE HR_COUNTRIES (\r\n  COUNTRY_ID NVARCHAR(100) NOT NULL,\r\n  COUNTRY_NAME NVARCHAR(40),\r\n  REGION_ID FLOAT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (COUNTRY_ID)\r\n);\r\n\r\nCREATE TABLE HR_LOCATIONS (\r\n  LOCATION_ID NVARCHAR(100),\r\n  STREET_ADDRESS NVARCHAR(40),\r\n  POSTAL_CODE NVARCHAR(12),\r\n  CITY NVARCHAR(30) NOT NULL,\r\n  STATE_PROVINCE NVARCHAR(25),\r\n  COUNTRY_ID CHAR(2),\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (LOCATION_ID)\r\n);\r\n\r\nCREATE TABLE HR_DEPARTMENTS (\r\n  DEPARTMENT_ID NVARCHAR(100),\r\n  DEPARTMENT_NAME NVARCHAR(30) NOT NULL,\r\n  MANAGER_ID INT,\r\n  LOCATION_ID INT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (DEPARTMENT_ID)\r\n);\r\n\r\nCREATE TABLE HR_EMPLOYEES (\r\n  EMPLOYEE_ID NVARCHAR(100),\r\n  FIRST_NAME NVARCHAR(20),\r\n  LAST_NAME NVARCHAR(25) NOT NULL,\r\n  EMAIL NVARCHAR(25) NOT NULL,\r\n  PHONE_NUMBER NVARCHAR(20),\r\n  HIRE_DATE DATETIME NOT NULL,\r\n  JOB_ID NVARCHAR(10) NOT NULL,\r\n  SALARY DECIMAL(8,2),\r\n  COMMISSION_PCT DECIMAL(2,2),\r\n  MANAGER_ID INT,\r\n  DEPARTMENT_ID INT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (EMPLOYEE_ID),\r\n  UNIQUE (EMAIL),\r\n  CHECK (salary > 0)\r\n);\r\n\r\nCREATE TABLE HR_JOB_HISTORY (\r\n  EMPLOYEE_ID NVARCHAR(100) NOT NULL,\r\n  START_DATE DATETIME NOT NULL,\r\n  END_DATE DATETIME NOT NULL,\r\n  JOB_ID NVARCHAR(10) NOT NULL,\r\n  DEPARTMENT_ID INT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (EMPLOYEE_ID, START_DATE),\r\n  CHECK (end_date > start_date)\r\n);"
+									"text": "CREATE TABLE OHR.JOBS (\r\n  JOB_ID NVARCHAR(100),\r\n  JOB_TITLE NVARCHAR(35) NOT NULL,\r\n  MIN_SALARY FLOAT,\r\n  MAX_SALARY FLOAT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (JOB_ID)\r\n);\r\n\r\nCREATE TABLE OHR.REGIONS (\r\n  REGION_ID NVARCHAR(100) NOT NULL,\r\n  REGION_NAME NVARCHAR(25),\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (REGION_ID)\r\n);\r\n\r\nCREATE TABLE OHR.COUNTRIES (\r\n  COUNTRY_ID NVARCHAR(100) NOT NULL,\r\n  COUNTRY_NAME NVARCHAR(40),\r\n  REGION_ID FLOAT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (COUNTRY_ID)\r\n);\r\n\r\nCREATE TABLE OHR.LOCATIONS (\r\n  LOCATION_ID NVARCHAR(100),\r\n  STREET_ADDRESS NVARCHAR(40),\r\n  POSTAL_CODE NVARCHAR(12),\r\n  CITY NVARCHAR(30) NOT NULL,\r\n  STATE_PROVINCE NVARCHAR(25),\r\n  COUNTRY_ID CHAR(2),\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (LOCATION_ID)\r\n);\r\n\r\nCREATE TABLE OHR.DEPARTMENTS (\r\n  DEPARTMENT_ID NVARCHAR(100),\r\n  DEPARTMENT_NAME NVARCHAR(30) NOT NULL,\r\n  MANAGER_ID INT,\r\n  LOCATION_ID INT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (DEPARTMENT_ID)\r\n);\r\n\r\nCREATE TABLE OHR.EMPLOYEES (\r\n  EMPLOYEE_ID NVARCHAR(100),\r\n  FIRST_NAME NVARCHAR(20),\r\n  LAST_NAME NVARCHAR(25) NOT NULL,\r\n  EMAIL NVARCHAR(25) NOT NULL,\r\n  PHONE_NUMBER NVARCHAR(20),\r\n  HIRE_DATE DATETIME NOT NULL,\r\n  JOB_ID NVARCHAR(10) NOT NULL,\r\n  SALARY DECIMAL(8,2),\r\n  COMMISSION_PCT DECIMAL(2,2),\r\n  MANAGER_ID INT,\r\n  DEPARTMENT_ID INT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (EMPLOYEE_ID),\r\n  UNIQUE (EMAIL),\r\n  CHECK (salary > 0)\r\n);\r\n\r\nCREATE TABLE OHR.JOB_HISTORY (\r\n  EMPLOYEE_ID NVARCHAR(100) NOT NULL,\r\n  START_DATE DATETIME NOT NULL,\r\n  END_DATE DATETIME NOT NULL,\r\n  JOB_ID NVARCHAR(10) NOT NULL,\r\n  DEPARTMENT_ID INT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (EMPLOYEE_ID, START_DATE),\r\n  CHECK (end_date > start_date)\r\n);"
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -686,6 +686,174 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_DIM_EMPLOYEE_0104')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "EMPLOYEE_SID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "EMPLOYEE_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FIRST_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LAST_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EMAIL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PHONE_NUMBER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "HIRE_DATE",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "JOB_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SALARY",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "COMMISSION_PCT",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 2
+					},
+					{
+						"name": "MANAGER_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DEPARTMENT_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SRC_ROW_INSERT_TSTMP",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "WATERMARK_VALUE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FILE_TABLE_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SRC_TBL_NM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PIPELINE_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ROW_VERSION",
+						"type": "timestamp"
+					},
+					{
+						"name": "WATERMARK_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ROW_EFF_DT",
+						"type": "date"
+					},
+					{
+						"name": "ROW_EXPIR_DT",
+						"type": "date"
+					},
+					{
+						"name": "ROW_STS_CD",
+						"type": "nchar"
+					},
+					{
+						"name": "INSERT_TSTMP_IST",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "LST_UPD_TSTMP_IST",
+						"type": "datetime2",
+						"scale": 7
+					}
+				],
+				"typeProperties": {
+					"schema": "DWH",
+					"table": "DIM_EMPLOYEE_DETAILS"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_DIM_EMP_DETAILS_3003')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"DIM_SCHEMA_NAME": {
+						"type": "String"
+					},
+					"DIM_TBL_NAME": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().DIM_SCHEMA_NAME",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().DIM_TBL_NAME",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_DWH_DIM_SRC_KEYS')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -996,117 +1164,6 @@
 						"value": "@dataset().Stg_Table_Name",
 						"type": "Expression"
 					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_Error_Generic_2702')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_Blob_Storage_2702",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"folderPath": {
-						"type": "String"
-					},
-					"fileName": {
-						"type": "String"
-					}
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": {
-							"value": "@dataset().fileName",
-							"type": "Expression"
-						},
-						"folderPath": {
-							"value": "@dataset().folderPath",
-							"type": "Expression"
-						},
-						"container": "error-files"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_Files_To_Tables_2502')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_Files_SB_Tables_Lkp_2502",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "FILE_TABLE_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "SRC_NAME",
-						"type": "nvarchar"
-					},
-					{
-						"name": "TGT_NAME",
-						"type": "nvarchar"
-					},
-					{
-						"name": "SRC_SCHEMA_NAME",
-						"type": "nvarchar"
-					},
-					{
-						"name": "TGT_SCHEMA_NAME",
-						"type": "nvarchar"
-					},
-					{
-						"name": "SRC_TYPE",
-						"type": "nvarchar"
-					},
-					{
-						"name": "TGT_TYPE",
-						"type": "nvarchar"
-					},
-					{
-						"name": "ROW_ADDED_BY",
-						"type": "nvarchar"
-					},
-					{
-						"name": "ROW_STS_CD",
-						"type": "nvarchar"
-					},
-					{
-						"name": "PIPLN_NM",
-						"type": "nvarchar"
-					},
-					{
-						"name": "ROW_VERSION",
-						"type": "timestamp"
-					},
-					{
-						"name": "INSERT_TSTMP_IST",
-						"type": "datetime2",
-						"scale": 7
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "FILE_TABLE_MAPPING"
 				}
 			},
 			"dependsOn": []

@@ -114,16 +114,16 @@
 			"value": "adf_user"
 		},
 		"LS_Run_DDLs_Azure_2507_properties_typeProperties_server": {
-			"value": "svetlsandbox.database.windows.net"
+			"value": "etlsandbox.database.windows.net"
 		},
 		"LS_Run_DDLs_Azure_2507_properties_typeProperties_database": {
-			"value": "etlsandbox"
+			"value": "ETLSANDBOX"
 		},
 		"LS_Run_DDLs_Azure_2507_properties_typeProperties_userName": {
 			"value": "akum"
 		},
 		"LS_SB_SCD_properties_typeProperties_server": {
-			"value": "svetlsandbox.database.windows.net"
+			"value": "etlsandbox.database.windows.net"
 		},
 		"LS_SB_SCD_properties_typeProperties_database": {
 			"value": "ETLSANDBOX"

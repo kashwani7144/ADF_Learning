@@ -153,11 +153,11 @@
 		},
 		"LS_Run_DDLs_Azure_2507_properties_typeProperties_server": {
 			"type": "string",
-			"defaultValue": "svetlsandbox.database.windows.net"
+			"defaultValue": "etlsandbox.database.windows.net"
 		},
 		"LS_Run_DDLs_Azure_2507_properties_typeProperties_database": {
 			"type": "string",
-			"defaultValue": "etlsandbox"
+			"defaultValue": "ETLSANDBOX"
 		},
 		"LS_Run_DDLs_Azure_2507_properties_typeProperties_userName": {
 			"type": "string",
@@ -165,7 +165,7 @@
 		},
 		"LS_SB_SCD_properties_typeProperties_server": {
 			"type": "string",
-			"defaultValue": "svetlsandbox.database.windows.net"
+			"defaultValue": "etlsandbox.database.windows.net"
 		},
 		"LS_SB_SCD_properties_typeProperties_database": {
 			"type": "string",
@@ -2025,6 +2025,64 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/AzureSQL_to_ADLS')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/P_DF_SCD_T2_Inc_OHR_Employees')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "SCD_T2_OHR_EMPLOYEES",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_SCD_T2_Inc_OHR_Employees",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"OHREmployeesSrc": {
+										"SRC_SCHEMA_NAME": "OHR",
+										"SRC_TBL_NAME": "EMPLOYEES"
+									},
+									"DimEmployeeDetails": {
+										"DIM_SCHEMA_NAME": "DWH",
+										"DIM_TBL_NAME": "DIM_EMPLOYEE_DETAILS"
+									},
+									"DwhDimEmployeeInsert": {},
+									"DwhDimEmployeeUpdate": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "DataFlows"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DF_SCD_T2_Inc_OHR_Employees')]",
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
 			]
 		},
 		{
@@ -6117,6 +6175,82 @@
 				"[concat(variables('factoryId'), '/datasets/DS_Oracle_HR_1903')]",
 				"[concat(variables('factoryId'), '/datasets/DS_Azure_TGT_SqlDBSalesLT_M_1203')]",
 				"[concat(variables('factoryId'), '/linkedServices/LS_STG_ADLS_1209')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/P_Migrate_Oracle_To_Azure')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy_Oracle_Azure",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "OracleSource",
+								"partitionOption": "None",
+								"numberPrecision": 38,
+								"numberScale": 18,
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_Oracle_HR_1903",
+								"type": "DatasetReference",
+								"parameters": {
+									"SRC_SCHEMA_NAME": "HR",
+									"SRC_TBL_NAME": "JOBS"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_Azure_SRC_SqlDBSalesLT_1203",
+								"type": "DatasetReference",
+								"parameters": {
+									"SRC_SCHEMA_NAME": "OHR",
+									"SRC_TABLE_NAME": "JOBS"
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Oracle"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_Oracle_HR_1903')]",
+				"[concat(variables('factoryId'), '/datasets/DS_Azure_SRC_SqlDBSalesLT_1203')]"
 			]
 		},
 		{
@@ -10698,7 +10832,7 @@
 							"scripts": [
 								{
 									"type": "Query",
-									"text": "DROP TABLE IF EXISTS HR_JOB_HISTORY;\r\nDROP TABLE IF EXISTS HR_EMPLOYEES;\r\nDROP TABLE IF EXISTS HR_DEPARTMENTS;\r\nDROP TABLE IF EXISTS HR_LOCATIONS;\r\nDROP TABLE IF EXISTS HR_COUNTRIES;\r\nDROP TABLE IF EXISTS HR_REGIONS;\r\nDROP TABLE IF EXISTS HR_JOBS;"
+									"text": "DROP TABLE IF EXISTS OHR.JOB_HISTORY;\r\nDROP TABLE IF EXISTS OHR.EMPLOYEES;\r\nDROP TABLE IF EXISTS OHR.DEPARTMENTS;\r\nDROP TABLE IF EXISTS OHR.LOCATIONS;\r\nDROP TABLE IF EXISTS OHR.COUNTRIES;\r\nDROP TABLE IF EXISTS OHR.REGIONS;\r\nDROP TABLE IF EXISTS OHR.JOBS;"
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -10732,7 +10866,7 @@
 							"scripts": [
 								{
 									"type": "Query",
-									"text": "CREATE TABLE HR_JOBS (\r\n  JOB_ID NVARCHAR(100),\r\n  JOB_TITLE NVARCHAR(35) NOT NULL,\r\n  MIN_SALARY FLOAT,\r\n  MAX_SALARY FLOAT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (JOB_ID)\r\n);\r\n\r\nCREATE TABLE HR_REGIONS (\r\n  REGION_ID NVARCHAR(100) NOT NULL,\r\n  REGION_NAME NVARCHAR(25),\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (REGION_ID)\r\n);\r\n\r\nCREATE TABLE HR_COUNTRIES (\r\n  COUNTRY_ID NVARCHAR(100) NOT NULL,\r\n  COUNTRY_NAME NVARCHAR(40),\r\n  REGION_ID FLOAT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (COUNTRY_ID)\r\n);\r\n\r\nCREATE TABLE HR_LOCATIONS (\r\n  LOCATION_ID NVARCHAR(100),\r\n  STREET_ADDRESS NVARCHAR(40),\r\n  POSTAL_CODE NVARCHAR(12),\r\n  CITY NVARCHAR(30) NOT NULL,\r\n  STATE_PROVINCE NVARCHAR(25),\r\n  COUNTRY_ID CHAR(2),\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (LOCATION_ID)\r\n);\r\n\r\nCREATE TABLE HR_DEPARTMENTS (\r\n  DEPARTMENT_ID NVARCHAR(100),\r\n  DEPARTMENT_NAME NVARCHAR(30) NOT NULL,\r\n  MANAGER_ID INT,\r\n  LOCATION_ID INT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (DEPARTMENT_ID)\r\n);\r\n\r\nCREATE TABLE HR_EMPLOYEES (\r\n  EMPLOYEE_ID NVARCHAR(100),\r\n  FIRST_NAME NVARCHAR(20),\r\n  LAST_NAME NVARCHAR(25) NOT NULL,\r\n  EMAIL NVARCHAR(25) NOT NULL,\r\n  PHONE_NUMBER NVARCHAR(20),\r\n  HIRE_DATE DATETIME NOT NULL,\r\n  JOB_ID NVARCHAR(10) NOT NULL,\r\n  SALARY DECIMAL(8,2),\r\n  COMMISSION_PCT DECIMAL(2,2),\r\n  MANAGER_ID INT,\r\n  DEPARTMENT_ID INT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (EMPLOYEE_ID),\r\n  UNIQUE (EMAIL),\r\n  CHECK (salary > 0)\r\n);\r\n\r\nCREATE TABLE HR_JOB_HISTORY (\r\n  EMPLOYEE_ID NVARCHAR(100) NOT NULL,\r\n  START_DATE DATETIME NOT NULL,\r\n  END_DATE DATETIME NOT NULL,\r\n  JOB_ID NVARCHAR(10) NOT NULL,\r\n  DEPARTMENT_ID INT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  WATERMARK_VALUE NVARCHAR(50) NULL,\r\n  FILE_TABLE_ID INTEGER,\r\n  BATCH_ID INTEGER,\r\n  SRC_TBL_NM NVARCHAR(100),\r\n  PIPLN_NM NVARCHAR(100),\r\n  ROW_VERSION TIMESTAMP,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (EMPLOYEE_ID, START_DATE),\r\n  CHECK (end_date > start_date)\r\n);"
+									"text": "CREATE TABLE OHR.JOBS (\r\n  JOB_ID NVARCHAR(100),\r\n  JOB_TITLE NVARCHAR(35) NOT NULL,\r\n  MIN_SALARY FLOAT,\r\n  MAX_SALARY FLOAT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (JOB_ID)\r\n);\r\n\r\nCREATE TABLE OHR.REGIONS (\r\n  REGION_ID NVARCHAR(100) NOT NULL,\r\n  REGION_NAME NVARCHAR(25),\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (REGION_ID)\r\n);\r\n\r\nCREATE TABLE OHR.COUNTRIES (\r\n  COUNTRY_ID NVARCHAR(100) NOT NULL,\r\n  COUNTRY_NAME NVARCHAR(40),\r\n  REGION_ID FLOAT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (COUNTRY_ID)\r\n);\r\n\r\nCREATE TABLE OHR.LOCATIONS (\r\n  LOCATION_ID NVARCHAR(100),\r\n  STREET_ADDRESS NVARCHAR(40),\r\n  POSTAL_CODE NVARCHAR(12),\r\n  CITY NVARCHAR(30) NOT NULL,\r\n  STATE_PROVINCE NVARCHAR(25),\r\n  COUNTRY_ID CHAR(2),\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (LOCATION_ID)\r\n);\r\n\r\nCREATE TABLE OHR.DEPARTMENTS (\r\n  DEPARTMENT_ID NVARCHAR(100),\r\n  DEPARTMENT_NAME NVARCHAR(30) NOT NULL,\r\n  MANAGER_ID INT,\r\n  LOCATION_ID INT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (DEPARTMENT_ID)\r\n);\r\n\r\nCREATE TABLE OHR.EMPLOYEES (\r\n  EMPLOYEE_ID NVARCHAR(100),\r\n  FIRST_NAME NVARCHAR(20),\r\n  LAST_NAME NVARCHAR(25) NOT NULL,\r\n  EMAIL NVARCHAR(25) NOT NULL,\r\n  PHONE_NUMBER NVARCHAR(20),\r\n  HIRE_DATE DATETIME NOT NULL,\r\n  JOB_ID NVARCHAR(10) NOT NULL,\r\n  SALARY DECIMAL(8,2),\r\n  COMMISSION_PCT DECIMAL(2,2),\r\n  MANAGER_ID INT,\r\n  DEPARTMENT_ID INT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (EMPLOYEE_ID),\r\n  UNIQUE (EMAIL),\r\n  CHECK (salary > 0)\r\n);\r\n\r\nCREATE TABLE OHR.JOB_HISTORY (\r\n  EMPLOYEE_ID NVARCHAR(100) NOT NULL,\r\n  START_DATE DATETIME NOT NULL,\r\n  END_DATE DATETIME NOT NULL,\r\n  JOB_ID NVARCHAR(10) NOT NULL,\r\n  DEPARTMENT_ID INT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (EMPLOYEE_ID, START_DATE),\r\n  CHECK (end_date > start_date)\r\n);"
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -11221,6 +11355,178 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/LS_SB_SCD')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_DIM_EMPLOYEE_0104')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "EMPLOYEE_SID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "EMPLOYEE_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FIRST_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LAST_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EMAIL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PHONE_NUMBER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "HIRE_DATE",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "JOB_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SALARY",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "COMMISSION_PCT",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 2
+					},
+					{
+						"name": "MANAGER_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DEPARTMENT_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SRC_ROW_INSERT_TSTMP",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "WATERMARK_VALUE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FILE_TABLE_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SRC_TBL_NM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PIPELINE_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ROW_VERSION",
+						"type": "timestamp"
+					},
+					{
+						"name": "WATERMARK_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ROW_EFF_DT",
+						"type": "date"
+					},
+					{
+						"name": "ROW_EXPIR_DT",
+						"type": "date"
+					},
+					{
+						"name": "ROW_STS_CD",
+						"type": "nchar"
+					},
+					{
+						"name": "INSERT_TSTMP_IST",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "LST_UPD_TSTMP_IST",
+						"type": "datetime2",
+						"scale": 7
+					}
+				],
+				"typeProperties": {
+					"schema": "DWH",
+					"table": "DIM_EMPLOYEE_DETAILS"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_Azure_SB_Lkp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_DIM_EMP_DETAILS_3003')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"DIM_SCHEMA_NAME": {
+						"type": "String"
+					},
+					"DIM_TBL_NAME": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().DIM_SCHEMA_NAME",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().DIM_TBL_NAME",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_Azure_SB_Lkp')]"
 			]
 		},
 		{
@@ -11863,6 +12169,104 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/LS__SB_ADVW')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_OHR_EMPLOYEES_3003')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"SRC_SCHEMA_NAME": {
+						"type": "String"
+					},
+					"SRC_TBL_NAME": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "EMPLOYEE_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FIRST_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LAST_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EMAIL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PHONE_NUMBER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "HIRE_DATE",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "JOB_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SALARY",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "COMMISSION_PCT",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 2
+					},
+					{
+						"name": "MANAGER_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DEPARTMENT_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SRC_ROW_INSERT_TSTMP",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "INSERT_TSTMP_IST",
+						"type": "datetime2",
+						"scale": 7
+					}
+				],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().SRC_SCHEMA_NAME",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().SRC_TBL_NAME",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_Azure_SB_Lkp')]"
 			]
 		},
 		{
@@ -13758,6 +14162,306 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DS_VIVID_RAW_TABLES')]",
 				"[concat(variables('factoryId'), '/datasets/DS_DWH_STG')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_SCD_T2_Inc_OHR_Employees')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_OHR_EMPLOYEES_3003",
+								"type": "DatasetReference"
+							},
+							"name": "OHREmployeesSrc"
+						},
+						{
+							"dataset": {
+								"referenceName": "DS_DIM_EMP_DETAILS_3003",
+								"type": "DatasetReference"
+							},
+							"name": "DimEmployeeDetails"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DS_DIM_EMPLOYEE_0104",
+								"type": "DatasetReference"
+							},
+							"name": "DwhDimEmployeeInsert"
+						},
+						{
+							"dataset": {
+								"referenceName": "DS_DIM_EMPLOYEE_0104",
+								"type": "DatasetReference"
+							},
+							"name": "DwhDimEmployeeUpdate"
+						}
+					],
+					"transformations": [
+						{
+							"name": "SourceJoinDimension"
+						},
+						{
+							"name": "SelectDistinctColumns"
+						},
+						{
+							"name": "DcTrackChanges"
+						},
+						{
+							"name": "CheckNewOrChangedRow"
+						},
+						{
+							"name": "NewRowsUnionChangedRows"
+						},
+						{
+							"name": "DcAddMetadataColumns"
+						},
+						{
+							"name": "DcExpiredRowSetup"
+						},
+						{
+							"name": "UpdateRowCondition"
+						},
+						{
+							"name": "FilterActiveRows"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          EMPLOYEE_ID as string,",
+						"          FIRST_NAME as string,",
+						"          LAST_NAME as string,",
+						"          EMAIL as string,",
+						"          PHONE_NUMBER as string,",
+						"          HIRE_DATE as timestamp,",
+						"          JOB_ID as string,",
+						"          SALARY as decimal(8,2),",
+						"          COMMISSION_PCT as decimal(2,2),",
+						"          MANAGER_ID as integer,",
+						"          DEPARTMENT_ID as integer,",
+						"          SRC_ROW_INSERT_TSTMP as timestamp,",
+						"          INSERT_TSTMP_IST as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     waterMarkColumn: 'INSERT_TSTMP_IST',",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table',",
+						"     mode: 'read') ~> OHREmployeesSrc",
+						"source(output(",
+						"          EMPLOYEE_SID as integer,",
+						"          EMPLOYEE_ID as string,",
+						"          FIRST_NAME as string,",
+						"          LAST_NAME as string,",
+						"          EMAIL as string,",
+						"          PHONE_NUMBER as string,",
+						"          HIRE_DATE as timestamp,",
+						"          JOB_ID as string,",
+						"          SALARY as decimal(8,2),",
+						"          COMMISSION_PCT as decimal(2,2),",
+						"          MANAGER_ID as integer,",
+						"          DEPARTMENT_ID as integer,",
+						"          SRC_ROW_INSERT_TSTMP as timestamp,",
+						"          WATERMARK_VALUE as string,",
+						"          FILE_TABLE_ID as integer,",
+						"          BATCH_ID as integer,",
+						"          SRC_TBL_NM as string,",
+						"          PIPELINE_NAME as string,",
+						"          ROW_VERSION as binary,",
+						"          WATERMARK_ID as integer,",
+						"          ROW_EFF_DT as date,",
+						"          ROW_EXPIR_DT as date,",
+						"          ROW_STS_CD as string,",
+						"          INSERT_TSTMP_IST as timestamp,",
+						"          LST_UPD_TSTMP_IST as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> DimEmployeeDetails",
+						"OHREmployeesSrc, FilterActiveRows join(OHREmployeesSrc@EMPLOYEE_ID == DimEmployeeDetails@EMPLOYEE_ID,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> SourceJoinDimension",
+						"SourceJoinDimension select(mapColumn(",
+						"          EMPLOYEE_ID = OHREmployeesSrc@EMPLOYEE_ID,",
+						"          FIRST_NAME = OHREmployeesSrc@FIRST_NAME,",
+						"          LAST_NAME = OHREmployeesSrc@LAST_NAME,",
+						"          EMAIL = OHREmployeesSrc@EMAIL,",
+						"          PHONE_NUMBER = OHREmployeesSrc@PHONE_NUMBER,",
+						"          HIRE_DATE = OHREmployeesSrc@HIRE_DATE,",
+						"          JOB_ID = OHREmployeesSrc@JOB_ID,",
+						"          SALARY = OHREmployeesSrc@SALARY,",
+						"          COMMISSION_PCT = OHREmployeesSrc@COMMISSION_PCT,",
+						"          MANAGER_ID = OHREmployeesSrc@MANAGER_ID,",
+						"          DEPARTMENT_ID = OHREmployeesSrc@DEPARTMENT_ID,",
+						"          SRC_ROW_INSERT_TSTMP = OHREmployeesSrc@SRC_ROW_INSERT_TSTMP,",
+						"          INSERT_TSTMP_IST = OHREmployeesSrc@INSERT_TSTMP_IST,",
+						"          EMPLOYEE_SID,",
+						"          TGT_EMPLOYEE_ID = DimEmployeeDetails@EMPLOYEE_ID,",
+						"          TGT_FIRST_NAME = DimEmployeeDetails@FIRST_NAME,",
+						"          TGT_LAST_NAME = DimEmployeeDetails@LAST_NAME,",
+						"          TGT_EMAIL = DimEmployeeDetails@EMAIL,",
+						"          TGT_PHONE_NUMBER = DimEmployeeDetails@PHONE_NUMBER,",
+						"          TGT_HIRE_DATE = DimEmployeeDetails@HIRE_DATE,",
+						"          TGT_JOB_ID = DimEmployeeDetails@JOB_ID,",
+						"          TGT_SALARY = DimEmployeeDetails@SALARY,",
+						"          TGT_COMMISSION_PCT = DimEmployeeDetails@COMMISSION_PCT,",
+						"          TGT_MANAGER_ID = DimEmployeeDetails@MANAGER_ID,",
+						"          TGT_DEPARTMENT_ID = DimEmployeeDetails@DEPARTMENT_ID,",
+						"          TGT_SRC_ROW_INSERT_TSTMP = DimEmployeeDetails@SRC_ROW_INSERT_TSTMP",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SelectDistinctColumns",
+						"SelectDistinctColumns derive(isChanged = iif(\r",
+						"     md5(EMPLOYEE_ID)  != md5(TGT_EMPLOYEE_ID)  ||\r",
+						"    md5(FIRST_NAME) != md5(TGT_FIRST_NAME) ||\r",
+						"    md5(LAST_NAME)  != md5(TGT_LAST_NAME)  ||\r",
+						"     md5(EMAIL)      != md5(TGT_EMAIL)      ||\r",
+						"    md5(PHONE_NUMBER)    != md5(TGT_PHONE_NUMBER)    ||\r",
+						"    md5(HIRE_DATE)       != md5(TGT_HIRE_DATE)       ||\r",
+						"    md5(JOB_ID)    != md5(TGT_JOB_ID)    ||\r",
+						"    md5(SALARY)    != md5(TGT_SALARY)    ||\r",
+						"    md5(COMMISSION_PCT)    != md5(TGT_COMMISSION_PCT)    ||\r",
+						"    \r",
+						"    md5(MANAGER_ID) != md5(TGT_MANAGER_ID) ||\r",
+						"    md5(DEPARTMENT_ID)    != md5(TGT_DEPARTMENT_ID),\r",
+						"    true(),\r",
+						"    false()\r",
+						")) ~> DcTrackChanges",
+						"DcTrackChanges split(isNull(TGT_EMPLOYEE_ID),",
+						"     !isNull(TGT_EMPLOYEE_ID) && (\r",
+						"  coalesce(FIRST_NAME , '') != coalesce(TGT_FIRST_NAME , '') ||\r",
+						"  coalesce(LAST_NAME  , '') != coalesce(TGT_LAST_NAME  , '') ||\r",
+						"  coalesce(EMAIL      , '') != coalesce(TGT_EMAIL      , '') || \r",
+						"  coalesce(PHONE_NUMBER, '') != coalesce(TGT_PHONE_NUMBER, '') ||\r",
+						"  coalesce(HIRE_DATE, toDate('1900-01-01')) != coalesce(TGT_HIRE_DATE, toDate('1900-01-01')) ||\r",
+						"  coalesce(JOB_ID, '') != coalesce(TGT_JOB_ID, '') ||\r",
+						"  coalesce(SALARY, 0) != coalesce(TGT_SALARY, 0) ||\r",
+						"  coalesce(COMMISSION_PCT, 0.0) != coalesce(TGT_COMMISSION_PCT, 0.0) ||\r",
+						"  coalesce(MANAGER_ID, 0) != coalesce(TGT_MANAGER_ID, 0) ||\r",
+						"  coalesce(DEPARTMENT_ID, 0) != coalesce(TGT_DEPARTMENT_ID, 0)\r",
+						"),",
+						"     disjoint: false) ~> CheckNewOrChangedRow@(NewRows, ChangedRows)",
+						"CheckNewOrChangedRow@NewRows, CheckNewOrChangedRow@ChangedRows union(byName: true)~> NewRowsUnionChangedRows",
+						"NewRowsUnionChangedRows derive(WATERMARK_VALUE = 3,",
+						"          BATCH_ID = toInteger(toString(currentDate(), 'yyyyMMdd')),",
+						"          ROW_EFF_DT = currentDate(),",
+						"          ROW_EXPIR_DT = toDate('9999-12-31'),",
+						"          ROW_STS_CD = 'A',",
+						"          PIPELINE_NAME = 'P_DF_SCD_T2_Inc_OHR_Employees') ~> DcAddMetadataColumns",
+						"CheckNewOrChangedRow@ChangedRows derive(ROW_STS_CD = 'I',",
+						"          ROW_EXPIR_DT = toDate(fromUTC(currentUTC(), 'India Standard Time')),",
+						"          LST_UPD_TSTMP_IST = fromUTC(currentUTC(), 'India Standard Time')) ~> DcExpiredRowSetup",
+						"DcExpiredRowSetup alterRow(updateIf(!isNull(EMPLOYEE_SID))) ~> UpdateRowCondition",
+						"DimEmployeeDetails filter(ROW_STS_CD == 'A' && ROW_EXPIR_DT == toDate('9999-12-31')) ~> FilterActiveRows",
+						"DcAddMetadataColumns sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          EMPLOYEE_SID as integer,",
+						"          EMPLOYEE_ID as string,",
+						"          FIRST_NAME as string,",
+						"          LAST_NAME as string,",
+						"          EMAIL as string,",
+						"          PHONE_NUMBER as string,",
+						"          HIRE_DATE as timestamp,",
+						"          JOB_ID as string,",
+						"          SALARY as decimal(8,2),",
+						"          COMMISSION_PCT as decimal(2,2),",
+						"          MANAGER_ID as integer,",
+						"          DEPARTMENT_ID as integer,",
+						"          SRC_ROW_INSERT_TSTMP as timestamp,",
+						"          WATERMARK_VALUE as string,",
+						"          FILE_TABLE_ID as integer,",
+						"          BATCH_ID as integer,",
+						"          SRC_TBL_NM as string,",
+						"          PIPELINE_NAME as string,",
+						"          ROW_VERSION as binary,",
+						"          WATERMARK_ID as integer,",
+						"          ROW_EFF_DT as date,",
+						"          ROW_EXPIR_DT as date,",
+						"          ROW_STS_CD as string,",
+						"          INSERT_TSTMP_IST as timestamp,",
+						"          LST_UPD_TSTMP_IST as timestamp",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          EMPLOYEE_ID,",
+						"          FIRST_NAME,",
+						"          LAST_NAME,",
+						"          EMAIL,",
+						"          PHONE_NUMBER,",
+						"          HIRE_DATE,",
+						"          JOB_ID,",
+						"          SALARY,",
+						"          COMMISSION_PCT,",
+						"          MANAGER_ID,",
+						"          DEPARTMENT_ID,",
+						"          SRC_ROW_INSERT_TSTMP,",
+						"          WATERMARK_VALUE,",
+						"          BATCH_ID,",
+						"          PIPELINE_NAME,",
+						"          WATERMARK_ID = WATERMARK_VALUE",
+						"     )) ~> DwhDimEmployeeInsert",
+						"UpdateRowCondition sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          EMPLOYEE_SID as integer,",
+						"          EMPLOYEE_ID as string,",
+						"          FIRST_NAME as string,",
+						"          LAST_NAME as string,",
+						"          EMAIL as string,",
+						"          PHONE_NUMBER as string,",
+						"          HIRE_DATE as timestamp,",
+						"          JOB_ID as string,",
+						"          SALARY as decimal(8,2),",
+						"          COMMISSION_PCT as decimal(2,2),",
+						"          MANAGER_ID as integer,",
+						"          DEPARTMENT_ID as integer,",
+						"          SRC_ROW_INSERT_TSTMP as timestamp,",
+						"          WATERMARK_VALUE as string,",
+						"          FILE_TABLE_ID as integer,",
+						"          BATCH_ID as integer,",
+						"          SRC_TBL_NM as string,",
+						"          PIPELINE_NAME as string,",
+						"          ROW_VERSION as binary,",
+						"          WATERMARK_ID as integer,",
+						"          ROW_EFF_DT as date,",
+						"          ROW_EXPIR_DT as date,",
+						"          ROW_STS_CD as string,",
+						"          INSERT_TSTMP_IST as timestamp,",
+						"          LST_UPD_TSTMP_IST as timestamp",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:false,",
+						"     updateable:true,",
+						"     upsertable:false,",
+						"     keys:['EMPLOYEE_SID'],",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> DwhDimEmployeeUpdate"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_OHR_EMPLOYEES_3003')]",
+				"[concat(variables('factoryId'), '/datasets/DS_DIM_EMP_DETAILS_3003')]",
+				"[concat(variables('factoryId'), '/datasets/DS_DIM_EMPLOYEE_0104')]"
 			]
 		},
 		{
