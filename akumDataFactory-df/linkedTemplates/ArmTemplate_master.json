@@ -75,6 +75,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'LS_STG_ADLS_1209'"
 		},
+		"LS_STG_Generic_1304_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_STG_Generic_1304'"
+		},
 		"LS__SB_ADVW_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS__SB_ADVW'"
@@ -205,11 +209,11 @@
 		},
 		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role": {
 			"type": "string",
-			"defaultValue": "ACCOUNTADMIN"
+			"defaultValue": "AZURE_DE_AKUM1823"
 		},
 		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host": {
 			"type": "string",
-			"defaultValue": "LPOYIGM-IN47228.snowflakecomputing.com"
+			"defaultValue": "SDJADWP-HZ24305.snowflakecomputing.com"
 		},
 		"LS__SB_ADVW_properties_typeProperties_server": {
 			"type": "string",
@@ -409,6 +413,9 @@
 					},
 					"LS_STG_ADLS_1209_connectionString": {
 						"value": "[parameters('LS_STG_ADLS_1209_connectionString')]"
+					},
+					"LS_STG_Generic_1304_connectionString": {
+						"value": "[parameters('LS_STG_Generic_1304_connectionString')]"
 					},
 					"LS__SB_ADVW_password": {
 						"value": "[parameters('LS__SB_ADVW_password')]"

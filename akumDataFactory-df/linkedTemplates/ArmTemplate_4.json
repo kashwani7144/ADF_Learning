@@ -13,6 +13,1118 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/BKP_P_Migrate_Mult_Files_To_Mult_tables_copy1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "SetStartTimestamp",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "StartTimestamp",
+							"value": {
+								"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "GetSrcTgtTableMapping",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "SetStartTimestamp",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat(\n  'SELECT FILE_TABLE_ID, ',\n  'RIGHT(SRC_SCHEMA_NAME, 8) AS SRC_SCHEMA_NAME, ',\n  'RIGHT(TGT_SCHEMA_NAME, 5) AS TGT_SCHEMA_NAME, ',\n  'SRC_NAME AS SRC_FILE_NAME, ',\n  'TGT_NAME AS TGT_TBL_NAME ',\n  'FROM FILE_TABLE_MAPPING ',\n  'WHERE PIPLN_NM = ''', pipeline().Pipeline, ''' ',\n  'AND ROW_STS_CD = ''A'''\n)",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DS_Files_To_Tables_2502",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEachFiles",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GetSrcTgtTableMapping",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetSrcTgtTableMapping').output.value",
+								"type": "Expression"
+							},
+							"batchCount": 5,
+							"activities": [
+								{
+									"name": "GetFileDetails",
+									"type": "GetMetadata",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataset": {
+											"referenceName": "DS_Landing_Generic_0303",
+											"type": "DatasetReference",
+											"parameters": {
+												"FileName": {
+													"value": "@item().SRC_FILE_NAME",
+													"type": "Expression"
+												}
+											}
+										},
+										"fieldList": [
+											"exists"
+										],
+										"storeSettings": {
+											"type": "AzureBlobStorageReadSettings",
+											"recursive": true,
+											"enablePartitionDiscovery": false
+										},
+										"formatSettings": {
+											"type": "DelimitedTextReadSettings"
+										}
+									}
+								},
+								{
+									"name": "IfValidFileExists",
+									"type": "IfCondition",
+									"dependsOn": [
+										{
+											"activity": "GetFileDetails",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@activity('GetFileDetails').output.exists",
+											"type": "Expression"
+										},
+										"ifFalseActivities": [
+											{
+												"name": "SP_Failure_Log_1",
+												"type": "SqlServerStoredProcedure",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"storedProcedureName": "[[dbo].[LOG_MIGRATION_EVENT]",
+													"storedProcedureParameters": {
+														"audit_key": {
+															"value": {
+																"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMddHHmmssfffffff')",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"batch_id": {
+															"value": {
+																"value": "@int(formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMdd'))",
+																"type": "Expression"
+															},
+															"type": "Int32"
+														},
+														"end_time": {
+															"value": null,
+															"type": "DateTime"
+														},
+														"error_msg": {
+															"value": {
+																"value": "@concat('File ', item().SRC_FILE_NAME, ' doesn''t exist in the landing')",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"file_table_id": {
+															"value": null,
+															"type": "Int32"
+														},
+														"pipeline_name": {
+															"value": {
+																"value": "@pipeline().Pipeline",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"row_count": {
+															"value": null,
+															"type": "Int32"
+														},
+														"src_schema_name": {
+															"value": null,
+															"type": "String"
+														},
+														"src_table_name": {
+															"value": null,
+															"type": "String"
+														},
+														"start_time": {
+															"value": null,
+															"type": "DateTime"
+														},
+														"status": {
+															"value": {
+																"value": "@concat('File ', item().SRC_FILE_NAME, ' doesn''t exist in the landing')",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"tgt_schema_name": {
+															"value": null,
+															"type": "String"
+														},
+														"tgt_table_name": {
+															"value": null,
+															"type": "String"
+														},
+														"triggered_by": {
+															"value": {
+																"value": "@pipeline().TriggerName",
+																"type": "Expression"
+															},
+															"type": "String"
+														}
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "LS_Files_SB_Tables_Lkp_2502",
+													"type": "LinkedServiceReference"
+												}
+											}
+										],
+										"ifTrueActivities": [
+											{
+												"name": "CopyFiles_Landing_To_Raw",
+												"type": "Copy",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "DelimitedTextSource",
+														"storeSettings": {
+															"type": "AzureBlobStorageReadSettings",
+															"recursive": false,
+															"enablePartitionDiscovery": false
+														},
+														"formatSettings": {
+															"type": "DelimitedTextReadSettings"
+														}
+													},
+													"sink": {
+														"type": "DelimitedTextSink",
+														"storeSettings": {
+															"type": "AzureBlobStorageWriteSettings",
+															"copyBehavior": "PreserveHierarchy"
+														},
+														"formatSettings": {
+															"type": "DelimitedTextWriteSettings",
+															"quoteAllText": true,
+															"fileExtension": ".csv"
+														}
+													},
+													"enableStaging": false,
+													"validateDataConsistency": true,
+													"logSettings": {
+														"enableCopyActivityLog": true,
+														"copyActivityLogSettings": {
+															"logLevel": "Warning",
+															"enableReliableLogging": false
+														},
+														"logLocationSettings": {
+															"linkedServiceName": {
+																"referenceName": "LS_Error_Log_Generic_2702",
+																"type": "LinkedServiceReference"
+															},
+															"path": "logs"
+														}
+													},
+													"translator": {
+														"type": "TabularTranslator",
+														"typeConversion": true,
+														"typeConversionSettings": {
+															"allowDataTruncation": true,
+															"treatBooleanAsNumber": false
+														}
+													}
+												},
+												"inputs": [
+													{
+														"referenceName": "DS_Landing_Generic_0303",
+														"type": "DatasetReference",
+														"parameters": {
+															"FileName": {
+																"value": "@item().SRC_FILE_NAME",
+																"type": "Expression"
+															}
+														}
+													}
+												],
+												"outputs": [
+													{
+														"referenceName": "DS_Raw_Generic_0303",
+														"type": "DatasetReference",
+														"parameters": {
+															"sink_file_name": {
+																"value": "@concat(\n replace(item().SRC_FILE_NAME,'.csv',''),\n '_',\n formatDateTime(convertFromUtc(utcNow(),'India Standard Time'),'yyyyMMdd_HHmmss'),\n '.csv'\n)",
+																"type": "Expression"
+															}
+														}
+													}
+												]
+											},
+											{
+												"name": "CopyRawFileDataToTables",
+												"type": "Copy",
+												"dependsOn": [
+													{
+														"activity": "CopyFiles_Landing_To_Raw",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "DelimitedTextSource",
+														"additionalColumns": [
+															{
+																"name": "FILE_TABLE_ID",
+																"value": {
+																	"value": "@item().FILE_TABLE_ID",
+																	"type": "Expression"
+																}
+															},
+															{
+																"name": "BATCH_ID",
+																"value": {
+																	"value": "@string(formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMdd'))",
+																	"type": "Expression"
+																}
+															},
+															{
+																"name": "SRC_FILE_NAME",
+																"value": {
+																	"value": "@item().SRC_FILE_NAME",
+																	"type": "Expression"
+																}
+															},
+															{
+																"name": "PIPELINE_NAME",
+																"value": {
+																	"value": "@pipeline().Pipeline",
+																	"type": "Expression"
+																}
+															}
+														],
+														"storeSettings": {
+															"type": "AzureBlobStorageReadSettings",
+															"recursive": true,
+															"wildcardFolderPath": {
+																"value": "@concat(\n    'raw/',\n    formatDateTime(\n        convertFromUtc(utcNow(),'India Standard Time'),\n        'yyyy/MMM/dd'\n    )\n)",
+																"type": "Expression"
+															},
+															"wildcardFileName": {
+																"value": "@concat(\n    replace(item().SRC_FILE_NAME,'.csv',''),\n    '_*.csv'\n)",
+																"type": "Expression"
+															},
+															"enablePartitionDiscovery": false
+														},
+														"formatSettings": {
+															"type": "DelimitedTextReadSettings"
+														}
+													},
+													"sink": {
+														"type": "AzureSqlSink",
+														"writeBehavior": "insert",
+														"sqlWriterUseTableLock": false,
+														"disableMetricsCollection": false
+													},
+													"enableStaging": false,
+													"validateDataConsistency": true,
+													"logSettings": {
+														"enableCopyActivityLog": true,
+														"copyActivityLogSettings": {
+															"logLevel": "Warning",
+															"enableReliableLogging": false
+														},
+														"logLocationSettings": {
+															"linkedServiceName": {
+																"referenceName": "LS_Error_Log_Generic_2702",
+																"type": "LinkedServiceReference"
+															},
+															"path": "logs"
+														}
+													},
+													"translator": {
+														"type": "TabularTranslator",
+														"typeConversion": true,
+														"typeConversionSettings": {
+															"allowDataTruncation": true,
+															"treatBooleanAsNumber": false
+														}
+													}
+												},
+												"inputs": [
+													{
+														"referenceName": "DS_Raw_Source_Generic_0603",
+														"type": "DatasetReference",
+														"parameters": {}
+													}
+												],
+												"outputs": [
+													{
+														"referenceName": "DS_SB_VIVID_Insert_2502",
+														"type": "DatasetReference",
+														"parameters": {
+															"TGT_SCHEMA_NAME": {
+																"value": "@item().TGT_SCHEMA_NAME",
+																"type": "Expression"
+															},
+															"TGT_TBL_NAME": {
+																"value": "@item().TGT_TBL_NAME",
+																"type": "Expression"
+															}
+														}
+													}
+												]
+											},
+											{
+												"name": "SP_Success_Log",
+												"type": "SqlServerStoredProcedure",
+												"dependsOn": [
+													{
+														"activity": "Delete_From_Landing",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"storedProcedureName": "[[dbo].[LOG_MIGRATION_EVENT]",
+													"storedProcedureParameters": {
+														"audit_key": {
+															"value": {
+																"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMddHHmmssfffffff')",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"batch_id": {
+															"value": {
+																"value": "@int(formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMdd'))",
+																"type": "Expression"
+															},
+															"type": "Int32"
+														},
+														"end_time": {
+															"value": {
+																"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
+																"type": "Expression"
+															},
+															"type": "DateTime"
+														},
+														"error_msg": {
+															"value": null,
+															"type": "String"
+														},
+														"file_table_id": {
+															"value": {
+																"value": "@item().FILE_TABLE_ID",
+																"type": "Expression"
+															},
+															"type": "Int32"
+														},
+														"pipeline_name": {
+															"value": {
+																"value": "@pipeline().Pipeline",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"row_count": {
+															"value": {
+																"value": "@activity('CopyRawFileDataToTables').output.rowsCopied",
+																"type": "Expression"
+															},
+															"type": "Int32"
+														},
+														"src_schema_name": {
+															"value": {
+																"value": "@item().SRC_SCHEMA_NAME",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"src_table_name": {
+															"value": {
+																"value": "@item().SRC_FILE_NAME",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"start_time": {
+															"value": {
+																"value": "@variables('StartTimestamp')",
+																"type": "Expression"
+															},
+															"type": "DateTime"
+														},
+														"status": {
+															"value": "Success",
+															"type": "String"
+														},
+														"tgt_schema_name": {
+															"value": {
+																"value": "@item().TGT_SCHEMA_NAME",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"tgt_table_name": {
+															"value": {
+																"value": "@item().TGT_TBL_NAME",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"triggered_by": {
+															"value": {
+																"value": "@pipeline().TriggerName",
+																"type": "Expression"
+															},
+															"type": "String"
+														}
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "LS_Files_SB_Tables_Lkp_2502",
+													"type": "LinkedServiceReference"
+												}
+											},
+											{
+												"name": "SP_Failure_Log",
+												"type": "SqlServerStoredProcedure",
+												"dependsOn": [
+													{
+														"activity": "CopyRawFileDataToTables",
+														"dependencyConditions": [
+															"Failed"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"storedProcedureName": "[[dbo].[LOG_MIGRATION_EVENT]",
+													"storedProcedureParameters": {
+														"audit_key": {
+															"value": {
+																"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMddHHmmssfffffff')",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"batch_id": {
+															"value": {
+																"value": "@int(formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyyMMdd'))",
+																"type": "Expression"
+															},
+															"type": "Int32"
+														},
+														"end_time": {
+															"value": {
+																"value": "@formatDateTime(convertFromUtc(utcNow(), 'India Standard Time'), 'yyyy-MM-dd HH:mm:ss.fffffff')",
+																"type": "Expression"
+															},
+															"type": "DateTime"
+														},
+														"error_msg": {
+															"value": {
+																"value": "@activity('CopyRawFileDataToTables').output.error.message",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"file_table_id": {
+															"value": {
+																"value": "@item().FILE_TABLE_ID",
+																"type": "Expression"
+															},
+															"type": "Int32"
+														},
+														"pipeline_name": {
+															"value": {
+																"value": "@pipeline().Pipeline",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"row_count": {
+															"value": {
+																"value": "@activity('CopyRawFileDataToTables').output.rowsCopied",
+																"type": "Expression"
+															},
+															"type": "Int32"
+														},
+														"src_schema_name": {
+															"value": {
+																"value": "@item().SRC_SCHEMA_NAME",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"src_table_name": {
+															"value": {
+																"value": "@item().SRC_FILE_NAME",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"start_time": {
+															"value": {
+																"value": "@variables('StartTimestamp')",
+																"type": "Expression"
+															},
+															"type": "DateTime"
+														},
+														"status": {
+															"value": "Fail",
+															"type": "String"
+														},
+														"tgt_schema_name": {
+															"value": {
+																"value": "@item().TGT_SCHEMA_NAME",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"tgt_table_name": {
+															"value": {
+																"value": "@item().TGT_TBL_NAME",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"triggered_by": {
+															"value": {
+																"value": "@pipeline().TriggerName",
+																"type": "Expression"
+															},
+															"type": "String"
+														}
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "LS_Files_SB_Tables_Lkp_2502",
+													"type": "LinkedServiceReference"
+												}
+											},
+											{
+												"name": "Delete_From_Landing",
+												"type": "Delete",
+												"dependsOn": [
+													{
+														"activity": "CopyRawFileDataToTables",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"dataset": {
+														"referenceName": "DS_Landing_Generic_0303",
+														"type": "DatasetReference",
+														"parameters": {
+															"FileName": {
+																"value": "@item().SRC_FILE_NAME",
+																"type": "Expression"
+															}
+														}
+													},
+													"logStorageSettings": {
+														"linkedServiceName": {
+															"referenceName": "LS_Delete_Blob_From_Landing_0803",
+															"type": "LinkedServiceReference"
+														},
+														"path": "deleted-files"
+													},
+													"enableLogging": true,
+													"storeSettings": {
+														"type": "AzureBlobStorageReadSettings",
+														"recursive": false,
+														"enablePartitionDiscovery": false
+													}
+												}
+											}
+										]
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"StartTimestamp": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "File_To_Tables_Migration"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Copy_AzureSql_to_Snowflake')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "DimPeopleDetails",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "SnowflakeV2Sink",
+								"importSettings": {
+									"type": "SnowflakeImportCopyCommand",
+									"storageIntegration": "DWH_DIM_AZURE_INT"
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "LS_STG_ADLS_1209",
+									"type": "LinkedServiceReference"
+								},
+								"path": "akum-adls-input"
+							},
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "PEOPLE_SID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "PEOPLE_SID",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"name": "INDEX_NUM",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "INDEX_NUM",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"name": "USR_ID",
+											"type": "String"
+										},
+										"sink": {
+											"name": "USR_ID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "FIRST_NAME",
+											"type": "String"
+										},
+										"sink": {
+											"name": "FIRST_NAME",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "LAST_NAME",
+											"type": "String"
+										},
+										"sink": {
+											"name": "LAST_NAME",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "SEX",
+											"type": "String"
+										},
+										"sink": {
+											"name": "SEX",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "EMAIL",
+											"type": "String"
+										},
+										"sink": {
+											"name": "EMAIL",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "PHONE",
+											"type": "String"
+										},
+										"sink": {
+											"name": "PHONE",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DATE_OF_BIRTH",
+											"type": "String"
+										},
+										"sink": {
+											"name": "DATE_OF_BIRTH",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "JOB_TITLE",
+											"type": "String"
+										},
+										"sink": {
+											"name": "JOB_TITLE",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "SRC_ROW_INSRT_TSTMP",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "SRC_ROW_INSRT_TSTMP",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "HASH_DIFF",
+											"type": "Byte[]"
+										},
+										"sink": {
+											"name": "HASH_DIFF",
+											"type": "Byte[]"
+										}
+									},
+									{
+										"source": {
+											"name": "WATERMARK_ID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "WATERMARK_ID",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"name": "BATCH_ID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "BATCH_ID",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"name": "ROW_EFF_DT",
+											"type": "Date"
+										},
+										"sink": {
+											"name": "ROW_EFF_DT",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "ROW_EXPIR_DT",
+											"type": "Date"
+										},
+										"sink": {
+											"name": "ROW_EXPIR_DT",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "ROW_STS_CD",
+											"type": "String"
+										},
+										"sink": {
+											"name": "ROW_STS_CD",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "VERSION_NUM",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "VERSION_NUM",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"name": "INSERT_TSTMP_IST",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "INSERT_TSTMP_IST",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "LST_UPD_TSTMP_IST",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "LST_UPD_TSTMP_IST",
+											"type": "DateTime"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_Azure_Dim_DWH_1209",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_Snowflake_DimPeople",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "ADLS"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Migrate_Oracle_HR_Snflk_ETLSB')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "OracleHR_To_Snflk_ETLSB",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "OracleSource",
+								"partitionOption": "None",
+								"numberPrecision": 38,
+								"numberScale": 18,
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "SnowflakeV2Sink",
+								"importSettings": {
+									"type": "SnowflakeImportCopyCommand",
+									"storageIntegration": "SNOWFLAKE_AZURE_INT"
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "LS_STG_Generic_1304",
+									"type": "LinkedServiceReference"
+								},
+								"path": "staging"
+							},
+							"logSettings": {
+								"enableCopyActivityLog": true,
+								"copyActivityLogSettings": {
+									"logLevel": "Warning",
+									"enableReliableLogging": false
+								},
+								"logLocationSettings": {
+									"linkedServiceName": {
+										"referenceName": "LS_Error_Log_Generic_2702",
+										"type": "LinkedServiceReference"
+									},
+									"path": "logs"
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_Oracle_HR_1903",
+								"type": "DatasetReference",
+								"parameters": {
+									"SRC_SCHEMA_NAME": "HR",
+									"SRC_TBL_NAME": "EMPLOYEES"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_SNFLK_ETLSB_1304",
+								"type": "DatasetReference",
+								"parameters": {
+									"TGT_TBL_NAME": "EMPLOYEES",
+									"TGT_SCHEMA_NAME": "HR"
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Snowflake_Migrations"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/P_Incremental_Migrate_ADVW_Azure')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -8915,176 +10027,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/AzureSQL_to_ADLS')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/P_DF_SCD_T2_Inc_OHR_Employees')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "SCD_T2_OHR_EMPLOYEES",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "DF_SCD_T2_Inc_OHR_Employees",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"OHREmployeesSrc": {
-										"SRC_SCHEMA_NAME": "OHR",
-										"SRC_TBL_NAME": "EMPLOYEES"
-									},
-									"DimEmployeeDetails": {
-										"DIM_SCHEMA_NAME": "DWH",
-										"DIM_TBL_NAME": "DIM_EMPLOYEE_DETAILS"
-									},
-									"DwhDimEmployeeInsert": {},
-									"DwhDimEmployeeUpdate": {}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataFlows"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/DF_SCD_T2_Inc_OHR_Employees')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/P_DF_SCD_T2_Inc_Vivid_Customer')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "SCD_T2_VIVID_CUSTOMER_SCHEMA",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "DF_SCD_T2_Vivid_Customer",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"VividCustomerRaw": {
-										"Src_Schema_Name": "VIVID",
-										"Src_Table_Name": "BLOB_CUSTOMER_RAW"
-									},
-									"DimCustomer": {},
-									"DwhDimCustomerInsert": {},
-									"DwhDimCustomerUpdate": {}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine",
-							"continuationSettings": {
-								"customizedCheckpointKey": "f9b5aa35-6478-4062-b84a-15343c423c1c"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataFlows"
-				},
-				"annotations": [],
-				"lastPublishTime": "2025-08-15T04:27:53Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/DF_SCD_T2_Vivid_Customer')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/P_DF_SCD_T2_Incremental')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "SCD_T2_VIVID_SCHEMA",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "DF_SCD_T2_Vivid_Scd",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"VividCustomerRaw": {
-										"Src_Schema_Name": "VIVID",
-										"Src_Table_Name": "BLOB_CUSTOMER_RAW"
-									},
-									"DimCustomer": {},
-									"DwhDimCustomerInsert": {},
-									"DwhDimCustomerUpdate": {}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataFlows"
-				},
-				"annotations": [],
-				"lastPublishTime": "2025-08-14T03:03:29Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/DF_SCD_T2_Vivid_Scd')]"
 			]
 		}
 	]

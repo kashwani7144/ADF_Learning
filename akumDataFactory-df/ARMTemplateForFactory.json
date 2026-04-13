@@ -75,6 +75,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'LS_STG_ADLS_1209'"
 		},
+		"LS_STG_Generic_1304_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_STG_Generic_1304'"
+		},
 		"LS__SB_ADVW_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS__SB_ADVW'"
@@ -205,11 +209,11 @@
 		},
 		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role": {
 			"type": "string",
-			"defaultValue": "ACCOUNTADMIN"
+			"defaultValue": "AZURE_DE_AKUM1823"
 		},
 		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host": {
 			"type": "string",
-			"defaultValue": "LPOYIGM-IN47228.snowflakecomputing.com"
+			"defaultValue": "SDJADWP-HZ24305.snowflakecomputing.com"
 		},
 		"LS__SB_ADVW_properties_typeProperties_server": {
 			"type": "string",
@@ -2028,6 +2032,99 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Migrate_Oracle_HR_Snflk_ETLSB')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "OracleHR_To_Snflk_ETLSB",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "OracleSource",
+								"partitionOption": "None",
+								"numberPrecision": 38,
+								"numberScale": 18,
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "SnowflakeV2Sink",
+								"importSettings": {
+									"type": "SnowflakeImportCopyCommand",
+									"storageIntegration": "SNOWFLAKE_AZURE_INT"
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "LS_STG_Generic_1304",
+									"type": "LinkedServiceReference"
+								},
+								"path": "staging"
+							},
+							"logSettings": {
+								"enableCopyActivityLog": true,
+								"copyActivityLogSettings": {
+									"logLevel": "Warning",
+									"enableReliableLogging": false
+								},
+								"logLocationSettings": {
+									"linkedServiceName": {
+										"referenceName": "LS_Error_Log_Generic_2702",
+										"type": "LinkedServiceReference"
+									},
+									"path": "logs"
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_Oracle_HR_1903",
+								"type": "DatasetReference",
+								"parameters": {
+									"SRC_SCHEMA_NAME": "HR",
+									"SRC_TBL_NAME": "EMPLOYEES"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_SNFLK_ETLSB_1304",
+								"type": "DatasetReference",
+								"parameters": {
+									"TGT_TBL_NAME": "EMPLOYEES",
+									"TGT_SCHEMA_NAME": "HR"
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Snowflake_Migrations"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_Oracle_HR_1903')]",
+				"[concat(variables('factoryId'), '/datasets/DS_SNFLK_ETLSB_1304')]",
+				"[concat(variables('factoryId'), '/linkedServices/LS_STG_Generic_1304')]",
+				"[concat(variables('factoryId'), '/linkedServices/LS_Error_Log_Generic_2702')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/P_DF_SCD_T2_Inc_OHR_Employees')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -2081,8 +2178,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/DF_SCD_T2_Inc_OHR_Employees')]",
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+				"[concat(variables('factoryId'), '/dataflows/DF_SCD_T2_Inc_OHR_Employees')]"
 			]
 		},
 		{
@@ -12834,6 +12930,41 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_SNFLK_ETLSB_1304')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_SNFLK_ETLSB_VIVID",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"TGT_TBL_NAME": {
+						"type": "String"
+					},
+					"TGT_SCHEMA_NAME": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "SnowflakeV2Table",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().TGT_SCHEMA_NAME",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().TGT_TBL_NAME",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_SNFLK_ETLSB_VIVID')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_SRC_DIM_LKP_1807')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -13874,8 +14005,8 @@
 				"type": "SnowflakeV2",
 				"typeProperties": {
 					"authenticationType": "Basic",
-					"accountIdentifier": "LPOYIGM-IN47228",
-					"user": "KMRASHWANI12",
+					"accountIdentifier": "SDJADWP-HZ24305",
+					"user": "akum1823",
 					"database": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database')]",
 					"warehouse": "COMPUTE_WH",
 					"role": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role')]",
@@ -13904,6 +14035,25 @@
 				"type": "AzureBlobStorage",
 				"typeProperties": {
 					"connectionString": "[parameters('LS_STG_ADLS_1209_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_STG_Generic_1304')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('LS_STG_Generic_1304_connectionString')]"
 				},
 				"connectVia": {
 					"referenceName": "AutoResolveIntegrationRuntime",

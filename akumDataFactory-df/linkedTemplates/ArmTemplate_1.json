@@ -15,6 +15,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'LS_STG_ADLS_1209'"
 		},
+		"LS_STG_Generic_1304_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_STG_Generic_1304'"
+		},
 		"LS__SB_ADVW_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS__SB_ADVW'"
@@ -29,11 +33,11 @@
 		},
 		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role": {
 			"type": "string",
-			"defaultValue": "ACCOUNTADMIN"
+			"defaultValue": "AZURE_DE_AKUM1823"
 		},
 		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host": {
 			"type": "string",
-			"defaultValue": "LPOYIGM-IN47228.snowflakecomputing.com"
+			"defaultValue": "SDJADWP-HZ24305.snowflakecomputing.com"
 		},
 		"LS__SB_ADVW_properties_typeProperties_server": {
 			"type": "string",
@@ -65,8 +69,8 @@
 				"type": "SnowflakeV2",
 				"typeProperties": {
 					"authenticationType": "Basic",
-					"accountIdentifier": "LPOYIGM-IN47228",
-					"user": "KMRASHWANI12",
+					"accountIdentifier": "SDJADWP-HZ24305",
+					"user": "akum1823",
 					"database": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database')]",
 					"warehouse": "COMPUTE_WH",
 					"role": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role')]",
@@ -93,6 +97,23 @@
 				"type": "AzureBlobStorage",
 				"typeProperties": {
 					"connectionString": "[parameters('LS_STG_ADLS_1209_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_STG_Generic_1304')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('LS_STG_Generic_1304_connectionString')]"
 				},
 				"connectVia": {
 					"referenceName": "AutoResolveIntegrationRuntime",
@@ -1131,39 +1152,6 @@
 				"typeProperties": {
 					"schema": "DWH",
 					"table": "DIM_CUSTOMER_DETAILS"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_DWH_STG')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_Azure_SB_Lkp",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"Stg_Schema_Name": {
-						"type": "String"
-					},
-					"Stg_Table_Name": {
-						"type": "String"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().Stg_Schema_Name",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().Stg_Table_Name",
-						"type": "Expression"
-					}
 				}
 			},
 			"dependsOn": []
