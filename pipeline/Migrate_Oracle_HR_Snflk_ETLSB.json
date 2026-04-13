@@ -29,7 +29,28 @@
 							"storageIntegration": "SNOWFLAKE_AZURE_INT"
 						}
 					},
-					"enableStaging": false
+					"enableStaging": true,
+					"stagingSettings": {
+						"linkedServiceName": {
+							"referenceName": "LS_STG_Generic_1304",
+							"type": "LinkedServiceReference"
+						},
+						"path": "staging"
+					},
+					"logSettings": {
+						"enableCopyActivityLog": true,
+						"copyActivityLogSettings": {
+							"logLevel": "Warning",
+							"enableReliableLogging": false
+						},
+						"logLocationSettings": {
+							"linkedServiceName": {
+								"referenceName": "LS_Error_Log_Generic_2702",
+								"type": "LinkedServiceReference"
+							},
+							"path": "logs"
+						}
+					}
 				},
 				"inputs": [
 					{
