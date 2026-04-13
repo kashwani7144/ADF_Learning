@@ -1,5 +1,5 @@
 {
-	"name": "Migrate_Oracle_HR_Snflk_ETLSB",
+	"name": "P_Migrate_Oracle_HR_Snflk_ETLSB",
 	"properties": {
 		"activities": [
 			{
