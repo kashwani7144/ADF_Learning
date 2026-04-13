@@ -5,8 +5,26 @@
 			"referenceName": "LS_SNFLK_ETLSB_VIVID",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"TGT_TBL_NAME": {
+				"type": "String"
+			},
+			"TGT_SCHEMA_NAME": {
+				"type": "String"
+			}
+		},
 		"annotations": [],
 		"type": "SnowflakeV2Table",
-		"schema": []
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().TGT_SCHEMA_NAME",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().TGT_TBL_NAME",
+				"type": "Expression"
+			}
+		}
 	}
 }

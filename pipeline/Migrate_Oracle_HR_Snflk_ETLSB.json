@@ -1,0 +1,57 @@
+{
+	"name": "Migrate_Oracle_HR_Snflk_ETLSB",
+	"properties": {
+		"activities": [
+			{
+				"name": "OracleHR_To_Snflk_ETLSB",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "OracleSource",
+						"partitionOption": "None",
+						"numberPrecision": 38,
+						"numberScale": 18,
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "SnowflakeV2Sink",
+						"importSettings": {
+							"type": "SnowflakeImportCopyCommand",
+							"storageIntegration": "SNOWFLAKE_AZURE_INT"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_Oracle_HR_1903",
+						"type": "DatasetReference",
+						"parameters": {
+							"SRC_SCHEMA_NAME": "HR",
+							"SRC_TBL_NAME": "EMPLOYEES"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_SNFLK_ETLSB_1304",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "Snowflake_Migrations"
+		},
+		"annotations": []
+	}
+}
