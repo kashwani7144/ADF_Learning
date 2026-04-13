@@ -156,7 +156,7 @@
 			"value": "ETLSANDBOX"
 		},
 		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role": {
-			"value": "AZURE_DE_AKUM1823"
+			"value": "ACCOUNTADMIN"
 		},
 		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host": {
 			"value": "SDJADWP-HZ24305.snowflakecomputing.com"

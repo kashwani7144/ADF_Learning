@@ -33,7 +33,7 @@
 		},
 		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role": {
 			"type": "string",
-			"defaultValue": "AZURE_DE_AKUM1823"
+			"defaultValue": "ACCOUNTADMIN"
 		},
 		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host": {
 			"type": "string",
