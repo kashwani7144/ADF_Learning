@@ -2032,7 +2032,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Migrate_Oracle_HR_Snflk_ETLSB')]",
+			"name": "[concat(parameters('factoryName'), '/P_Migrate_Oracle_HR_Snflk_ETLSB')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
