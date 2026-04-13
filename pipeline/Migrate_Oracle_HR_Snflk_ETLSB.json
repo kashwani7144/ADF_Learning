@@ -1,0 +1,9 @@
+{
+	"name": "Migrate_Oracle_HR_Snflk_ETLSB",
+	"properties": {
+		"folder": {
+			"name": "Snowflake_Migrations"
+		},
+		"annotations": []
+	}
+}
