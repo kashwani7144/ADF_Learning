@@ -44,7 +44,11 @@
 				"outputs": [
 					{
 						"referenceName": "DS_SNFLK_ETLSB_1304",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"TGT_TBL_NAME": "HR",
+							"TGT_SCHEMA_NAME": "EMPLOYEES"
+						}
 					}
 				]
 			}
