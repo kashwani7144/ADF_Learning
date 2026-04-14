@@ -56,7 +56,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"SRC_SCHEMA_NAME": "HR",
-							"SRC_TABLE_NAME": "LOCATIONS"
+							"SRC_TABLE_NAME": "REGIONS"
 						}
 					}
 				],
@@ -65,7 +65,7 @@
 						"referenceName": "DS_SNFLK_ETLSB_1304",
 						"type": "DatasetReference",
 						"parameters": {
-							"TGT_TBL_NAME": "LOCATIONS",
+							"TGT_TBL_NAME": "REGIONS",
 							"TGT_SCHEMA_NAME": "HR"
 						}
 					}
