@@ -56,7 +56,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"SRC_SCHEMA_NAME": "HR",
-							"SRC_TABLE_NAME": "DEPARTMENTS"
+							"SRC_TABLE_NAME": "COUNTRIES"
 						}
 					}
 				],
@@ -65,7 +65,7 @@
 						"referenceName": "DS_SNFLK_ETLSB_1304",
 						"type": "DatasetReference",
 						"parameters": {
-							"TGT_TBL_NAME": "DEPARTMENTS",
+							"TGT_TBL_NAME": "COUNTRIES",
 							"TGT_SCHEMA_NAME": "HR"
 						}
 					}
