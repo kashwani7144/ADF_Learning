@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "OracleHR_To_Snflk_ETLSB",
+				"name": "AzureHR_To_Snflk_ETLSB",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
