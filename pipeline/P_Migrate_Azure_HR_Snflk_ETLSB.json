@@ -53,7 +53,11 @@
 				"inputs": [
 					{
 						"referenceName": "DS_Azure_HR_1404",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"SRC_SCHEMA_NAME": "HR",
+							"SRC_TABLE_NAME": "DEPARTMENTS"
+						}
 					}
 				],
 				"outputs": [
@@ -61,7 +65,7 @@
 						"referenceName": "DS_SNFLK_ETLSB_1304",
 						"type": "DatasetReference",
 						"parameters": {
-							"TGT_TBL_NAME": "EMPLOYEES",
+							"TGT_TBL_NAME": "DEPARTMENTS",
 							"TGT_SCHEMA_NAME": "HR"
 						}
 					}
