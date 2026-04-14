@@ -16,11 +16,9 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "OracleSource",
-						"partitionOption": "None",
-						"numberPrecision": 38,
-						"numberScale": 18,
-						"queryTimeout": "02:00:00"
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
 					},
 					"sink": {
 						"type": "SnowflakeV2Sink",
@@ -54,12 +52,8 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "DS_Oracle_HR_1903",
-						"type": "DatasetReference",
-						"parameters": {
-							"SRC_SCHEMA_NAME": "HR",
-							"SRC_TBL_NAME": "EMPLOYEES"
-						}
+						"referenceName": "DS_Azure_HR_1404",
+						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
