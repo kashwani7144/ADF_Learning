@@ -1,0 +1,19 @@
+{
+	"name": "DS_DIM_CUST_1604",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ADLS_Parquet_1604",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileSystem": "input"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}

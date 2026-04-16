@@ -21,15 +21,13 @@
 						"partitionOption": "None"
 					},
 					"sink": {
-						"type": "DelimitedTextSink",
+						"type": "ParquetSink",
 						"storeSettings": {
 							"type": "AzureBlobFSWriteSettings",
 							"copyBehavior": "PreserveHierarchy"
 						},
 						"formatSettings": {
-							"type": "DelimitedTextWriteSettings",
-							"quoteAllText": true,
-							"fileExtension": ".csv"
+							"type": "ParquetWriteSettings"
 						}
 					},
 					"enableStaging": false,
@@ -54,7 +52,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "DS_TGT_DIM_CUSTOMER_DETAILS_1604",
+						"referenceName": "DS_DIM_CUST_1604",
 						"type": "DatasetReference"
 					}
 				]
