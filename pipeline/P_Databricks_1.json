@@ -1,6 +1,21 @@
 {
 	"name": "P_Databricks_1",
 	"properties": {
+		"activities": [
+			{
+				"name": "src_cust_raw_10m",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": []
+			}
+		],
 		"annotations": []
 	}
 }
