@@ -1,0 +1,9 @@
+{
+	"name": "P_Copy_Azure_ADLS_Dim_Customer",
+	"properties": {
+		"folder": {
+			"name": "ADLS"
+		},
+		"annotations": []
+	}
+}
