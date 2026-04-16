@@ -1,6 +1,65 @@
 {
 	"name": "P_Copy_Azure_ADLS_Dim_Customer",
 	"properties": {
+		"activities": [
+			{
+				"name": "DIM_CUSTOMER_DETAILS",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings",
+							"copyBehavior": "PreserveHierarchy"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".csv"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_Tgt_DWH_DimCustomer",
+						"type": "DatasetReference",
+						"parameters": {
+							"Dim_Schema_Name": "DWH",
+							"Dim_Table_Name": "DIM_CUSTOMER_DETAILS"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_TGT_DIM_CUSTOMER_DETAILS_1604",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
 		"folder": {
 			"name": "ADLS"
 		},
