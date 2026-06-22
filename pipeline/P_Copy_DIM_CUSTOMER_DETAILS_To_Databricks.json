@@ -1,6 +1,39 @@
 {
 	"name": "P_Copy_DIM_CUSTOMER_DETAILS_To_Databricks",
 	"properties": {
+		"activities": [
+			{
+				"name": "DIM_CUSTOMER_DETAILS",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_Tgt_DWH_DimCustomer",
+						"type": "DatasetReference",
+						"parameters": {
+							"Dim_Schema_Name": "DWH",
+							"Dim_Table_Name": "DIM_CUSTOMER_DETAILS"
+						}
+					}
+				]
+			}
+		],
 		"folder": {
 			"name": "ADLS_and_Databricks"
 		},
