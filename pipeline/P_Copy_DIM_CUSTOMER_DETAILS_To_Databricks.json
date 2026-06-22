@@ -20,7 +20,25 @@
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
-					"enableStaging": false
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings",
+							"copyBehavior": "PreserveHierarchy"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
 				},
 				"inputs": [
 					{
@@ -30,6 +48,12 @@
 							"Dim_Schema_Name": "DWH",
 							"Dim_Table_Name": "DIM_CUSTOMER_DETAILS"
 						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_ADLS_Parquet_Dim_Cust_2206",
+						"type": "DatasetReference"
 					}
 				]
 			}
