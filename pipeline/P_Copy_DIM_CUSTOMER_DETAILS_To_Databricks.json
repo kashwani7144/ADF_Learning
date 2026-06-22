@@ -1,0 +1,9 @@
+{
+	"name": "P_Copy_DIM_CUSTOMER_DETAILS_To_Databricks",
+	"properties": {
+		"folder": {
+			"name": "ADLS_and_Databricks"
+		},
+		"annotations": []
+	}
+}
