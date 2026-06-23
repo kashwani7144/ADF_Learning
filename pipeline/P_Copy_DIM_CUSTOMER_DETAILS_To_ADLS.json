@@ -1,5 +1,5 @@
 {
-	"name": "P_Copy_DIM_CUSTOMER_DETAILS_To_Databricks",
+	"name": "P_Copy_DIM_CUSTOMER_DETAILS_To_ADLS",
 	"properties": {
 		"activities": [
 			{
