@@ -45,15 +45,18 @@
 						"referenceName": "DS_Tgt_DWH_DimCustomer",
 						"type": "DatasetReference",
 						"parameters": {
-							"Dim_Schema_Name": "DWH",
-							"Dim_Table_Name": "DIM_CUSTOMER_DETAILS"
+							"Dim_Schema_Name": "VIVID",
+							"Dim_Table_Name": "BLOB_PEOPLE_RAW"
 						}
 					}
 				],
 				"outputs": [
 					{
 						"referenceName": "DS_ADLS_Parquet_Dim_Cust_2206",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"Dim_Table_Name": "VIVID_BLOB_PEOPLE_RAW"
+						}
 					}
 				]
 			}

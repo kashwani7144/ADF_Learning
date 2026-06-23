@@ -5,11 +5,20 @@
 			"referenceName": "LS_ADLS_Parquet_1604",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"Dim_Table_Name": {
+				"type": "String"
+			}
+		},
 		"annotations": [],
 		"type": "Parquet",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@concat(dataset().Dim_Table_Name,'.parquet')",
+					"type": "Expression"
+				},
 				"folderPath": "paraquet",
 				"fileSystem": "output"
 			},
