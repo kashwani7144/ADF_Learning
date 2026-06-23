@@ -7,6 +7,14 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "akumDataFactory-df"
 		},
+		"LS_ADLS_1604_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'LS_ADLS_1604'"
+		},
+		"LS_ADLS_Parquet_1604_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'LS_ADLS_Parquet_1604'"
+		},
 		"LS_AZURE_ORACLE_2507_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_AZURE_ORACLE_2507'"
@@ -86,6 +94,14 @@
 		"Par_ETLSANDBOX_accountKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'Par_ETLSANDBOX'"
+		},
+		"LS_ADLS_1604_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://rastorageaccountadlsgen2.dfs.core.windows.net/"
+		},
+		"LS_ADLS_Parquet_1604_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://mystorageaccountadlsgen2.dfs.core.windows.net/"
 		},
 		"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
 			"type": "string",
@@ -1972,7 +1988,7 @@
 					"elapsedTimeMetric": {}
 				},
 				"folder": {
-					"name": "ADLS"
+					"name": "ADLS_and_Databricks"
 				},
 				"annotations": []
 			},
@@ -2023,7 +2039,7 @@
 					"elapsedTimeMetric": {}
 				},
 				"folder": {
-					"name": "ADLS"
+					"name": "ADLS_and_Databricks"
 				},
 				"annotations": []
 			},
@@ -2032,13 +2048,13 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/P_Migrate_Oracle_HR_Snflk_ETLSB')]",
+			"name": "[concat(parameters('factoryName'), '/P_Copy_Azure_ADLS_Dim_Customer')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"activities": [
 					{
-						"name": "OracleHR_To_Snflk_ETLSB",
+						"name": "DIM_CUSTOMER_DETAILS",
 						"type": "Copy",
 						"dependsOn": [],
 						"policy": {
@@ -2051,60 +2067,47 @@
 						"userProperties": [],
 						"typeProperties": {
 							"source": {
-								"type": "OracleSource",
-								"partitionOption": "None",
-								"numberPrecision": 38,
-								"numberScale": 18,
-								"queryTimeout": "02:00:00"
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
 							},
 							"sink": {
-								"type": "SnowflakeV2Sink",
-								"importSettings": {
-									"type": "SnowflakeImportCopyCommand",
-									"storageIntegration": "SNOWFLAKE_AZURE_INT"
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings",
+									"copyBehavior": "PreserveHierarchy"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".csv"
 								}
 							},
-							"enableStaging": true,
-							"stagingSettings": {
-								"linkedServiceName": {
-									"referenceName": "LS_STG_Generic_1304",
-									"type": "LinkedServiceReference"
-								},
-								"path": "staging"
-							},
-							"logSettings": {
-								"enableCopyActivityLog": true,
-								"copyActivityLogSettings": {
-									"logLevel": "Warning",
-									"enableReliableLogging": false
-								},
-								"logLocationSettings": {
-									"linkedServiceName": {
-										"referenceName": "LS_Error_Log_Generic_2702",
-										"type": "LinkedServiceReference"
-									},
-									"path": "logs"
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
 								}
 							}
 						},
 						"inputs": [
 							{
-								"referenceName": "DS_Oracle_HR_1903",
+								"referenceName": "DS_Tgt_DWH_DimCustomer",
 								"type": "DatasetReference",
 								"parameters": {
-									"SRC_SCHEMA_NAME": "HR",
-									"SRC_TBL_NAME": "EMPLOYEES"
+									"Dim_Schema_Name": "DWH",
+									"Dim_Table_Name": "DIM_CUSTOMER_DETAILS"
 								}
 							}
 						],
 						"outputs": [
 							{
-								"referenceName": "DS_SNFLK_ETLSB_1304",
+								"referenceName": "DS_TGT_DIM_CUSTOMER_DETAILS_1604",
 								"type": "DatasetReference",
-								"parameters": {
-									"TGT_TBL_NAME": "EMPLOYEES",
-									"TGT_SCHEMA_NAME": "HR"
-								}
+								"parameters": {}
 							}
 						]
 					}
@@ -2113,15 +2116,165 @@
 					"elapsedTimeMetric": {}
 				},
 				"folder": {
-					"name": "Snowflake_Migrations"
+					"name": "ADLS_and_Databricks"
 				},
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DS_Oracle_HR_1903')]",
-				"[concat(variables('factoryId'), '/datasets/DS_SNFLK_ETLSB_1304')]",
-				"[concat(variables('factoryId'), '/linkedServices/LS_STG_Generic_1304')]",
-				"[concat(variables('factoryId'), '/linkedServices/LS_Error_Log_Generic_2702')]"
+				"[concat(variables('factoryId'), '/datasets/DS_Tgt_DWH_DimCustomer')]",
+				"[concat(variables('factoryId'), '/datasets/DS_TGT_DIM_CUSTOMER_DETAILS_1604')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/P_Copy_Azure_ADLS_Dim_Customer_2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "DIM_CUSTOMER_DETAILS",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings",
+									"copyBehavior": "PreserveHierarchy"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_Tgt_DWH_DimCustomer",
+								"type": "DatasetReference",
+								"parameters": {
+									"Dim_Schema_Name": "DWH",
+									"Dim_Table_Name": "DIM_CUSTOMER_DETAILS"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_DIM_CUST_1604",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "ADLS_and_Databricks"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_Tgt_DWH_DimCustomer')]",
+				"[concat(variables('factoryId'), '/datasets/DS_DIM_CUST_1604')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/P_Copy_DIM_CUSTOMER_DETAILS_To_ADLS')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "DIM_CUSTOMER_DETAILS",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings",
+									"copyBehavior": "PreserveHierarchy"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_Tgt_DWH_DimCustomer",
+								"type": "DatasetReference",
+								"parameters": {
+									"Dim_Schema_Name": "DWH",
+									"Dim_Table_Name": "DIM_CUSTOMER_DETAILS"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_ADLS_Parquet_Dim_Cust_2206",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "ADLS_and_Databricks"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_Tgt_DWH_DimCustomer')]",
+				"[concat(variables('factoryId'), '/datasets/DS_ADLS_Parquet_Dim_Cust_2206')]"
 			]
 		},
 		{
@@ -4638,6 +4791,97 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/P_Migrate_Azure_HR_Snflk_ETLSB')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "AzureHR_To_Snflk_ETLSB",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "SnowflakeV2Sink",
+								"importSettings": {
+									"type": "SnowflakeImportCopyCommand",
+									"storageIntegration": "SNOWFLAKE_AZURE_INT_RA"
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "LS_STG_Generic_1304",
+									"type": "LinkedServiceReference"
+								},
+								"path": "staging"
+							},
+							"logSettings": {
+								"enableCopyActivityLog": true,
+								"copyActivityLogSettings": {
+									"logLevel": "Warning",
+									"enableReliableLogging": false
+								},
+								"logLocationSettings": {
+									"linkedServiceName": {
+										"referenceName": "LS_Error_Log_Generic_2702",
+										"type": "LinkedServiceReference"
+									},
+									"path": "logs"
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_Azure_HR_1404",
+								"type": "DatasetReference",
+								"parameters": {
+									"SRC_SCHEMA_NAME": "HR",
+									"SRC_TABLE_NAME": "REGIONS"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_SNFLK_ETLSB_1304",
+								"type": "DatasetReference",
+								"parameters": {
+									"TGT_TBL_NAME": "REGIONS",
+									"TGT_SCHEMA_NAME": "HR"
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Snowflake_Migrations"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_Azure_HR_1404')]",
+				"[concat(variables('factoryId'), '/datasets/DS_SNFLK_ETLSB_1304')]",
+				"[concat(variables('factoryId'), '/linkedServices/LS_STG_Generic_1304')]",
+				"[concat(variables('factoryId'), '/linkedServices/LS_Error_Log_Generic_2702')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/P_Migrate_Mult_Files_To_Mult_tables')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -6271,6 +6515,99 @@
 				"[concat(variables('factoryId'), '/datasets/DS_Oracle_HR_1903')]",
 				"[concat(variables('factoryId'), '/datasets/DS_Azure_TGT_SqlDBSalesLT_M_1203')]",
 				"[concat(variables('factoryId'), '/linkedServices/LS_STG_ADLS_1209')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/P_Migrate_Oracle_HR_Snflk_ETLSB')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "OracleHR_To_Snflk_ETLSB",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "OracleSource",
+								"partitionOption": "None",
+								"numberPrecision": 38,
+								"numberScale": 18,
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "SnowflakeV2Sink",
+								"importSettings": {
+									"type": "SnowflakeImportCopyCommand",
+									"storageIntegration": "SNOWFLAKE_AZURE_INT"
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "LS_STG_Generic_1304",
+									"type": "LinkedServiceReference"
+								},
+								"path": "staging"
+							},
+							"logSettings": {
+								"enableCopyActivityLog": true,
+								"copyActivityLogSettings": {
+									"logLevel": "Warning",
+									"enableReliableLogging": false
+								},
+								"logLocationSettings": {
+									"linkedServiceName": {
+										"referenceName": "LS_Error_Log_Generic_2702",
+										"type": "LinkedServiceReference"
+									},
+									"path": "logs"
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_Oracle_HR_1903",
+								"type": "DatasetReference",
+								"parameters": {
+									"SRC_SCHEMA_NAME": "HR",
+									"SRC_TBL_NAME": "EMPLOYEES"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_SNFLK_ETLSB_1304",
+								"type": "DatasetReference",
+								"parameters": {
+									"TGT_TBL_NAME": "EMPLOYEES",
+									"TGT_SCHEMA_NAME": "HR"
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Snowflake_Migrations"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_Oracle_HR_1903')]",
+				"[concat(variables('factoryId'), '/datasets/DS_SNFLK_ETLSB_1304')]",
+				"[concat(variables('factoryId'), '/linkedServices/LS_STG_Generic_1304')]",
+				"[concat(variables('factoryId'), '/linkedServices/LS_Error_Log_Generic_2702')]"
 			]
 		},
 		{
@@ -10983,6 +11320,31 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_ADLS_Parquet_Dim_Cust_2206')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ADLS_Parquet_1604",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "paraquet",
+						"fileSystem": "output"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_Parquet_1604')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_ADVW_Src_2807')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -11220,6 +11582,41 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_Azure_HR_1404')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"SRC_SCHEMA_NAME": {
+						"type": "String"
+					},
+					"SRC_TABLE_NAME": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().SRC_SCHEMA_NAME",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().SRC_TABLE_NAME",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_Azure_SB_Lkp')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_Azure_SRC_SqlDBSalesLT_1203')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -11451,6 +11848,30 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/LS_SB_SCD')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_DIM_CUST_1604')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ADLS_Parquet_1604",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "input"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_Parquet_1604')]"
 			]
 		},
 		{
@@ -13163,6 +13584,82 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_TGT_DIM_CUSTOMER_DETAILS_1604')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ADLS_1604",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "input"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "INDEX_NUM",
+						"type": "String"
+					},
+					{
+						"name": "CUSTOMER_ID",
+						"type": "String"
+					},
+					{
+						"name": "FIRST_NAME",
+						"type": "String"
+					},
+					{
+						"name": "LAST_NAME",
+						"type": "String"
+					},
+					{
+						"name": "COMPANY",
+						"type": "String"
+					},
+					{
+						"name": "CITY",
+						"type": "String"
+					},
+					{
+						"name": "COUNTRY",
+						"type": "String"
+					},
+					{
+						"name": "PHONE_1",
+						"type": "String"
+					},
+					{
+						"name": "PHONE_2",
+						"type": "String"
+					},
+					{
+						"name": "EMAIL",
+						"type": "String"
+					},
+					{
+						"name": "SUBSCRIPTION_DATE",
+						"type": "String"
+					},
+					{
+						"name": "WEBSITE",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_1604')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_Target_Azure_etlorcl_2507')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -13620,6 +14117,52 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/LS_ADLS_1604')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('LS_ADLS_1604_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('LS_ADLS_1604_accountKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzureIR-Standard",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-Standard')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_ADLS_Parquet_1604')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('LS_ADLS_Parquet_1604_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('LS_ADLS_Parquet_1604_accountKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzureIR-Standard",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-Standard')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/LS_AZURE_ORACLE_2507')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -13667,12 +14210,12 @@
 					}
 				},
 				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
+					"referenceName": "AzureIR-Standard",
 					"type": "IntegrationRuntimeReference"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-Standard')]"
 			]
 		},
 		{
@@ -13695,12 +14238,12 @@
 					}
 				},
 				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
+					"referenceName": "AzureIR-Standard",
 					"type": "IntegrationRuntimeReference"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-Standard')]"
 			]
 		},
 		{
@@ -13714,12 +14257,12 @@
 					"connectionString": "[parameters('LS_Blob_ALL_CSV_2502_connectionString')]"
 				},
 				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
+					"referenceName": "AzureIR-Standard",
 					"type": "IntegrationRuntimeReference"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-Standard')]"
 			]
 		},
 		{
@@ -13733,12 +14276,12 @@
 					"connectionString": "[parameters('LS_Blob_Storage_2702_connectionString')]"
 				},
 				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
+					"referenceName": "AzureIR-Standard",
 					"type": "IntegrationRuntimeReference"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-Standard')]"
 			]
 		},
 		{
@@ -13799,12 +14342,12 @@
 					}
 				},
 				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
+					"referenceName": "AzureIR-Standard",
 					"type": "IntegrationRuntimeReference"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-Standard')]"
 			]
 		},
 		{
@@ -13827,12 +14370,12 @@
 					}
 				},
 				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
+					"referenceName": "AzureIR-Standard",
 					"type": "IntegrationRuntimeReference"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-Standard')]"
 			]
 		},
 		{
@@ -13932,12 +14475,12 @@
 					}
 				},
 				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
+					"referenceName": "AzureIR-Standard",
 					"type": "IntegrationRuntimeReference"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-Standard')]"
 			]
 		},
 		{
@@ -14084,12 +14627,12 @@
 					}
 				},
 				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
+					"referenceName": "AzureIR-Standard",
 					"type": "IntegrationRuntimeReference"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-Standard')]"
 			]
 		},
 		{
@@ -14141,13 +14684,34 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/AzureIR-Standard')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "AutoResolve",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 10,
+							"cleanup": false,
+							"customProperties": []
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/SHIR-ONPREM-ORACLE')]",
 			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"type": "SelfHosted",
 				"typeProperties": {
-					"selfContainedInteractiveAuthoringEnabled": true
+					"selfContainedInteractiveAuthoringEnabled": false
 				}
 			},
 			"dependsOn": []

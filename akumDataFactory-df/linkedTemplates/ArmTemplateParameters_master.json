@@ -5,6 +5,12 @@
 		"factoryName": {
 			"value": "akumDataFactory-df"
 		},
+		"LS_ADLS_1604_accountKey": {
+			"value": ""
+		},
+		"LS_ADLS_Parquet_1604_accountKey": {
+			"value": ""
+		},
 		"LS_AZURE_ORACLE_2507_password": {
 			"value": ""
 		},
@@ -64,6 +70,12 @@
 		},
 		"Par_ETLSANDBOX_accountKey": {
 			"value": ""
+		},
+		"LS_ADLS_1604_properties_typeProperties_url": {
+			"value": "https://rastorageaccountadlsgen2.dfs.core.windows.net/"
+		},
+		"LS_ADLS_Parquet_1604_properties_typeProperties_url": {
+			"value": "https://mystorageaccountadlsgen2.dfs.core.windows.net/"
 		},
 		"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
 			"value": "etl-oracle.database.windows.net"

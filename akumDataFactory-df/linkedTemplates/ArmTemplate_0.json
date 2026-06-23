@@ -7,13 +7,13 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "akumDataFactory-df"
 		},
-		"LS_Oracle_ADF_USER_1903_password": {
+		"LS_ADLS_1604_accountKey": {
 			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'LS_Oracle_ADF_USER_1903'"
+			"metadata": "Secure string for 'accountKey' of 'LS_ADLS_1604'"
 		},
-		"LS_AZURE_ORACLE_2507_password": {
+		"LS_ADLS_Parquet_1604_accountKey": {
 			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'LS_AZURE_ORACLE_2507'"
+			"metadata": "Secure string for 'accountKey' of 'LS_ADLS_Parquet_1604'"
 		},
 		"LS_Azure_SB_Lkp_password": {
 			"type": "secureString",
@@ -31,14 +31,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'LS_Blob_Storage_2702'"
 		},
-		"LS_Delete_Blob_From_Landing_0803_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'LS_Delete_Blob_From_Landing_0803'"
-		},
-		"LS_Error_Log_Generic_2702_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'LS_Error_Log_Generic_2702'"
-		},
 		"LS_Files_SB_Tables_Lkp_2502_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_Files_SB_Tables_Lkp_2502'"
@@ -47,45 +39,25 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_LOG_MIGRATION_EVENT'"
 		},
-		"LS_RawFiles_Generic_2702_connectionString": {
+		"LS_Oracle_ADF_USER_1903_password": {
 			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'LS_RawFiles_Generic_2702'"
-		},
-		"LS_Run_DDLs_Azure_2507_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'LS_Run_DDLs_Azure_2507'"
+			"metadata": "Secure string for 'password' of 'LS_Oracle_ADF_USER_1903'"
 		},
 		"LS_SB_SCD_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_SB_SCD'"
 		},
-		"LS_SB_Tgt_SalesLT_M_password": {
+		"LS__SB_ADVW_password": {
 			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'LS_SB_Tgt_SalesLT_M'"
+			"metadata": "Secure string for 'password' of 'LS__SB_ADVW'"
 		},
-		"LS_SB_VIVID_Insert_2502_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'LS_SB_VIVID_Insert_2502'"
-		},
-		"LS_Oracle_ADF_USER_1903_properties_typeProperties_server": {
+		"LS_ADLS_1604_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "localhost:1521/orcl"
+			"defaultValue": "https://rastorageaccountadlsgen2.dfs.core.windows.net/"
 		},
-		"LS_Oracle_ADF_USER_1903_properties_typeProperties_username": {
+		"LS_ADLS_Parquet_1604_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "adf_user"
-		},
-		"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "etl-oracle.database.windows.net"
-		},
-		"LS_AZURE_ORACLE_2507_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "etl-oracle"
-		},
-		"LS_AZURE_ORACLE_2507_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "akum"
+			"defaultValue": "https://mystorageaccountadlsgen2.dfs.core.windows.net/"
 		},
 		"LS_Azure_SB_Lkp_properties_typeProperties_server": {
 			"type": "string",
@@ -135,17 +107,13 @@
 			"type": "string",
 			"defaultValue": "akum"
 		},
-		"LS_Run_DDLs_Azure_2507_properties_typeProperties_server": {
+		"LS_Oracle_ADF_USER_1903_properties_typeProperties_server": {
 			"type": "string",
-			"defaultValue": "etlsandbox.database.windows.net"
+			"defaultValue": "localhost:1521/orcl"
 		},
-		"LS_Run_DDLs_Azure_2507_properties_typeProperties_database": {
+		"LS_Oracle_ADF_USER_1903_properties_typeProperties_username": {
 			"type": "string",
-			"defaultValue": "ETLSANDBOX"
-		},
-		"LS_Run_DDLs_Azure_2507_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "akum"
+			"defaultValue": "adf_user"
 		},
 		"LS_SB_SCD_properties_typeProperties_server": {
 			"type": "string",
@@ -159,27 +127,15 @@
 			"type": "string",
 			"defaultValue": "akum"
 		},
-		"LS_SB_Tgt_SalesLT_M_properties_typeProperties_server": {
+		"LS__SB_ADVW_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "etlsandbox.database.windows.net"
 		},
-		"LS_SB_Tgt_SalesLT_M_properties_typeProperties_database": {
+		"LS__SB_ADVW_properties_typeProperties_database": {
 			"type": "string",
 			"defaultValue": "ETLSANDBOX"
 		},
-		"LS_SB_Tgt_SalesLT_M_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "akum"
-		},
-		"LS_SB_VIVID_Insert_2502_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "etlsandbox.database.windows.net"
-		},
-		"LS_SB_VIVID_Insert_2502_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "ETLSANDBOX"
-		},
-		"LS_SB_VIVID_Insert_2502_properties_typeProperties_userName": {
+		"LS__SB_ADVW_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "akum"
 		}
@@ -189,13 +145,34 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/AzureIR-Standard')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "AutoResolve",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 10,
+							"cleanup": false,
+							"customProperties": []
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/SHIR-ONPREM-ORACLE')]",
 			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"type": "SelfHosted",
 				"typeProperties": {
-					"selfContainedInteractiveAuthoringEnabled": true
+					"selfContainedInteractiveAuthoringEnabled": false
 				}
 			},
 			"dependsOn": []
@@ -765,6 +742,202 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/LS_ADLS_1604')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('LS_ADLS_1604_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('LS_ADLS_1604_accountKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzureIR-Standard",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-Standard')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_ADLS_Parquet_1604')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('LS_ADLS_Parquet_1604_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('LS_ADLS_Parquet_1604_accountKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzureIR-Standard",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-Standard')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_Azure_SB_Lkp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS_Azure_SB_Lkp_properties_typeProperties_server')]",
+					"database": "[parameters('LS_Azure_SB_Lkp_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_Azure_SB_Lkp_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_Azure_SB_Lkp_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzureIR-Standard",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-Standard')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_Azure_tgt_etl_orcl')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS_Azure_tgt_etl_orcl_properties_typeProperties_server')]",
+					"database": "[parameters('LS_Azure_tgt_etl_orcl_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_Azure_tgt_etl_orcl_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_Azure_tgt_etl_orcl_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzureIR-Standard",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-Standard')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_Blob_ALL_CSV_2502')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('LS_Blob_ALL_CSV_2502_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AzureIR-Standard",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-Standard')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_Blob_Storage_2702')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('LS_Blob_Storage_2702_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AzureIR-Standard",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-Standard')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_Files_SB_Tables_Lkp_2502')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_server')]",
+					"database": "[parameters('LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_Files_SB_Tables_Lkp_2502_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzureIR-Standard",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-Standard')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_LOG_MIGRATION_EVENT')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS_LOG_MIGRATION_EVENT_properties_typeProperties_server')]",
+					"database": "[parameters('LS_LOG_MIGRATION_EVENT_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_LOG_MIGRATION_EVENT_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_LOG_MIGRATION_EVENT_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzureIR-Standard",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-Standard')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/LS_Oracle_ADF_USER_1903')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -795,6 +968,62 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/LS_SB_SCD')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS_SB_SCD_properties_typeProperties_server')]",
+					"database": "[parameters('LS_SB_SCD_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_SB_SCD_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_SB_SCD_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzureIR-Standard",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-Standard')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS__SB_ADVW')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS__SB_ADVW_properties_typeProperties_server')]",
+					"database": "[parameters('LS__SB_ADVW_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS__SB_ADVW_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS__SB_ADVW_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzureIR-Standard",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-Standard')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/AutoResolveIntegrationRuntime')]",
 			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
 			"apiVersion": "2018-06-01",
@@ -820,385 +1049,230 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DS_Oracle_HR_1903')]",
+			"name": "[concat(parameters('factoryName'), '/DS_ADLS_Parquet_Dim_Cust_2206')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "LS_Oracle_ADF_USER_1903",
+					"referenceName": "LS_ADLS_Parquet_1604",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "paraquet",
+						"fileSystem": "output"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_Parquet_1604')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_ADVW_Src_2807')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS__SB_ADVW",
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
-					"SRC_SCHEMA_NAME": {
+					"SRC_ADVW_SCHEMA_NAME": {
 						"type": "String"
 					},
-					"SRC_TBL_NAME": {
+					"SRC_ADVW_TABLE_NAME": {
 						"type": "String"
 					}
 				},
 				"annotations": [],
-				"type": "OracleTable",
+				"type": "AzureSqlTable",
 				"schema": [],
 				"typeProperties": {
 					"schema": {
-						"value": "@dataset().SRC_SCHEMA_NAME",
+						"value": "@dataset().SRC_ADVW_SCHEMA_NAME",
 						"type": "Expression"
 					},
 					"table": {
-						"value": "@dataset().SRC_TBL_NAME",
+						"value": "@dataset().SRC_ADVW_TABLE_NAME",
 						"type": "Expression"
 					}
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS_Oracle_ADF_USER_1903')]"
+				"[concat(variables('factoryId'), '/linkedServices/LS__SB_ADVW')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/LS_AZURE_ORACLE_2507')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"name": "[concat(parameters('factoryName'), '/DS_ALL_CSV_2502')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('LS_AZURE_ORACLE_2507_properties_typeProperties_server')]",
-					"database": "[parameters('LS_AZURE_ORACLE_2507_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('LS_AZURE_ORACLE_2507_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS_AZURE_ORACLE_2507_password')]"
+				"linkedServiceName": {
+					"referenceName": "LS_Blob_ALL_CSV_2502",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"SRC_FILE_NAME": {
+						"type": "String"
 					}
 				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_Azure_SB_Lkp')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
 				"annotations": [],
-				"type": "AzureSqlDatabase",
+				"type": "DelimitedText",
 				"typeProperties": {
-					"server": "[parameters('LS_Azure_SB_Lkp_properties_typeProperties_server')]",
-					"database": "[parameters('LS_Azure_SB_Lkp_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('LS_Azure_SB_Lkp_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS_Azure_SB_Lkp_password')]"
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().SRC_FILE_NAME",
+							"type": "Expression"
+						},
+						"container": "raw-files"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "DEPARTMENT_ID",
+						"type": "String"
+					},
+					{
+						"name": "DEPARTMENT_NAME",
+						"type": "String"
+					},
+					{
+						"name": "LOCATION",
+						"type": "String"
+					},
+					{
+						"name": "HEAD_OF_DEPARTMENT",
+						"type": "String"
+					},
+					{
+						"name": "BUDGET",
+						"type": "String"
 					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
+				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+				"[concat(variables('factoryId'), '/linkedServices/LS_Blob_ALL_CSV_2502')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/LS_Azure_tgt_etl_orcl')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"name": "[concat(parameters('factoryName'), '/DS_Azure_Dim_DWH_1209')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
 				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('LS_Azure_tgt_etl_orcl_properties_typeProperties_server')]",
-					"database": "[parameters('LS_Azure_tgt_etl_orcl_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('LS_Azure_tgt_etl_orcl_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS_Azure_tgt_etl_orcl_password')]"
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "PEOPLE_SID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "INDEX_NUM",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "USR_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FIRST_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LAST_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SEX",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EMAIL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PHONE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DATE_OF_BIRTH",
+						"type": "nvarchar"
+					},
+					{
+						"name": "JOB_TITLE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SRC_ROW_INSRT_TSTMP",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "HASH_DIFF",
+						"type": "varbinary"
+					},
+					{
+						"name": "WATERMARK_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ROW_EFF_DT",
+						"type": "date"
+					},
+					{
+						"name": "ROW_EXPIR_DT",
+						"type": "date"
+					},
+					{
+						"name": "ROW_STS_CD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "VERSION_NUM",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "INSERT_TSTMP_IST",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "LST_UPD_TSTMP_IST",
+						"type": "datetime2",
+						"scale": 7
 					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_Blob_ALL_CSV_2502')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
+				],
 				"typeProperties": {
-					"connectionString": "[parameters('LS_Blob_ALL_CSV_2502_connectionString')]"
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
+					"schema": "DWH",
+					"table": "DIM_PEOPLE_DETAILS"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_Blob_Storage_2702')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('LS_Blob_Storage_2702_connectionString')]"
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_Delete_Blob_From_Landing_0803')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('LS_Delete_Blob_From_Landing_0803_connectionString')]"
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_Error_Log_Generic_2702')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('LS_Error_Log_Generic_2702_connectionString')]"
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_Files_SB_Tables_Lkp_2502')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_server')]",
-					"database": "[parameters('LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('LS_Files_SB_Tables_Lkp_2502_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS_Files_SB_Tables_Lkp_2502_password')]"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_LOG_MIGRATION_EVENT')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('LS_LOG_MIGRATION_EVENT_properties_typeProperties_server')]",
-					"database": "[parameters('LS_LOG_MIGRATION_EVENT_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('LS_LOG_MIGRATION_EVENT_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS_LOG_MIGRATION_EVENT_password')]"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_RawFiles_Generic_2702')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('LS_RawFiles_Generic_2702_connectionString')]"
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_Run_DDLs_Azure_2507')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('LS_Run_DDLs_Azure_2507_properties_typeProperties_server')]",
-					"database": "[parameters('LS_Run_DDLs_Azure_2507_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('LS_Run_DDLs_Azure_2507_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS_Run_DDLs_Azure_2507_password')]"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_SB_SCD')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('LS_SB_SCD_properties_typeProperties_server')]",
-					"database": "[parameters('LS_SB_SCD_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('LS_SB_SCD_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS_SB_SCD_password')]"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_SB_Tgt_SalesLT_M')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('LS_SB_Tgt_SalesLT_M_properties_typeProperties_server')]",
-					"database": "[parameters('LS_SB_Tgt_SalesLT_M_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('LS_SB_Tgt_SalesLT_M_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS_SB_Tgt_SalesLT_M_password')]"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_SB_VIVID_Insert_2502')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('LS_SB_VIVID_Insert_2502_properties_typeProperties_server')]",
-					"database": "[parameters('LS_SB_VIVID_Insert_2502_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('LS_SB_VIVID_Insert_2502_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS_SB_VIVID_Insert_2502_password')]"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+				"[concat(variables('factoryId'), '/linkedServices/LS_Azure_SB_Lkp')]"
 			]
 		}
 	]

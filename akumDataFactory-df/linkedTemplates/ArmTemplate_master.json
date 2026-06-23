@@ -7,6 +7,14 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "akumDataFactory-df"
 		},
+		"LS_ADLS_1604_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'LS_ADLS_1604'"
+		},
+		"LS_ADLS_Parquet_1604_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'LS_ADLS_Parquet_1604'"
+		},
 		"LS_AZURE_ORACLE_2507_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_AZURE_ORACLE_2507'"
@@ -86,6 +94,14 @@
 		"Par_ETLSANDBOX_accountKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'Par_ETLSANDBOX'"
+		},
+		"LS_ADLS_1604_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://rastorageaccountadlsgen2.dfs.core.windows.net/"
+		},
+		"LS_ADLS_Parquet_1604_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://mystorageaccountadlsgen2.dfs.core.windows.net/"
 		},
 		"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
 			"type": "string",
@@ -258,11 +274,11 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
-					"LS_Oracle_ADF_USER_1903_password": {
-						"value": "[parameters('LS_Oracle_ADF_USER_1903_password')]"
+					"LS_ADLS_1604_accountKey": {
+						"value": "[parameters('LS_ADLS_1604_accountKey')]"
 					},
-					"LS_AZURE_ORACLE_2507_password": {
-						"value": "[parameters('LS_AZURE_ORACLE_2507_password')]"
+					"LS_ADLS_Parquet_1604_accountKey": {
+						"value": "[parameters('LS_ADLS_Parquet_1604_accountKey')]"
 					},
 					"LS_Azure_SB_Lkp_password": {
 						"value": "[parameters('LS_Azure_SB_Lkp_password')]"
@@ -276,47 +292,26 @@
 					"LS_Blob_Storage_2702_connectionString": {
 						"value": "[parameters('LS_Blob_Storage_2702_connectionString')]"
 					},
-					"LS_Delete_Blob_From_Landing_0803_connectionString": {
-						"value": "[parameters('LS_Delete_Blob_From_Landing_0803_connectionString')]"
-					},
-					"LS_Error_Log_Generic_2702_connectionString": {
-						"value": "[parameters('LS_Error_Log_Generic_2702_connectionString')]"
-					},
 					"LS_Files_SB_Tables_Lkp_2502_password": {
 						"value": "[parameters('LS_Files_SB_Tables_Lkp_2502_password')]"
 					},
 					"LS_LOG_MIGRATION_EVENT_password": {
 						"value": "[parameters('LS_LOG_MIGRATION_EVENT_password')]"
 					},
-					"LS_RawFiles_Generic_2702_connectionString": {
-						"value": "[parameters('LS_RawFiles_Generic_2702_connectionString')]"
-					},
-					"LS_Run_DDLs_Azure_2507_password": {
-						"value": "[parameters('LS_Run_DDLs_Azure_2507_password')]"
+					"LS_Oracle_ADF_USER_1903_password": {
+						"value": "[parameters('LS_Oracle_ADF_USER_1903_password')]"
 					},
 					"LS_SB_SCD_password": {
 						"value": "[parameters('LS_SB_SCD_password')]"
 					},
-					"LS_SB_Tgt_SalesLT_M_password": {
-						"value": "[parameters('LS_SB_Tgt_SalesLT_M_password')]"
+					"LS__SB_ADVW_password": {
+						"value": "[parameters('LS__SB_ADVW_password')]"
 					},
-					"LS_SB_VIVID_Insert_2502_password": {
-						"value": "[parameters('LS_SB_VIVID_Insert_2502_password')]"
+					"LS_ADLS_1604_properties_typeProperties_url": {
+						"value": "[parameters('LS_ADLS_1604_properties_typeProperties_url')]"
 					},
-					"LS_Oracle_ADF_USER_1903_properties_typeProperties_server": {
-						"value": "[parameters('LS_Oracle_ADF_USER_1903_properties_typeProperties_server')]"
-					},
-					"LS_Oracle_ADF_USER_1903_properties_typeProperties_username": {
-						"value": "[parameters('LS_Oracle_ADF_USER_1903_properties_typeProperties_username')]"
-					},
-					"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
-						"value": "[parameters('LS_AZURE_ORACLE_2507_properties_typeProperties_server')]"
-					},
-					"LS_AZURE_ORACLE_2507_properties_typeProperties_database": {
-						"value": "[parameters('LS_AZURE_ORACLE_2507_properties_typeProperties_database')]"
-					},
-					"LS_AZURE_ORACLE_2507_properties_typeProperties_userName": {
-						"value": "[parameters('LS_AZURE_ORACLE_2507_properties_typeProperties_userName')]"
+					"LS_ADLS_Parquet_1604_properties_typeProperties_url": {
+						"value": "[parameters('LS_ADLS_Parquet_1604_properties_typeProperties_url')]"
 					},
 					"LS_Azure_SB_Lkp_properties_typeProperties_server": {
 						"value": "[parameters('LS_Azure_SB_Lkp_properties_typeProperties_server')]"
@@ -354,14 +349,11 @@
 					"LS_LOG_MIGRATION_EVENT_properties_typeProperties_userName": {
 						"value": "[parameters('LS_LOG_MIGRATION_EVENT_properties_typeProperties_userName')]"
 					},
-					"LS_Run_DDLs_Azure_2507_properties_typeProperties_server": {
-						"value": "[parameters('LS_Run_DDLs_Azure_2507_properties_typeProperties_server')]"
+					"LS_Oracle_ADF_USER_1903_properties_typeProperties_server": {
+						"value": "[parameters('LS_Oracle_ADF_USER_1903_properties_typeProperties_server')]"
 					},
-					"LS_Run_DDLs_Azure_2507_properties_typeProperties_database": {
-						"value": "[parameters('LS_Run_DDLs_Azure_2507_properties_typeProperties_database')]"
-					},
-					"LS_Run_DDLs_Azure_2507_properties_typeProperties_userName": {
-						"value": "[parameters('LS_Run_DDLs_Azure_2507_properties_typeProperties_userName')]"
+					"LS_Oracle_ADF_USER_1903_properties_typeProperties_username": {
+						"value": "[parameters('LS_Oracle_ADF_USER_1903_properties_typeProperties_username')]"
 					},
 					"LS_SB_SCD_properties_typeProperties_server": {
 						"value": "[parameters('LS_SB_SCD_properties_typeProperties_server')]"
@@ -372,23 +364,14 @@
 					"LS_SB_SCD_properties_typeProperties_userName": {
 						"value": "[parameters('LS_SB_SCD_properties_typeProperties_userName')]"
 					},
-					"LS_SB_Tgt_SalesLT_M_properties_typeProperties_server": {
-						"value": "[parameters('LS_SB_Tgt_SalesLT_M_properties_typeProperties_server')]"
+					"LS__SB_ADVW_properties_typeProperties_server": {
+						"value": "[parameters('LS__SB_ADVW_properties_typeProperties_server')]"
 					},
-					"LS_SB_Tgt_SalesLT_M_properties_typeProperties_database": {
-						"value": "[parameters('LS_SB_Tgt_SalesLT_M_properties_typeProperties_database')]"
+					"LS__SB_ADVW_properties_typeProperties_database": {
+						"value": "[parameters('LS__SB_ADVW_properties_typeProperties_database')]"
 					},
-					"LS_SB_Tgt_SalesLT_M_properties_typeProperties_userName": {
-						"value": "[parameters('LS_SB_Tgt_SalesLT_M_properties_typeProperties_userName')]"
-					},
-					"LS_SB_VIVID_Insert_2502_properties_typeProperties_server": {
-						"value": "[parameters('LS_SB_VIVID_Insert_2502_properties_typeProperties_server')]"
-					},
-					"LS_SB_VIVID_Insert_2502_properties_typeProperties_database": {
-						"value": "[parameters('LS_SB_VIVID_Insert_2502_properties_typeProperties_database')]"
-					},
-					"LS_SB_VIVID_Insert_2502_properties_typeProperties_userName": {
-						"value": "[parameters('LS_SB_VIVID_Insert_2502_properties_typeProperties_userName')]"
+					"LS__SB_ADVW_properties_typeProperties_userName": {
+						"value": "[parameters('LS__SB_ADVW_properties_typeProperties_userName')]"
 					}
 				}
 			},
@@ -407,42 +390,6 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
-					},
-					"LS_SNFLK_ETLSB_VIVID_password": {
-						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_password')]"
-					},
-					"LS_STG_ADLS_1209_connectionString": {
-						"value": "[parameters('LS_STG_ADLS_1209_connectionString')]"
-					},
-					"LS_STG_Generic_1304_connectionString": {
-						"value": "[parameters('LS_STG_Generic_1304_connectionString')]"
-					},
-					"LS__SB_ADVW_password": {
-						"value": "[parameters('LS__SB_ADVW_password')]"
-					},
-					"Par_ETLSANDBOX_accountKey": {
-						"value": "[parameters('Par_ETLSANDBOX_accountKey')]"
-					},
-					"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database": {
-						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database')]"
-					},
-					"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role": {
-						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role')]"
-					},
-					"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host": {
-						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host')]"
-					},
-					"LS__SB_ADVW_properties_typeProperties_server": {
-						"value": "[parameters('LS__SB_ADVW_properties_typeProperties_server')]"
-					},
-					"LS__SB_ADVW_properties_typeProperties_database": {
-						"value": "[parameters('LS__SB_ADVW_properties_typeProperties_database')]"
-					},
-					"LS__SB_ADVW_properties_typeProperties_userName": {
-						"value": "[parameters('LS__SB_ADVW_properties_typeProperties_userName')]"
-					},
-					"Par_ETLSANDBOX_properties_typeProperties_url": {
-						"value": "[parameters('Par_ETLSANDBOX_properties_typeProperties_url')]"
 					}
 				}
 			},
@@ -483,6 +430,87 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"LS_AZURE_ORACLE_2507_password": {
+						"value": "[parameters('LS_AZURE_ORACLE_2507_password')]"
+					},
+					"LS_Delete_Blob_From_Landing_0803_connectionString": {
+						"value": "[parameters('LS_Delete_Blob_From_Landing_0803_connectionString')]"
+					},
+					"LS_Error_Log_Generic_2702_connectionString": {
+						"value": "[parameters('LS_Error_Log_Generic_2702_connectionString')]"
+					},
+					"LS_RawFiles_Generic_2702_connectionString": {
+						"value": "[parameters('LS_RawFiles_Generic_2702_connectionString')]"
+					},
+					"LS_Run_DDLs_Azure_2507_password": {
+						"value": "[parameters('LS_Run_DDLs_Azure_2507_password')]"
+					},
+					"LS_SB_Tgt_SalesLT_M_password": {
+						"value": "[parameters('LS_SB_Tgt_SalesLT_M_password')]"
+					},
+					"LS_SB_VIVID_Insert_2502_password": {
+						"value": "[parameters('LS_SB_VIVID_Insert_2502_password')]"
+					},
+					"LS_SNFLK_ETLSB_VIVID_password": {
+						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_password')]"
+					},
+					"LS_STG_ADLS_1209_connectionString": {
+						"value": "[parameters('LS_STG_ADLS_1209_connectionString')]"
+					},
+					"LS_STG_Generic_1304_connectionString": {
+						"value": "[parameters('LS_STG_Generic_1304_connectionString')]"
+					},
+					"Par_ETLSANDBOX_accountKey": {
+						"value": "[parameters('Par_ETLSANDBOX_accountKey')]"
+					},
+					"LS_AZURE_ORACLE_2507_properties_typeProperties_server": {
+						"value": "[parameters('LS_AZURE_ORACLE_2507_properties_typeProperties_server')]"
+					},
+					"LS_AZURE_ORACLE_2507_properties_typeProperties_database": {
+						"value": "[parameters('LS_AZURE_ORACLE_2507_properties_typeProperties_database')]"
+					},
+					"LS_AZURE_ORACLE_2507_properties_typeProperties_userName": {
+						"value": "[parameters('LS_AZURE_ORACLE_2507_properties_typeProperties_userName')]"
+					},
+					"LS_Run_DDLs_Azure_2507_properties_typeProperties_server": {
+						"value": "[parameters('LS_Run_DDLs_Azure_2507_properties_typeProperties_server')]"
+					},
+					"LS_Run_DDLs_Azure_2507_properties_typeProperties_database": {
+						"value": "[parameters('LS_Run_DDLs_Azure_2507_properties_typeProperties_database')]"
+					},
+					"LS_Run_DDLs_Azure_2507_properties_typeProperties_userName": {
+						"value": "[parameters('LS_Run_DDLs_Azure_2507_properties_typeProperties_userName')]"
+					},
+					"LS_SB_Tgt_SalesLT_M_properties_typeProperties_server": {
+						"value": "[parameters('LS_SB_Tgt_SalesLT_M_properties_typeProperties_server')]"
+					},
+					"LS_SB_Tgt_SalesLT_M_properties_typeProperties_database": {
+						"value": "[parameters('LS_SB_Tgt_SalesLT_M_properties_typeProperties_database')]"
+					},
+					"LS_SB_Tgt_SalesLT_M_properties_typeProperties_userName": {
+						"value": "[parameters('LS_SB_Tgt_SalesLT_M_properties_typeProperties_userName')]"
+					},
+					"LS_SB_VIVID_Insert_2502_properties_typeProperties_server": {
+						"value": "[parameters('LS_SB_VIVID_Insert_2502_properties_typeProperties_server')]"
+					},
+					"LS_SB_VIVID_Insert_2502_properties_typeProperties_database": {
+						"value": "[parameters('LS_SB_VIVID_Insert_2502_properties_typeProperties_database')]"
+					},
+					"LS_SB_VIVID_Insert_2502_properties_typeProperties_userName": {
+						"value": "[parameters('LS_SB_VIVID_Insert_2502_properties_typeProperties_userName')]"
+					},
+					"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database": {
+						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database')]"
+					},
+					"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role": {
+						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role')]"
+					},
+					"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host": {
+						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host')]"
+					},
+					"Par_ETLSANDBOX_properties_typeProperties_url": {
+						"value": "[parameters('Par_ETLSANDBOX_properties_typeProperties_url')]"
 					}
 				}
 			},

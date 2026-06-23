@@ -6,447 +6,12 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "akumDataFactory-df"
-		},
-		"LS_SNFLK_ETLSB_VIVID_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'LS_SNFLK_ETLSB_VIVID'"
-		},
-		"LS_STG_ADLS_1209_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'LS_STG_ADLS_1209'"
-		},
-		"LS_STG_Generic_1304_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'LS_STG_Generic_1304'"
-		},
-		"LS__SB_ADVW_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'LS__SB_ADVW'"
-		},
-		"Par_ETLSANDBOX_accountKey": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accountKey' of 'Par_ETLSANDBOX'"
-		},
-		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "ETLSANDBOX"
-		},
-		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role": {
-			"type": "string",
-			"defaultValue": "ACCOUNTADMIN"
-		},
-		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host": {
-			"type": "string",
-			"defaultValue": "SDJADWP-HZ24305.snowflakecomputing.com"
-		},
-		"LS__SB_ADVW_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "etlsandbox.database.windows.net"
-		},
-		"LS__SB_ADVW_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "ETLSANDBOX"
-		},
-		"LS__SB_ADVW_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "akum"
-		},
-		"Par_ETLSANDBOX_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://akumadlsgen2.dfs.core.windows.net/"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_SNFLK_ETLSB_VIVID')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "SnowflakeV2",
-				"typeProperties": {
-					"authenticationType": "Basic",
-					"accountIdentifier": "SDJADWP-HZ24305",
-					"user": "akum1823",
-					"database": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database')]",
-					"warehouse": "COMPUTE_WH",
-					"role": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role')]",
-					"host": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_password')]"
-					}
-				},
-				"version": "1.1",
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_STG_ADLS_1209')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('LS_STG_ADLS_1209_connectionString')]"
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_STG_Generic_1304')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('LS_STG_Generic_1304_connectionString')]"
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS__SB_ADVW')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('LS__SB_ADVW_properties_typeProperties_server')]",
-					"database": "[parameters('LS__SB_ADVW_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('LS__SB_ADVW_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS__SB_ADVW_password')]"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Par_ETLSANDBOX')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobFS",
-				"typeProperties": {
-					"url": "[parameters('Par_ETLSANDBOX_properties_typeProperties_url')]",
-					"accountKey": {
-						"type": "SecureString",
-						"value": "[parameters('Par_ETLSANDBOX_accountKey')]"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/RunDDLs')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "It runs DDLs",
-				"activities": [
-					{
-						"name": "DropTables",
-						"description": "Drop Tables if exists",
-						"type": "Script",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "LS_Run_DDLs_Azure_2507",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": "DROP TABLE IF EXISTS OHR.JOB_HISTORY;\r\nDROP TABLE IF EXISTS OHR.EMPLOYEES;\r\nDROP TABLE IF EXISTS OHR.DEPARTMENTS;\r\nDROP TABLE IF EXISTS OHR.LOCATIONS;\r\nDROP TABLE IF EXISTS OHR.COUNTRIES;\r\nDROP TABLE IF EXISTS OHR.REGIONS;\r\nDROP TABLE IF EXISTS OHR.JOBS;"
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					},
-					{
-						"name": "CreateTables",
-						"description": "Create Tables etl-oracle database in azure",
-						"type": "Script",
-						"dependsOn": [
-							{
-								"activity": "DropTables",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "LS_Run_DDLs_Azure_2507",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": "CREATE TABLE OHR.JOBS (\r\n  JOB_ID NVARCHAR(100),\r\n  JOB_TITLE NVARCHAR(35) NOT NULL,\r\n  MIN_SALARY FLOAT,\r\n  MAX_SALARY FLOAT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (JOB_ID)\r\n);\r\n\r\nCREATE TABLE OHR.REGIONS (\r\n  REGION_ID NVARCHAR(100) NOT NULL,\r\n  REGION_NAME NVARCHAR(25),\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (REGION_ID)\r\n);\r\n\r\nCREATE TABLE OHR.COUNTRIES (\r\n  COUNTRY_ID NVARCHAR(100) NOT NULL,\r\n  COUNTRY_NAME NVARCHAR(40),\r\n  REGION_ID FLOAT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (COUNTRY_ID)\r\n);\r\n\r\nCREATE TABLE OHR.LOCATIONS (\r\n  LOCATION_ID NVARCHAR(100),\r\n  STREET_ADDRESS NVARCHAR(40),\r\n  POSTAL_CODE NVARCHAR(12),\r\n  CITY NVARCHAR(30) NOT NULL,\r\n  STATE_PROVINCE NVARCHAR(25),\r\n  COUNTRY_ID CHAR(2),\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (LOCATION_ID)\r\n);\r\n\r\nCREATE TABLE OHR.DEPARTMENTS (\r\n  DEPARTMENT_ID NVARCHAR(100),\r\n  DEPARTMENT_NAME NVARCHAR(30) NOT NULL,\r\n  MANAGER_ID INT,\r\n  LOCATION_ID INT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (DEPARTMENT_ID)\r\n);\r\n\r\nCREATE TABLE OHR.EMPLOYEES (\r\n  EMPLOYEE_ID NVARCHAR(100),\r\n  FIRST_NAME NVARCHAR(20),\r\n  LAST_NAME NVARCHAR(25) NOT NULL,\r\n  EMAIL NVARCHAR(25) NOT NULL,\r\n  PHONE_NUMBER NVARCHAR(20),\r\n  HIRE_DATE DATETIME NOT NULL,\r\n  JOB_ID NVARCHAR(10) NOT NULL,\r\n  SALARY DECIMAL(8,2),\r\n  COMMISSION_PCT DECIMAL(2,2),\r\n  MANAGER_ID INT,\r\n  DEPARTMENT_ID INT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (EMPLOYEE_ID),\r\n  UNIQUE (EMAIL),\r\n  CHECK (salary > 0)\r\n);\r\n\r\nCREATE TABLE OHR.JOB_HISTORY (\r\n  EMPLOYEE_ID NVARCHAR(100) NOT NULL,\r\n  START_DATE DATETIME NOT NULL,\r\n  END_DATE DATETIME NOT NULL,\r\n  JOB_ID NVARCHAR(10) NOT NULL,\r\n  DEPARTMENT_ID INT,\r\n  SRC_ROW_INSERT_TSTMP DATETIME2,\r\n  INSERT_TSTMP_IST DATETIME2 DEFAULT SYSDATETIME() AT TIME ZONE 'UTC' AT TIME ZONE 'India Standard Time',\r\n  PRIMARY KEY (EMPLOYEE_ID, START_DATE),\r\n  CHECK (end_date > start_date)\r\n);"
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DDLs"
-				},
-				"annotations": [],
-				"lastPublishTime": "2025-08-14T03:03:28Z"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_ADVW_Src_2807')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS__SB_ADVW",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"SRC_ADVW_SCHEMA_NAME": {
-						"type": "String"
-					},
-					"SRC_ADVW_TABLE_NAME": {
-						"type": "String"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().SRC_ADVW_SCHEMA_NAME",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().SRC_ADVW_TABLE_NAME",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS__SB_ADVW')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_ALL_CSV_2502')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_Blob_ALL_CSV_2502",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"SRC_FILE_NAME": {
-						"type": "String"
-					}
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": {
-							"value": "@dataset().SRC_FILE_NAME",
-							"type": "Expression"
-						},
-						"container": "raw-files"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "DEPARTMENT_ID",
-						"type": "String"
-					},
-					{
-						"name": "DEPARTMENT_NAME",
-						"type": "String"
-					},
-					{
-						"name": "LOCATION",
-						"type": "String"
-					},
-					{
-						"name": "HEAD_OF_DEPARTMENT",
-						"type": "String"
-					},
-					{
-						"name": "BUDGET",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_Azure_Dim_DWH_1209')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_Azure_SB_Lkp",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "PEOPLE_SID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "INDEX_NUM",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "USR_ID",
-						"type": "nvarchar"
-					},
-					{
-						"name": "FIRST_NAME",
-						"type": "nvarchar"
-					},
-					{
-						"name": "LAST_NAME",
-						"type": "nvarchar"
-					},
-					{
-						"name": "SEX",
-						"type": "nvarchar"
-					},
-					{
-						"name": "EMAIL",
-						"type": "nvarchar"
-					},
-					{
-						"name": "PHONE",
-						"type": "nvarchar"
-					},
-					{
-						"name": "DATE_OF_BIRTH",
-						"type": "nvarchar"
-					},
-					{
-						"name": "JOB_TITLE",
-						"type": "nvarchar"
-					},
-					{
-						"name": "SRC_ROW_INSRT_TSTMP",
-						"type": "datetime2",
-						"scale": 7
-					},
-					{
-						"name": "HASH_DIFF",
-						"type": "varbinary"
-					},
-					{
-						"name": "WATERMARK_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "BATCH_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "ROW_EFF_DT",
-						"type": "date"
-					},
-					{
-						"name": "ROW_EXPIR_DT",
-						"type": "date"
-					},
-					{
-						"name": "ROW_STS_CD",
-						"type": "nvarchar"
-					},
-					{
-						"name": "VERSION_NUM",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "INSERT_TSTMP_IST",
-						"type": "datetime2",
-						"scale": 7
-					},
-					{
-						"name": "LST_UPD_TSTMP_IST",
-						"type": "datetime2",
-						"scale": 7
-					}
-				],
-				"typeProperties": {
-					"schema": "DWH",
-					"table": "DIM_PEOPLE_DETAILS"
-				}
-			},
-			"dependsOn": []
-		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DS_Azure_ETL_Oracle')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
@@ -474,6 +39,39 @@
 					},
 					"table": {
 						"value": "@dataset().Azure_Tgt_Table_name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Azure_HR_1404')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"SRC_SCHEMA_NAME": {
+						"type": "String"
+					},
+					"SRC_TABLE_NAME": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().SRC_SCHEMA_NAME",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().SRC_TABLE_NAME",
 						"type": "Expression"
 					}
 				}
@@ -582,9 +180,7 @@
 					"table": "BLOB_CUSTOMER_RAW"
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS__SB_ADVW')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DS_DIM_CUST')]",
@@ -703,6 +299,28 @@
 					"schema": "DWH",
 					"table": "DIM_CUSTOMER_DETAILS"
 				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_DIM_CUST_1604')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ADLS_Parquet_1604",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "input"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
 			},
 			"dependsOn": []
 		},
@@ -1153,6 +771,325 @@
 					"schema": "DWH",
 					"table": "DIM_CUSTOMER_DETAILS"
 				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_DWH_STG')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Azure_SB_Lkp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Stg_Schema_Name": {
+						"type": "String"
+					},
+					"Stg_Table_Name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().Stg_Schema_Name",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().Stg_Table_Name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Error_Generic_2702')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Blob_Storage_2702",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"folderPath": {
+						"type": "String"
+					},
+					"fileName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().fileName",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().folderPath",
+							"type": "Expression"
+						},
+						"container": "error-files"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Files_To_Tables_2502')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Files_SB_Tables_Lkp_2502",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "FILE_TABLE_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SRC_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TGT_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SRC_SCHEMA_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TGT_SCHEMA_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SRC_TYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TGT_TYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ROW_ADDED_BY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ROW_STS_CD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PIPLN_NM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ROW_VERSION",
+						"type": "timestamp"
+					},
+					{
+						"name": "INSERT_TSTMP_IST",
+						"type": "datetime2",
+						"scale": 7
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "FILE_TABLE_MAPPING"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Get_Watermark_2308')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS__SB_ADVW",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Stg_Schema_Name": {
+						"type": "String"
+					},
+					"Stg_Table_Name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().Stg_Schema_Name",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().Stg_Table_Name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Landing_Generic_0303')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Blob_Storage_2702",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"FileName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().FileName",
+							"type": "Expression"
+						},
+						"container": "files-landing-zone"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "INDEX_NUM",
+						"type": "String"
+					},
+					{
+						"name": "CUSTOMER_ID",
+						"type": "String"
+					},
+					{
+						"name": "FIRST_NAME",
+						"type": "String"
+					},
+					{
+						"name": "LAST_NAME",
+						"type": "String"
+					},
+					{
+						"name": "COMPANY",
+						"type": "String"
+					},
+					{
+						"name": "CITY",
+						"type": "String"
+					},
+					{
+						"name": "COUNTRY",
+						"type": "String"
+					},
+					{
+						"name": "PHONE_1",
+						"type": "String"
+					},
+					{
+						"name": "PHONE_2",
+						"type": "String"
+					},
+					{
+						"name": "EMAIL",
+						"type": "String"
+					},
+					{
+						"name": "SUBSCRIPTION_DATE",
+						"type": "String"
+					},
+					{
+						"name": "WEBSITE",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Landing_Generic_0503')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Blob_Storage_2702",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": "files-landing-zone"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Landing_Generic_2702')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Blob_Storage_2702",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"folderPath": {
+						"type": "String"
+					},
+					"fileName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "*",
+						"container": "files-landing-zone"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
 			},
 			"dependsOn": []
 		}
