@@ -47,9 +47,17 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_SB_SCD'"
 		},
+		"LS_SNFLK_ETLSB_VIVID_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_SNFLK_ETLSB_VIVID'"
+		},
 		"LS__SB_ADVW_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS__SB_ADVW'"
+		},
+		"Par_ETLSANDBOX_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'Par_ETLSANDBOX'"
 		},
 		"LS_ADLS_1604_properties_typeProperties_url": {
 			"type": "string",
@@ -127,6 +135,18 @@
 			"type": "string",
 			"defaultValue": "akum"
 		},
+		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "ETLSANDBOX"
+		},
+		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role": {
+			"type": "string",
+			"defaultValue": "ACCOUNTADMIN"
+		},
+		"LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "SDJADWP-HZ24305.snowflakecomputing.com"
+		},
 		"LS__SB_ADVW_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "etlsandbox.database.windows.net"
@@ -138,6 +158,10 @@
 		"LS__SB_ADVW_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "akum"
+		},
+		"Par_ETLSANDBOX_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://akumadlsgen2.dfs.core.windows.net/"
 		}
 	},
 	"variables": {
@@ -996,6 +1020,36 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/LS_SNFLK_ETLSB_VIVID')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "SnowflakeV2",
+				"typeProperties": {
+					"authenticationType": "Basic",
+					"accountIdentifier": "SDJADWP-HZ24305",
+					"user": "akum1823",
+					"database": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_database')]",
+					"warehouse": "COMPUTE_WH",
+					"role": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_role')]",
+					"host": "[parameters('LS_SNFLK_ETLSB_VIVID_properties_typeProperties_host')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_SNFLK_ETLSB_VIVID_password')]"
+					}
+				},
+				"version": "1.1",
+				"connectVia": {
+					"referenceName": "AzureIR-Standard",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-Standard')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/LS__SB_ADVW')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -1012,6 +1066,29 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('LS__SB_ADVW_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzureIR-Standard",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-Standard')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Par_ETLSANDBOX')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('Par_ETLSANDBOX_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('Par_ETLSANDBOX_accountKey')]"
 					}
 				},
 				"connectVia": {
@@ -1106,173 +1183,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/LS__SB_ADVW')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_ALL_CSV_2502')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_Blob_ALL_CSV_2502",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"SRC_FILE_NAME": {
-						"type": "String"
-					}
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": {
-							"value": "@dataset().SRC_FILE_NAME",
-							"type": "Expression"
-						},
-						"container": "raw-files"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "DEPARTMENT_ID",
-						"type": "String"
-					},
-					{
-						"name": "DEPARTMENT_NAME",
-						"type": "String"
-					},
-					{
-						"name": "LOCATION",
-						"type": "String"
-					},
-					{
-						"name": "HEAD_OF_DEPARTMENT",
-						"type": "String"
-					},
-					{
-						"name": "BUDGET",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS_Blob_ALL_CSV_2502')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_Azure_Dim_DWH_1209')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_Azure_SB_Lkp",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "PEOPLE_SID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "INDEX_NUM",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "USR_ID",
-						"type": "nvarchar"
-					},
-					{
-						"name": "FIRST_NAME",
-						"type": "nvarchar"
-					},
-					{
-						"name": "LAST_NAME",
-						"type": "nvarchar"
-					},
-					{
-						"name": "SEX",
-						"type": "nvarchar"
-					},
-					{
-						"name": "EMAIL",
-						"type": "nvarchar"
-					},
-					{
-						"name": "PHONE",
-						"type": "nvarchar"
-					},
-					{
-						"name": "DATE_OF_BIRTH",
-						"type": "nvarchar"
-					},
-					{
-						"name": "JOB_TITLE",
-						"type": "nvarchar"
-					},
-					{
-						"name": "SRC_ROW_INSRT_TSTMP",
-						"type": "datetime2",
-						"scale": 7
-					},
-					{
-						"name": "HASH_DIFF",
-						"type": "varbinary"
-					},
-					{
-						"name": "WATERMARK_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "BATCH_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "ROW_EFF_DT",
-						"type": "date"
-					},
-					{
-						"name": "ROW_EXPIR_DT",
-						"type": "date"
-					},
-					{
-						"name": "ROW_STS_CD",
-						"type": "nvarchar"
-					},
-					{
-						"name": "VERSION_NUM",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "INSERT_TSTMP_IST",
-						"type": "datetime2",
-						"scale": 7
-					},
-					{
-						"name": "LST_UPD_TSTMP_IST",
-						"type": "datetime2",
-						"scale": 7
-					}
-				],
-				"typeProperties": {
-					"schema": "DWH",
-					"table": "DIM_PEOPLE_DETAILS"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS_Azure_SB_Lkp')]"
 			]
 		}
 	]

@@ -6,12 +6,452 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "akumDataFactory-df"
+		},
+		"LS_STG_Generic_1304_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_STG_Generic_1304'"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_STG_Generic_1304')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('LS_STG_Generic_1304_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Copy_AzureSql_to_Snowflake')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "DimPeopleDetails",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "SnowflakeV2Sink",
+								"importSettings": {
+									"type": "SnowflakeImportCopyCommand",
+									"storageIntegration": "DWH_DIM_AZURE_INT"
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "LS_STG_ADLS_1209",
+									"type": "LinkedServiceReference"
+								},
+								"path": "akum-adls-input"
+							},
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "PEOPLE_SID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "PEOPLE_SID",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"name": "INDEX_NUM",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "INDEX_NUM",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"name": "USR_ID",
+											"type": "String"
+										},
+										"sink": {
+											"name": "USR_ID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "FIRST_NAME",
+											"type": "String"
+										},
+										"sink": {
+											"name": "FIRST_NAME",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "LAST_NAME",
+											"type": "String"
+										},
+										"sink": {
+											"name": "LAST_NAME",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "SEX",
+											"type": "String"
+										},
+										"sink": {
+											"name": "SEX",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "EMAIL",
+											"type": "String"
+										},
+										"sink": {
+											"name": "EMAIL",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "PHONE",
+											"type": "String"
+										},
+										"sink": {
+											"name": "PHONE",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DATE_OF_BIRTH",
+											"type": "String"
+										},
+										"sink": {
+											"name": "DATE_OF_BIRTH",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "JOB_TITLE",
+											"type": "String"
+										},
+										"sink": {
+											"name": "JOB_TITLE",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "SRC_ROW_INSRT_TSTMP",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "SRC_ROW_INSRT_TSTMP",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "HASH_DIFF",
+											"type": "Byte[]"
+										},
+										"sink": {
+											"name": "HASH_DIFF",
+											"type": "Byte[]"
+										}
+									},
+									{
+										"source": {
+											"name": "WATERMARK_ID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "WATERMARK_ID",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"name": "BATCH_ID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "BATCH_ID",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"name": "ROW_EFF_DT",
+											"type": "Date"
+										},
+										"sink": {
+											"name": "ROW_EFF_DT",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "ROW_EXPIR_DT",
+											"type": "Date"
+										},
+										"sink": {
+											"name": "ROW_EXPIR_DT",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "ROW_STS_CD",
+											"type": "String"
+										},
+										"sink": {
+											"name": "ROW_STS_CD",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "VERSION_NUM",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "VERSION_NUM",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"name": "INSERT_TSTMP_IST",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "INSERT_TSTMP_IST",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "LST_UPD_TSTMP_IST",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "LST_UPD_TSTMP_IST",
+											"type": "DateTime"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_Azure_Dim_DWH_1209",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_Snowflake_DimPeople",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "ADLS_and_Databricks"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/P_Copy_Azure_ADLS_Dim_Customer')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "DIM_CUSTOMER_DETAILS",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings",
+									"copyBehavior": "PreserveHierarchy"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".csv"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_Tgt_DWH_DimCustomer",
+								"type": "DatasetReference",
+								"parameters": {
+									"Dim_Schema_Name": "DWH",
+									"Dim_Table_Name": "DIM_CUSTOMER_DETAILS"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_TGT_DIM_CUSTOMER_DETAILS_1604",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "ADLS_and_Databricks"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/P_Copy_Azure_ADLS_Dim_Customer_2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "DIM_CUSTOMER_DETAILS",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings",
+									"copyBehavior": "PreserveHierarchy"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_Tgt_DWH_DimCustomer",
+								"type": "DatasetReference",
+								"parameters": {
+									"Dim_Schema_Name": "DWH",
+									"Dim_Table_Name": "DIM_CUSTOMER_DETAILS"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_DIM_CUST_1604",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "ADLS_and_Databricks"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/P_Copy_DIM_CUSTOMER_DETAILS_To_ADLS')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
@@ -940,6 +1380,94 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/P_Migrate_Azure_HR_Snflk_ETLSB')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "AzureHR_To_Snflk_ETLSB",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "SnowflakeV2Sink",
+								"importSettings": {
+									"type": "SnowflakeImportCopyCommand",
+									"storageIntegration": "SNOWFLAKE_AZURE_INT_RA"
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "LS_STG_Generic_1304",
+									"type": "LinkedServiceReference"
+								},
+								"path": "staging"
+							},
+							"logSettings": {
+								"enableCopyActivityLog": true,
+								"copyActivityLogSettings": {
+									"logLevel": "Warning",
+									"enableReliableLogging": false
+								},
+								"logLocationSettings": {
+									"linkedServiceName": {
+										"referenceName": "LS_Error_Log_Generic_2702",
+										"type": "LinkedServiceReference"
+									},
+									"path": "logs"
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_Azure_HR_1404",
+								"type": "DatasetReference",
+								"parameters": {
+									"SRC_SCHEMA_NAME": "HR",
+									"SRC_TABLE_NAME": "REGIONS"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_SNFLK_ETLSB_1304",
+								"type": "DatasetReference",
+								"parameters": {
+									"TGT_TBL_NAME": "REGIONS",
+									"TGT_SCHEMA_NAME": "HR"
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Snowflake_Migrations"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_STG_Generic_1304')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/P_Migrate_Oracle_HR_Schema')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1805,6 +2333,96 @@
 				"annotations": []
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/P_Migrate_Oracle_HR_Snflk_ETLSB')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "OracleHR_To_Snflk_ETLSB",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "OracleSource",
+								"partitionOption": "None",
+								"numberPrecision": 38,
+								"numberScale": 18,
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "SnowflakeV2Sink",
+								"importSettings": {
+									"type": "SnowflakeImportCopyCommand",
+									"storageIntegration": "SNOWFLAKE_AZURE_INT"
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "LS_STG_Generic_1304",
+									"type": "LinkedServiceReference"
+								},
+								"path": "staging"
+							},
+							"logSettings": {
+								"enableCopyActivityLog": true,
+								"copyActivityLogSettings": {
+									"logLevel": "Warning",
+									"enableReliableLogging": false
+								},
+								"logLocationSettings": {
+									"linkedServiceName": {
+										"referenceName": "LS_Error_Log_Generic_2702",
+										"type": "LinkedServiceReference"
+									},
+									"path": "logs"
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_Oracle_HR_1903",
+								"type": "DatasetReference",
+								"parameters": {
+									"SRC_SCHEMA_NAME": "HR",
+									"SRC_TBL_NAME": "EMPLOYEES"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_SNFLK_ETLSB_1304",
+								"type": "DatasetReference",
+								"parameters": {
+									"TGT_TBL_NAME": "EMPLOYEES",
+									"TGT_SCHEMA_NAME": "HR"
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Snowflake_Migrations"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_STG_Generic_1304')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/P_Migrate_Oracle_To_Azure')]",
@@ -6602,757 +7220,6 @@
 						"value": "@dataset().TGT_TBL_NAME",
 						"type": "Expression"
 					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_SNFLK_ETLSB_1304')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_SNFLK_ETLSB_VIVID",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"TGT_TBL_NAME": {
-						"type": "String"
-					},
-					"TGT_SCHEMA_NAME": {
-						"type": "String"
-					}
-				},
-				"annotations": [],
-				"type": "SnowflakeV2Table",
-				"schema": [],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().TGT_SCHEMA_NAME",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().TGT_TBL_NAME",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_Snowflake_DimPeople')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_SNFLK_ETLSB_VIVID",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "SnowflakeV2Table",
-				"schema": [],
-				"typeProperties": {
-					"schema": "VIVID",
-					"table": "DIM_PEOPLE_DETAILS"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/P_DimCustomer')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "Par_ETLSANDBOX",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Parquet",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": "ADLS_DimCustomer.parquet",
-						"fileSystem": "akum-adls-input"
-					},
-					"compressionCodec": "snappy"
-				},
-				"schema": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DF_LoadStage_WithHash')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "DS_VIVID_RAW_TABLES",
-								"type": "DatasetReference"
-							},
-							"name": "VivivdRawTable"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "DS_DWH_STG",
-								"type": "DatasetReference"
-							},
-							"name": "StgCustomerDetails"
-						}
-					],
-					"transformations": [
-						{
-							"name": "addHashDiffColumn"
-						}
-					],
-					"scriptLines": [
-						"parameters{",
-						"     df_sqlQuery as string",
-						"}",
-						"source(output(",
-						"          INDEX_NUM as integer,",
-						"          CUSTOMER_ID as string,",
-						"          FIRST_NAME as string,",
-						"          LAST_NAME as string,",
-						"          COMPANY as string,",
-						"          CITY as string,",
-						"          COUNTRY as string,",
-						"          PHONE_1 as string,",
-						"          PHONE_2 as string,",
-						"          EMAIL as string,",
-						"          SUBSCRIPTION_DATE as string,",
-						"          WEBSITE as string,",
-						"          SRC_ROW_INSRT_TSTMP as timestamp",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     query: (toString($df_sqlQuery)),",
-						"     format: 'query') ~> VivivdRawTable",
-						"VivivdRawTable derive(HASH_DIFF = unhex(\r",
-						"  md5(\r",
-						"    concat(\r",
-						"      toString(upper(trim(FIRST_NAME))), '|',\r",
-						"      toString(upper(trim(LAST_NAME))),  '|',\r",
-						"      toString(trim(COMPANY)),           '|',\r",
-						"      toString(upper(trim(CITY))),       '|',\r",
-						"      toString(upper(trim(COUNTRY))),    '|',\r",
-						"      toString(replace(PHONE_1,' ','')), '|',\r",
-						"      toString(replace(PHONE_2,' ','')), '|',\r",
-						"      toString(lower(trim(EMAIL))),      '|',\r",
-						"      toString(trim(SUBSCRIPTION_DATE)), '|',\r",
-						"      toString(trim(WEBSITE))\r",
-						"    )\r",
-						"  )\r",
-						")) ~> addHashDiffColumn",
-						"addHashDiffColumn sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     deletable:false,",
-						"     insertable:true,",
-						"     updateable:false,",
-						"     upsertable:false,",
-						"     truncate:true,",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError') ~> StgCustomerDetails"
-					]
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DF_SCD_T2_Inc_OHR_Employees')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "DS_OHR_EMPLOYEES_3003",
-								"type": "DatasetReference"
-							},
-							"name": "OHREmployeesSrc"
-						},
-						{
-							"dataset": {
-								"referenceName": "DS_DIM_EMP_DETAILS_3003",
-								"type": "DatasetReference"
-							},
-							"name": "DimEmployeeDetails"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "DS_DIM_EMPLOYEE_0104",
-								"type": "DatasetReference"
-							},
-							"name": "DwhDimEmployeeInsert"
-						},
-						{
-							"dataset": {
-								"referenceName": "DS_DIM_EMPLOYEE_0104",
-								"type": "DatasetReference"
-							},
-							"name": "DwhDimEmployeeUpdate"
-						}
-					],
-					"transformations": [
-						{
-							"name": "SourceJoinDimension"
-						},
-						{
-							"name": "SelectDistinctColumns"
-						},
-						{
-							"name": "DcTrackChanges"
-						},
-						{
-							"name": "CheckNewOrChangedRow"
-						},
-						{
-							"name": "NewRowsUnionChangedRows"
-						},
-						{
-							"name": "DcAddMetadataColumns"
-						},
-						{
-							"name": "DcExpiredRowSetup"
-						},
-						{
-							"name": "UpdateRowCondition"
-						},
-						{
-							"name": "FilterActiveRows"
-						}
-					],
-					"scriptLines": [
-						"source(output(",
-						"          EMPLOYEE_ID as string,",
-						"          FIRST_NAME as string,",
-						"          LAST_NAME as string,",
-						"          EMAIL as string,",
-						"          PHONE_NUMBER as string,",
-						"          HIRE_DATE as timestamp,",
-						"          JOB_ID as string,",
-						"          SALARY as decimal(8,2),",
-						"          COMMISSION_PCT as decimal(2,2),",
-						"          MANAGER_ID as integer,",
-						"          DEPARTMENT_ID as integer,",
-						"          SRC_ROW_INSERT_TSTMP as timestamp,",
-						"          INSERT_TSTMP_IST as timestamp",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     waterMarkColumn: 'INSERT_TSTMP_IST',",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table',",
-						"     mode: 'read') ~> OHREmployeesSrc",
-						"source(output(",
-						"          EMPLOYEE_SID as integer,",
-						"          EMPLOYEE_ID as string,",
-						"          FIRST_NAME as string,",
-						"          LAST_NAME as string,",
-						"          EMAIL as string,",
-						"          PHONE_NUMBER as string,",
-						"          HIRE_DATE as timestamp,",
-						"          JOB_ID as string,",
-						"          SALARY as decimal(8,2),",
-						"          COMMISSION_PCT as decimal(2,2),",
-						"          MANAGER_ID as integer,",
-						"          DEPARTMENT_ID as integer,",
-						"          SRC_ROW_INSERT_TSTMP as timestamp,",
-						"          WATERMARK_VALUE as string,",
-						"          FILE_TABLE_ID as integer,",
-						"          BATCH_ID as integer,",
-						"          SRC_TBL_NM as string,",
-						"          PIPELINE_NAME as string,",
-						"          ROW_VERSION as binary,",
-						"          WATERMARK_ID as integer,",
-						"          ROW_EFF_DT as date,",
-						"          ROW_EXPIR_DT as date,",
-						"          ROW_STS_CD as string,",
-						"          INSERT_TSTMP_IST as timestamp,",
-						"          LST_UPD_TSTMP_IST as timestamp",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> DimEmployeeDetails",
-						"OHREmployeesSrc, FilterActiveRows join(OHREmployeesSrc@EMPLOYEE_ID == DimEmployeeDetails@EMPLOYEE_ID,",
-						"     joinType:'left',",
-						"     matchType:'exact',",
-						"     ignoreSpaces: false,",
-						"     broadcast: 'auto')~> SourceJoinDimension",
-						"SourceJoinDimension select(mapColumn(",
-						"          EMPLOYEE_ID = OHREmployeesSrc@EMPLOYEE_ID,",
-						"          FIRST_NAME = OHREmployeesSrc@FIRST_NAME,",
-						"          LAST_NAME = OHREmployeesSrc@LAST_NAME,",
-						"          EMAIL = OHREmployeesSrc@EMAIL,",
-						"          PHONE_NUMBER = OHREmployeesSrc@PHONE_NUMBER,",
-						"          HIRE_DATE = OHREmployeesSrc@HIRE_DATE,",
-						"          JOB_ID = OHREmployeesSrc@JOB_ID,",
-						"          SALARY = OHREmployeesSrc@SALARY,",
-						"          COMMISSION_PCT = OHREmployeesSrc@COMMISSION_PCT,",
-						"          MANAGER_ID = OHREmployeesSrc@MANAGER_ID,",
-						"          DEPARTMENT_ID = OHREmployeesSrc@DEPARTMENT_ID,",
-						"          SRC_ROW_INSERT_TSTMP = OHREmployeesSrc@SRC_ROW_INSERT_TSTMP,",
-						"          INSERT_TSTMP_IST = OHREmployeesSrc@INSERT_TSTMP_IST,",
-						"          EMPLOYEE_SID,",
-						"          TGT_EMPLOYEE_ID = DimEmployeeDetails@EMPLOYEE_ID,",
-						"          TGT_FIRST_NAME = DimEmployeeDetails@FIRST_NAME,",
-						"          TGT_LAST_NAME = DimEmployeeDetails@LAST_NAME,",
-						"          TGT_EMAIL = DimEmployeeDetails@EMAIL,",
-						"          TGT_PHONE_NUMBER = DimEmployeeDetails@PHONE_NUMBER,",
-						"          TGT_HIRE_DATE = DimEmployeeDetails@HIRE_DATE,",
-						"          TGT_JOB_ID = DimEmployeeDetails@JOB_ID,",
-						"          TGT_SALARY = DimEmployeeDetails@SALARY,",
-						"          TGT_COMMISSION_PCT = DimEmployeeDetails@COMMISSION_PCT,",
-						"          TGT_MANAGER_ID = DimEmployeeDetails@MANAGER_ID,",
-						"          TGT_DEPARTMENT_ID = DimEmployeeDetails@DEPARTMENT_ID,",
-						"          TGT_SRC_ROW_INSERT_TSTMP = DimEmployeeDetails@SRC_ROW_INSERT_TSTMP",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> SelectDistinctColumns",
-						"SelectDistinctColumns derive(isChanged = iif(\r",
-						"     md5(EMPLOYEE_ID)  != md5(TGT_EMPLOYEE_ID)  ||\r",
-						"    md5(FIRST_NAME) != md5(TGT_FIRST_NAME) ||\r",
-						"    md5(LAST_NAME)  != md5(TGT_LAST_NAME)  ||\r",
-						"     md5(EMAIL)      != md5(TGT_EMAIL)      ||\r",
-						"    md5(PHONE_NUMBER)    != md5(TGT_PHONE_NUMBER)    ||\r",
-						"    md5(HIRE_DATE)       != md5(TGT_HIRE_DATE)       ||\r",
-						"    md5(JOB_ID)    != md5(TGT_JOB_ID)    ||\r",
-						"    md5(SALARY)    != md5(TGT_SALARY)    ||\r",
-						"    md5(COMMISSION_PCT)    != md5(TGT_COMMISSION_PCT)    ||\r",
-						"    \r",
-						"    md5(MANAGER_ID) != md5(TGT_MANAGER_ID) ||\r",
-						"    md5(DEPARTMENT_ID)    != md5(TGT_DEPARTMENT_ID),\r",
-						"    true(),\r",
-						"    false()\r",
-						")) ~> DcTrackChanges",
-						"DcTrackChanges split(isNull(TGT_EMPLOYEE_ID),",
-						"     !isNull(TGT_EMPLOYEE_ID) && (\r",
-						"  coalesce(FIRST_NAME , '') != coalesce(TGT_FIRST_NAME , '') ||\r",
-						"  coalesce(LAST_NAME  , '') != coalesce(TGT_LAST_NAME  , '') ||\r",
-						"  coalesce(EMAIL      , '') != coalesce(TGT_EMAIL      , '') || \r",
-						"  coalesce(PHONE_NUMBER, '') != coalesce(TGT_PHONE_NUMBER, '') ||\r",
-						"  coalesce(HIRE_DATE, toDate('1900-01-01')) != coalesce(TGT_HIRE_DATE, toDate('1900-01-01')) ||\r",
-						"  coalesce(JOB_ID, '') != coalesce(TGT_JOB_ID, '') ||\r",
-						"  coalesce(SALARY, 0) != coalesce(TGT_SALARY, 0) ||\r",
-						"  coalesce(COMMISSION_PCT, 0.0) != coalesce(TGT_COMMISSION_PCT, 0.0) ||\r",
-						"  coalesce(MANAGER_ID, 0) != coalesce(TGT_MANAGER_ID, 0) ||\r",
-						"  coalesce(DEPARTMENT_ID, 0) != coalesce(TGT_DEPARTMENT_ID, 0)\r",
-						"),",
-						"     disjoint: false) ~> CheckNewOrChangedRow@(NewRows, ChangedRows)",
-						"CheckNewOrChangedRow@NewRows, CheckNewOrChangedRow@ChangedRows union(byName: true)~> NewRowsUnionChangedRows",
-						"NewRowsUnionChangedRows derive(WATERMARK_VALUE = 3,",
-						"          BATCH_ID = toInteger(toString(currentDate(), 'yyyyMMdd')),",
-						"          ROW_EFF_DT = currentDate(),",
-						"          ROW_EXPIR_DT = toDate('9999-12-31'),",
-						"          ROW_STS_CD = 'A',",
-						"          PIPELINE_NAME = 'P_DF_SCD_T2_Inc_OHR_Employees') ~> DcAddMetadataColumns",
-						"CheckNewOrChangedRow@ChangedRows derive(FIRST_NAME = TGT_FIRST_NAME,",
-						"          LAST_NAME = TGT_LAST_NAME,",
-						"          EMAIL = TGT_EMAIL,",
-						"          PHONE_NUMBER = TGT_EMAIL,",
-						"          HIRE_DATE = TGT_HIRE_DATE,",
-						"          JOB_ID = TGT_JOB_ID,",
-						"          SALARY = TGT_SALARY,",
-						"          COMMISSION_PCT = TGT_COMMISSION_PCT,",
-						"          MANAGER_ID = TGT_MANAGER_ID,",
-						"          DEPARTMENT_ID = TGT_DEPARTMENT_ID,",
-						"          SRC_ROW_INSERT_TSTMP = TGT_SRC_ROW_INSERT_TSTMP,",
-						"          ROW_STS_CD = 'I',",
-						"          ROW_EXPIR_DT = toDate(fromUTC(currentUTC(), 'India Standard Time')),",
-						"          LST_UPD_TSTMP_IST = fromUTC(currentUTC(), 'India Standard Time')) ~> DcExpiredRowSetup",
-						"DcExpiredRowSetup alterRow(updateIf(!isNull(EMPLOYEE_SID))) ~> UpdateRowCondition",
-						"DimEmployeeDetails filter(ROW_STS_CD == 'A' && ROW_EXPIR_DT == toDate('9999-12-31')) ~> FilterActiveRows",
-						"DcAddMetadataColumns sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          EMPLOYEE_SID as integer,",
-						"          EMPLOYEE_ID as string,",
-						"          FIRST_NAME as string,",
-						"          LAST_NAME as string,",
-						"          EMAIL as string,",
-						"          PHONE_NUMBER as string,",
-						"          HIRE_DATE as timestamp,",
-						"          JOB_ID as string,",
-						"          SALARY as decimal(8,2),",
-						"          COMMISSION_PCT as decimal(2,2),",
-						"          MANAGER_ID as integer,",
-						"          DEPARTMENT_ID as integer,",
-						"          SRC_ROW_INSERT_TSTMP as timestamp,",
-						"          WATERMARK_VALUE as string,",
-						"          FILE_TABLE_ID as integer,",
-						"          BATCH_ID as integer,",
-						"          SRC_TBL_NM as string,",
-						"          PIPELINE_NAME as string,",
-						"          ROW_VERSION as binary,",
-						"          WATERMARK_ID as integer,",
-						"          ROW_EFF_DT as date,",
-						"          ROW_EXPIR_DT as date,",
-						"          ROW_STS_CD as string,",
-						"          INSERT_TSTMP_IST as timestamp,",
-						"          LST_UPD_TSTMP_IST as timestamp",
-						"     ),",
-						"     deletable:false,",
-						"     insertable:true,",
-						"     updateable:false,",
-						"     upsertable:false,",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError',",
-						"     mapColumn(",
-						"          EMPLOYEE_ID,",
-						"          FIRST_NAME,",
-						"          LAST_NAME,",
-						"          EMAIL,",
-						"          PHONE_NUMBER,",
-						"          HIRE_DATE,",
-						"          JOB_ID,",
-						"          SALARY,",
-						"          COMMISSION_PCT,",
-						"          MANAGER_ID,",
-						"          DEPARTMENT_ID,",
-						"          SRC_ROW_INSERT_TSTMP,",
-						"          WATERMARK_VALUE,",
-						"          BATCH_ID,",
-						"          PIPELINE_NAME,",
-						"          WATERMARK_ID = WATERMARK_VALUE",
-						"     )) ~> DwhDimEmployeeInsert",
-						"UpdateRowCondition sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          EMPLOYEE_SID as integer,",
-						"          EMPLOYEE_ID as string,",
-						"          FIRST_NAME as string,",
-						"          LAST_NAME as string,",
-						"          EMAIL as string,",
-						"          PHONE_NUMBER as string,",
-						"          HIRE_DATE as timestamp,",
-						"          JOB_ID as string,",
-						"          SALARY as decimal(8,2),",
-						"          COMMISSION_PCT as decimal(2,2),",
-						"          MANAGER_ID as integer,",
-						"          DEPARTMENT_ID as integer,",
-						"          SRC_ROW_INSERT_TSTMP as timestamp,",
-						"          WATERMARK_VALUE as string,",
-						"          FILE_TABLE_ID as integer,",
-						"          BATCH_ID as integer,",
-						"          SRC_TBL_NM as string,",
-						"          PIPELINE_NAME as string,",
-						"          ROW_VERSION as binary,",
-						"          WATERMARK_ID as integer,",
-						"          ROW_EFF_DT as date,",
-						"          ROW_EXPIR_DT as date,",
-						"          ROW_STS_CD as string,",
-						"          INSERT_TSTMP_IST as timestamp,",
-						"          LST_UPD_TSTMP_IST as timestamp",
-						"     ),",
-						"     deletable:false,",
-						"     insertable:false,",
-						"     updateable:true,",
-						"     upsertable:false,",
-						"     keys:['EMPLOYEE_SID'],",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError') ~> DwhDimEmployeeUpdate"
-					]
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DF_SCD_T2_Vivid_Customer')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "DS_VIVID_CUSTOMER",
-								"type": "DatasetReference"
-							},
-							"name": "VividCustomerRaw"
-						},
-						{
-							"dataset": {
-								"referenceName": "DS_SB_TGT_SCD",
-								"type": "DatasetReference"
-							},
-							"name": "DimCustomer"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "DS_DWH_SB",
-								"type": "DatasetReference"
-							},
-							"name": "DwhDimCustomerInsert"
-						},
-						{
-							"dataset": {
-								"referenceName": "DS_DWH_SB",
-								"type": "DatasetReference"
-							},
-							"name": "DwhDimCustomerUpdate"
-						}
-					],
-					"transformations": [
-						{
-							"name": "SourceJoinDimension"
-						},
-						{
-							"name": "SelectDistinctColumns"
-						},
-						{
-							"name": "DcTrackChanges"
-						},
-						{
-							"name": "CheckNewOrChangedRow"
-						},
-						{
-							"name": "NewRowsUnionChangedRows"
-						},
-						{
-							"name": "DcAddMetadataColumns"
-						},
-						{
-							"name": "DcExpireSetup"
-						},
-						{
-							"name": "alterRow1"
-						}
-					],
-					"scriptLines": [
-						"source(output(",
-						"          INDEX_NUM as integer,",
-						"          CUSTOMER_ID as string,",
-						"          FIRST_NAME as string,",
-						"          LAST_NAME as string,",
-						"          COMPANY as string,",
-						"          CITY as string,",
-						"          COUNTRY as string,",
-						"          PHONE_1 as string,",
-						"          PHONE_2 as string,",
-						"          EMAIL as string,",
-						"          SUBSCRIPTION_DATE as string,",
-						"          WEBSITE as string,",
-						"          SRC_ROW_INSRT_TSTMP as timestamp",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     enableCdc: true,",
-						"     mode: 'read',",
-						"     skipInitialLoad: true,",
-						"     waterMarkColumn: 'SRC_ROW_INSRT_TSTMP',",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> VividCustomerRaw",
-						"source(output(",
-						"          CUSTOMER_SID as integer,",
-						"          INDEX_NUM as integer,",
-						"          CUSTOMER_ID as string,",
-						"          FIRST_NAME as string,",
-						"          LAST_NAME as string,",
-						"          COMPANY as string,",
-						"          CITY as string,",
-						"          COUNTRY as string,",
-						"          PHONE_1 as string,",
-						"          PHONE_2 as string,",
-						"          EMAIL as string,",
-						"          SUBSCRIPTION_DATE as string,",
-						"          WEBSITE as string,",
-						"          SRC_ROW_INSRT_TSTMP as timestamp,",
-						"          WATERMARK_ID as integer,",
-						"          BATCH_ID as integer,",
-						"          ROW_EFF_DT as date,",
-						"          ROW_EXPIR_DT as date,",
-						"          ROW_STS_CD as string,",
-						"          INSERT_TSTMP_IST as timestamp,",
-						"          LST_UPD_TSTMP_IST as timestamp",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> DimCustomer",
-						"VividCustomerRaw, DimCustomer join(VividCustomerRaw@CUSTOMER_ID == DimCustomer@CUSTOMER_ID,",
-						"     joinType:'left',",
-						"     matchType:'exact',",
-						"     ignoreSpaces: false,",
-						"     broadcast: 'auto')~> SourceJoinDimension",
-						"SourceJoinDimension select(mapColumn(",
-						"          INDEX_NUM = VividCustomerRaw@INDEX_NUM,",
-						"          CUSTOMER_ID = VividCustomerRaw@CUSTOMER_ID,",
-						"          FIRST_NAME = VividCustomerRaw@FIRST_NAME,",
-						"          LAST_NAME = VividCustomerRaw@LAST_NAME,",
-						"          COMPANY = VividCustomerRaw@COMPANY,",
-						"          CITY = VividCustomerRaw@CITY,",
-						"          COUNTRY = VividCustomerRaw@COUNTRY,",
-						"          PHONE_1 = VividCustomerRaw@PHONE_1,",
-						"          PHONE_2 = VividCustomerRaw@PHONE_2,",
-						"          EMAIL = VividCustomerRaw@EMAIL,",
-						"          SUBSCRIPTION_DATE = VividCustomerRaw@SUBSCRIPTION_DATE,",
-						"          WEBSITE = VividCustomerRaw@WEBSITE,",
-						"          SRC_ROW_INSRT_TSTMP = VividCustomerRaw@SRC_ROW_INSRT_TSTMP,",
-						"          CUSTOMER_SID,",
-						"          TGT_INDEX_NUM = DimCustomer@INDEX_NUM,",
-						"          TGT_CUSTOMER_ID = DimCustomer@CUSTOMER_ID,",
-						"          TGT_FIRST_NAME = DimCustomer@FIRST_NAME,",
-						"          TGT_LAST_NAME = DimCustomer@LAST_NAME,",
-						"          TGT_COMPANY = DimCustomer@COMPANY,",
-						"          TGT_CITY = DimCustomer@CITY,",
-						"          TGT_COUNTRY = DimCustomer@COUNTRY,",
-						"          TGT_PHONE_1 = DimCustomer@PHONE_1,",
-						"          TGT_PHONE_2 = DimCustomer@PHONE_2,",
-						"          TGT_EMAIL = DimCustomer@EMAIL,",
-						"          TGT_SUBSCRIPTION_DATE = DimCustomer@SUBSCRIPTION_DATE,",
-						"          TGT_WEBSITE = DimCustomer@WEBSITE,",
-						"          TGT_SRC_ROW_INSRT_TSTMP = DimCustomer@SRC_ROW_INSRT_TSTMP",
-						"     ),",
-						"     skipDuplicateMapInputs: false,",
-						"     skipDuplicateMapOutputs: false) ~> SelectDistinctColumns",
-						"SelectDistinctColumns derive(isChanged = iif(\r",
-						"     md5(INDEX_NUM)  != md5(TGT_INDEX_NUM)  ||\r",
-						"    md5(FIRST_NAME) != md5(TGT_FIRST_NAME) ||\r",
-						"    md5(LAST_NAME)  != md5(TGT_LAST_NAME)  ||\r",
-						"    md5(COMPANY)    != md5(TGT_COMPANY)    ||\r",
-						"    md5(CITY)       != md5(TGT_CITY)       ||\r",
-						"    md5(COUNTRY)    != md5(TGT_COUNTRY)    ||\r",
-						"    md5(PHONE_1)    != md5(TGT_PHONE_1)    ||\r",
-						"    md5(PHONE_2)    != md5(TGT_PHONE_2)    ||\r",
-						"    md5(EMAIL)      != md5(TGT_EMAIL)      ||\r",
-						"    md5(SUBSCRIPTION_DATE) != md5(TGT_SUBSCRIPTION_DATE) ||\r",
-						"    md5(WEBSITE)    != md5(TGT_WEBSITE),\r",
-						"    true(),\r",
-						"    false()\r",
-						")) ~> DcTrackChanges",
-						"DcTrackChanges split(isNull(TGT_CUSTOMER_ID),",
-						"     !isNull(TGT_CUSTOMER_ID) && (\r",
-						"  coalesce(FIRST_NAME , '') != coalesce(TGT_FIRST_NAME , '') ||\r",
-						"  coalesce(LAST_NAME  , '') != coalesce(TGT_LAST_NAME  , '') ||\r",
-						"  coalesce(COMPANY    , '') != coalesce(TGT_COMPANY    , '') ||\r",
-						"  coalesce(CITY       , '') != coalesce(TGT_CITY       , '') ||\r",
-						"  coalesce(COUNTRY    , '') != coalesce(TGT_COUNTRY    , '') ||\r",
-						"  coalesce(PHONE_1    , '') != coalesce(TGT_PHONE_1    , '') ||\r",
-						"  coalesce(PHONE_2    , '') != coalesce(TGT_PHONE_2    , '') ||\r",
-						"  coalesce(EMAIL      , '') != coalesce(TGT_EMAIL      , '') ||  \r",
-						"  coalesce(SUBSCRIPTION_DATE      , '') != coalesce(TGT_SUBSCRIPTION_DATE      , '') ||\r",
-						"  coalesce(WEBSITE    , '') != coalesce(TGT_WEBSITE    , '')\r",
-						"),",
-						"     disjoint: false) ~> CheckNewOrChangedRow@(NewRows, ChangedRows)",
-						"CheckNewOrChangedRow@NewRows, CheckNewOrChangedRow@ChangedRows union(byName: true)~> NewRowsUnionChangedRows",
-						"NewRowsUnionChangedRows derive(WATERMARK_ID = 10002,",
-						"          BATCH_ID = 50001,",
-						"          ROW_EFF_DT = currentDate(),",
-						"          ROW_EXPIR_DT = toDate('9999-12-31'),",
-						"          ROW_STS_CD = 'A') ~> DcAddMetadataColumns",
-						"CheckNewOrChangedRow@ChangedRows derive(ROW_STS_CD = 'I',",
-						"          ROW_EXPIR_DT = toDate(fromUTC(currentUTC(), 'India Standard Time')),",
-						"          LST_UPD_TSTMP_IST = fromUTC(currentUTC(), 'India Standard Time')) ~> DcExpireSetup",
-						"DcExpireSetup alterRow(updateIf(true())) ~> alterRow1",
-						"DcAddMetadataColumns sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          CUSTOMER_SID as integer,",
-						"          INDEX_NUM as integer,",
-						"          CUSTOMER_ID as string,",
-						"          FIRST_NAME as string,",
-						"          LAST_NAME as string,",
-						"          COMPANY as string,",
-						"          CITY as string,",
-						"          COUNTRY as string,",
-						"          PHONE_1 as string,",
-						"          PHONE_2 as string,",
-						"          EMAIL as string,",
-						"          SUBSCRIPTION_DATE as date,",
-						"          WEBSITE as string,",
-						"          SRC_ROW_INSRT_TSTMP as timestamp,",
-						"          WATERMARK_ID as integer,",
-						"          BATCH_ID as integer,",
-						"          ROW_EFF_DT as date,",
-						"          ROW_EXPIR_DT as date,",
-						"          ROW_STS_CD as string,",
-						"          INSERT_TSTMP_IST as timestamp,",
-						"          LST_UPD_TSTMP_IST as timestamp",
-						"     ),",
-						"     deletable:false,",
-						"     insertable:true,",
-						"     updateable:false,",
-						"     upsertable:false,",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError',",
-						"     mapColumn(",
-						"          INDEX_NUM,",
-						"          CUSTOMER_ID,",
-						"          FIRST_NAME,",
-						"          LAST_NAME,",
-						"          COMPANY,",
-						"          CITY,",
-						"          COUNTRY,",
-						"          PHONE_1,",
-						"          PHONE_2,",
-						"          EMAIL,",
-						"          SUBSCRIPTION_DATE,",
-						"          WEBSITE,",
-						"          SRC_ROW_INSRT_TSTMP,",
-						"          WATERMARK_ID,",
-						"          BATCH_ID,",
-						"          ROW_EFF_DT,",
-						"          ROW_EXPIR_DT,",
-						"          ROW_STS_CD",
-						"     )) ~> DwhDimCustomerInsert",
-						"alterRow1 sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          CUSTOMER_SID as integer,",
-						"          INDEX_NUM as integer,",
-						"          CUSTOMER_ID as string,",
-						"          FIRST_NAME as string,",
-						"          LAST_NAME as string,",
-						"          COMPANY as string,",
-						"          CITY as string,",
-						"          COUNTRY as string,",
-						"          PHONE_1 as string,",
-						"          PHONE_2 as string,",
-						"          EMAIL as string,",
-						"          SUBSCRIPTION_DATE as date,",
-						"          WEBSITE as string,",
-						"          SRC_ROW_INSRT_TSTMP as timestamp,",
-						"          WATERMARK_ID as integer,",
-						"          BATCH_ID as integer,",
-						"          ROW_EFF_DT as date,",
-						"          ROW_EXPIR_DT as date,",
-						"          ROW_STS_CD as string,",
-						"          INSERT_TSTMP_IST as timestamp,",
-						"          LST_UPD_TSTMP_IST as timestamp",
-						"     ),",
-						"     deletable:false,",
-						"     insertable:false,",
-						"     updateable:true,",
-						"     upsertable:false,",
-						"     keys:['CUSTOMER_SID'],",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError') ~> DwhDimCustomerUpdate"
-					]
 				}
 			},
 			"dependsOn": []
